@@ -26,8 +26,31 @@
 
     <!-- Template Main CSS File -->
     <link href="css/style.css" rel="stylesheet">
+    {% block title %}{% endblock %}
+    {% block css%}
+        <link href="{{asset('libraries/aos/aos.css')}}">
+        <link href="{{asset('libraries/bootstrap/css/bootstrap.min.css')}}">
+        <link href="{{asset('libraries/icofont/icofont.min.css')}}">
+        <link href="{{asset('libraries/owl.carousel/assets/owl.carousel.css')}}">
+        <link href="{{asset('libraries/boxicons/css/boxicons.min.css')}}">
+        <link href="{{asset('libraries/venobox/venobox.css')}}">
+        <link href="{{asset('css/style.css')}}">
+    {% endblock %}
 
-
+    {% block js %}
+        <link href="{{asset('libraries/aos/aos.js')}}">
+        <link href="{{asset('libraries/jquery/jquery.min.js')}}">
+        <link href="{{asset('libraries/jquery.easing/jquery.easing.min.js')}}">
+        <link href="{{asset('libraries/php-email-form/validate.js')}}">
+        <link href="{{asset('libraries/bootstrap/js/bootstrap.js')}}">
+        <link href="{{asset('libraries/waypoints/jquery.waypoints.min.js')}}">
+        <link href="{{asset('libraries/counterup/counterup.min.js')}}">
+        <link href="{{asset('libraries/counterup/counterup.min.js')}}">
+        <link href="{{asset('libraries/owl.carousel/owl.carousel.js')}}">
+        <link href="{{asset('libraries/isotope-layout/isotope.pkgd.js')}}">
+        <link href="{{asset('libraries/venobox/venobox.js')}}">
+        <link href="{{asset('js/main.js')}}">
+    {% endblock %}
     </head>
 
     <body>
@@ -39,7 +62,7 @@
         <h1 class="logo"><a href="index.html">Esprit</a></h1>
         <!-- Uncomment below if you prefer to use an image logo -->
         
-        {% block title %}{% endblock %}
+        
         <nav class="nav-menu d-none d-lg-block">
             <ul>
             <li class="active"><a href="index.html">Home</a></li>
