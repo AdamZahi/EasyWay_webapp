@@ -13,8 +13,5 @@ return [
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
     Symfony\Bundle\MakerBundle\MakerBundle::class => ['dev' => true],
-<<<<<<< HEAD
-=======
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
->>>>>>> 78df1d0b375aabdd442fded7d2b224fcae7e86a5
 ];
