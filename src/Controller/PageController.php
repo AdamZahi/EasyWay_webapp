@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class PageController extends AbstractController
 {
-    #[Route('/', name: 'app_page')]
+    #[Route('/front', name: 'app_page')]
     public function index(): Response
     {
         return $this->render('front-office/index.html.twig', [
