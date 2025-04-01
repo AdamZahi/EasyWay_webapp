@@ -7,30 +7,32 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentaireRepository::class)]
+#[ORM\Table(name: 'commentaire')]
 class Commentaire
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_com', type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: 'contenu', type: 'text')]
     private ?string $contenu = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_creat = null;
+    #[ORM\Column(name: 'date_creat', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $dateCreat = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?posts $id_post = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'commentaires')]
+    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id')]
+    private ?User $user = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?user $nom = null;
+    #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'commentaires')]
+    #[ORM\JoinColumn(name: 'id_post', referencedColumnName: 'id_post')]
+    private ?Posts $post = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?user $id_user = null;
+    public function __construct()
+    {
+        $this->dateCreat = new \DateTime();
+    }
 
     public function getId(): ?int
     {
@@ -45,55 +47,39 @@ class Commentaire
     public function setContenu(string $contenu): static
     {
         $this->contenu = $contenu;
-
         return $this;
     }
 
     public function getDateCreat(): ?\DateTimeInterface
     {
-        return $this->date_creat;
+        return $this->dateCreat;
     }
 
-    public function setDateCreat(\DateTimeInterface $date_creat): static
+    public function setDateCreat(\DateTimeInterface $dateCreat): static
     {
-        $this->date_creat = $date_creat;
-
+        $this->dateCreat = $dateCreat;
         return $this;
     }
 
-    public function getIdPost(): ?posts
+    public function getUser(): ?User
     {
-        return $this->id_post;
+        return $this->user;
     }
 
-    public function setIdPost(?posts $id_post): static
+    public function setUser(?User $user): static
     {
-        $this->id_post = $id_post;
-
+        $this->user = $user;
         return $this;
     }
 
-    public function getNom(): ?user
+    public function getPost(): ?Posts
     {
-        return $this->nom;
+        return $this->post;
     }
 
-    public function setNom(?user $nom): static
+    public function setPost(?Posts $post): static
     {
-        $this->nom = $nom;
-
-        return $this;
-    }
-
-    public function getIdUser(): ?user
-    {
-        return $this->id_user;
-    }
-
-    public function setIdUser(?user $id_user): static
-    {
-        $this->id_user = $id_user;
-
+        $this->post = $post;
         return $this;
     }
 }

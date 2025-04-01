@@ -3,38 +3,49 @@
 namespace App\Entity;
 
 use App\Repository\PostsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostsRepository::class)]
+#[ORM\Table(name: 'posts')]
 class Posts
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $ville_depart = null;
+    #[ORM\Column(name: 'id_post', type: 'integer')]  // Fixed: removed extra space in column name
+    private ?int $id = null;  // Changed property name to follow conventions
 
-    #[ORM\Column(length: 255)]
-    private ?string $ville_arrivee = null;
+    #[ORM\Column(name: 'ville_depart', type: 'string', length: 255)]
+    private ?string $villeDepart = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(name: 'ville_arrivee', type: 'string', length: 255)]
+    private ?string $villeArrivee = null;
+
+    #[ORM\Column(name: 'date', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: 'message', type: 'string', length: 255)]
     private ?string $message = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'nombreDePlaces', type: 'integer')]
     private ?int $nombreDePlaces = null;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'prix', type: 'float')]
     private ?float $prix = null;
 
-    #[ORM\ManyToOne(inversedBy: 'id_post')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?user $id_user = null;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id', nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'post')]
+    private Collection $commentaires;
+
+    public function __construct()
+    {
+        $this->commentaires = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -43,25 +54,23 @@ class Posts
 
     public function getVilleDepart(): ?string
     {
-        return $this->ville_depart;
+        return $this->villeDepart;
     }
 
-    public function setVilleDepart(string $ville_depart): static
+    public function setVilleDepart(string $villeDepart): static
     {
-        $this->ville_depart = $ville_depart;
-
+        $this->villeDepart = $villeDepart;
         return $this;
     }
 
     public function getVilleArrivee(): ?string
     {
-        return $this->ville_arrivee;
+        return $this->villeArrivee;
     }
 
-    public function setVilleArrivee(string $ville_arrivee): static
+    public function setVilleArrivee(string $villeArrivee): static
     {
-        $this->ville_arrivee = $ville_arrivee;
-
+        $this->villeArrivee = $villeArrivee;
         return $this;
     }
 
@@ -73,7 +82,6 @@ class Posts
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
-
         return $this;
     }
 
@@ -85,7 +93,6 @@ class Posts
     public function setMessage(string $message): static
     {
         $this->message = $message;
-
         return $this;
     }
 
@@ -97,7 +104,6 @@ class Posts
     public function setNombreDePlaces(int $nombreDePlaces): static
     {
         $this->nombreDePlaces = $nombreDePlaces;
-
         return $this;
     }
 
@@ -109,19 +115,44 @@ class Posts
     public function setPrix(float $prix): static
     {
         $this->prix = $prix;
-
         return $this;
     }
 
-    public function getIdUser(): ?user
+    public function getUser(): ?User
     {
-        return $this->id_user;
+        return $this->user;
     }
 
-    public function setIdUser(?user $id_user): static
+    public function setUser(?User $user): static
     {
-        $this->id_user = $id_user;
+        $this->user = $user;
+        return $this;
+    }
 
+    /**
+     * @return Collection<int, Commentaire>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaire $commentaire): static
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setPost($this);
+        }
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaire $commentaire): static
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            if ($commentaire->getPost() === $this) {
+                $commentaire->setPost(null);
+            }
+        }
         return $this;
     }
 }
