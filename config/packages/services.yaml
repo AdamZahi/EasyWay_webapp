@@ -1,0 +1,7 @@
+parameters:
+    profile_photos_directory: '%kernel.project_dir%/public/uploads/profile_photos'
+
+services:
+    App\Controller\RegistrationController:
+        arguments:
+            $profilePhotosDirectory: '%profile_photos_directory%'
