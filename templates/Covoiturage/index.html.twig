@@ -1,0 +1,29 @@
+{# templates/covoiturage/index.html.twig #}
+{% extends 'covoiturage/choix.html.twig' %}
+
+{% block content %}
+    <h1 class="text-center mb-4 fw-bold">Bienvenue sur EasyWay Covoiturage</h1>
+    
+    <div class="text-center mb-4">
+        <img  src="{{ asset('img/carpool.png') }}" alt="Illustration covoiturage" class="img-fluid" style="max-height: 200px;">
+    </div>
+    
+    <p class="text-center mb-4 lead">
+        Facilitez vos déplacements à Tunis en choisissant l'option qui vous convient le mieux.
+    </p>
+    
+    <h2 class="text-center mb-3 fw-bold">Que souhaitez-vous faire ?</h2>
+    
+    <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+        <a href="{{ path('app_covoiturage_poster') }}" class="btn fw-bold py-3 px-5 btn-publish">
+            <i class="fas fa-car me-2"></i>Publier un trajet
+        </a>
+        <a href="{{ path('app_covoiturage_rechercher') }}" class="btn fw-bold py-3 px-5 btn-reserve">
+            <i class="fas fa-search me-2"></i>Rechercher un trajet
+        </a>
+    </div>
+    
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle me-2"></i> Notre système de covoiturage vous permet de partager vos trajets et économiser sur vos déplacements.
+    </div>
+{% endblock %}

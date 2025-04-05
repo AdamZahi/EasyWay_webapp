@@ -1,0 +1,125 @@
+{# templates/covoiturage/poster.html.twig #}
+{% extends 'covoiturage/choix.html.twig' %}
+
+{% block content %}
+    <div class="container" style="max-width: 800px; margin: 0 auto;">
+        <h1 class="text-center mb-4" style="color: #A11010; font-weight: bold;">
+            Besoin d'un passager ? Publiez ici !
+        </h1>
+
+        {# Display flash messages #}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                <i class="fas fa-check-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form_label(form.ville_depart, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                        {{ form_widget(form.ville_depart, {'attr': {
+                            'class': 'form-control form-select',
+                            'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                        }}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.ville_depart) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        {{ form_label(form.ville_arrivee, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                        {{ form_widget(form.ville_arrivee, {'attr': {
+                            'class': 'form-control form-select',
+                            'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                        }}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.ville_arrivee) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="form-group">
+        {{ form_label(form.date, null, {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.date, {'attr': {
+            'class': 'form-control',
+            'required': 'required'
+        }}) }}
+        <div class="invalid-feedback">
+            {{ form_errors(form.date) }}
+        </div>
+    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-group">
+                        {{ form_label(form.prix, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #DDDEC6; border: 1px solid #A11010;">DT</span>
+                            {{ form_widget(form.prix, {'attr': {
+                                'class': 'form-control',
+                                'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                            }}) }}
+                        </div>
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.prix) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="form-group">
+                        {{ form_label(form.nombreDePlaces, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                        {{ form_widget(form.nombreDePlaces, {'attr': {
+                            'class': 'form-control',
+                            'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                        }}) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.nombreDePlaces) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="form-group">
+                    <label class="form-label fw-bold" style="color: #8b0e0e;">Quand et comment voyagez-vous ?</label>
+                    {{ form_widget(form.message, {'attr': {
+                        'class': 'form-control',
+                        'style': 'border: 1px solid #A11010; border-radius: 8px; height: 120px;',
+                        'placeholder': "🕒 Heure : \n📍 Point de départ : "
+                    }}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(form.message) }}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                {{ form_widget(form.submit, {'attr': {
+                    'class': 'btn fw-bold py-2 px-4',
+                    'style': 'background-color: #DDDEC6; color: #331414; border: 2px solid #A11010; border-radius: 10px;'
+                }}) }}
+            </div>
+        {{ form_end(form) }}
+    </div>
+
+    <style>
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+    </style>
+{% endblock %}
