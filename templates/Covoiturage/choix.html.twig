@@ -1,0 +1,83 @@
+{# templates/covoiturage/choix.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}EasyWay - Covoiturage{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-color: #A11010;
+            --secondary-color: #DDDEC6;
+            --background-color: #F4EFE2;
+            --success-color: #008955;
+        }
+        .main-header {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .sidebar {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .main-content {
+            background-color: var(--secondary-color);
+            border: 10px solid var(--primary-color);
+            border-radius: 10px;
+        }
+        .nav-link-custom {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .btn-publish {
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 10px;
+        }
+        .btn-reserve {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12 p-3 d-flex align-items-center main-header">
+            <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" class="img-fluid" style="max-height: 50px;">
+            <div class="ms-auto">
+                <a href="{{ path('app_page') }}" class="btn btn-link nav-link-custom">Accueil</a>
+                <a href="#" class="btn btn-link nav-link-custom">Notre Solution</a>
+                <a href="#" class="btn btn-link nav-link-custom">Communauté</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <!-- Sidebar -->
+        <div class="col-md-3 p-4 sidebar">
+            <h4 class="text-center mb-4 fw-bold" style="color: var(--primary-color);">EasyWay</h4>
+            <div class="d-flex flex-column gap-2">
+                <a href="#" class="btn text-start fw-bold bg-transparent">Mon profile</a>
+                <a href="#" class="btn text-start fw-bold bg-transparent">Suivre les trajets</a>
+                <a href="#" class="btn text-start fw-bold bg-transparent">Découvrir nos lignes</a>
+                <a href="{{ path('app_covoiturage') }}" class="btn text-start fw-bold bg-transparent">Espace covoiturage</a>
+                <a href="#" class="btn text-start fw-bold bg-transparent">Réclamation</a>
+                <a href="#" class="btn mt-5 text-white fw-bold" style="background-color: var(--primary-color);">Déconnexion</a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="p-4 h-100 main-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
