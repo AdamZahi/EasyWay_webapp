@@ -1,0 +1,46 @@
+security:
+    # Encoders for password hashing (you can use bcrypt, argon2i, etc.)
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\User:
+            algorithm: auto
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    # The firewall section
+    firewalls:
+        # This is the firewall that will handle authentication for your users
+        # You can set this for login pages, APIs, or other types of routes
+        main:
+            # Enable security for the application
+            pattern: ^/
+            # Form login is used for traditional web authentication
+            form_login:
+                login_path: login
+                check_path: login
+                default_target_path: homepage # Redirect after login
+
+            # Enable logout feature
+            logout:
+                path: logout
+                # Optionally, define the URL to redirect after logout
+                target: homepage
+
+            # Enable authentication for the whole site
+            security:
+                # If you don't want anonymous users accessing certain pages, enable it
+                # anonymous: false
+
+    # Access Control section for your roles and permissions
+    access_control:
+        # Allow everyone to access the homepage
+        - { path: ^/, roles: PUBLIC_ACCESS }
+
+        # Restrict access to specific routes for users with specific roles
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/conductor, roles: ROLE_CONDUCTEUR }
+        - { path: ^/user, roles: ROLE_USER }
