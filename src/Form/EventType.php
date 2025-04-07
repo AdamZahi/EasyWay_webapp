@@ -20,40 +20,50 @@ class EventType extends AbstractType
     {
         $builder
             ->add('type', ChoiceType::class, [
-                'choices' => array_combine(
-                    array_map(fn($case) => $case->value, TypeEvent::cases()),
-                    array_map(fn($case) => $case->value, TypeEvent::cases())
-                ),
-                'choice_value' => function ($choice) {
-                    return $choice instanceof TypeEvent ? $choice->value : $choice;
-                },
-                'label' => 'Type',
-                'required' => true,
+                'choices' => [
+                    'Retard' => 'RETARD',
+                    'Greve' => 'GREVE',
+                    'Incident' => 'INCIDENT',
+                ],
+                'placeholder' => 'Sélectionnez un type',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
             ])
             ->add('status', ChoiceType::class, [
-                'choices' => array_combine(
-                    array_map(fn($case) => $case->value, EventStatus::cases()),
-                    array_map(fn($case) => $case->value, EventStatus::cases())
-                ),
-                'choice_value' => function ($choice) {
-                    return $choice instanceof EventStatus ? $choice->value : $choice;
-                },
-                'label' => 'Status',
-                'required' => true,
+                'choices' => [
+                    'En cours' => 'EN_COUR',
+                    'Résolu' => 'RESOLU',
+                    'Annulé' => 'ANNULE',
+                ],
+                'placeholder' => 'Sélectionnez un statut',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Description',
-                'required' => true,
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 4,
+                    'placeholder' => 'Décrivez l\'événement en détail',
+                ],
             ])
             ->add('dateDebut', DateTimeType::class, [
-                'label' => 'Date Debut',
                 'widget' => 'single_text',
-                'required' => true,
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
             ])
             ->add('dateFin', DateTimeType::class, [
-                'label' => 'Date Fin',
                 'widget' => 'single_text',
-                'required' => true,
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
             ])
         ;
     }
@@ -62,6 +72,7 @@ class EventType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Event::class,
+            'validation_groups' => ['Default'],
         ]);
     }
 } 

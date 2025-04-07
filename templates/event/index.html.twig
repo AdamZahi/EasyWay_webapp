@@ -9,7 +9,7 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Search by type, status, description or date..." value="{{ query }}">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by type, status, description or date..." value="{{ searchQuery }}">
                 </div>
             </div>
             <div class="col-md-6 text-right">
@@ -32,8 +32,8 @@
                 <tbody>
                 {% for event in events %}
                     <tr>
-                        <td>{{ event.type.value }}</td>
-                        <td>{{ event.status.value }}</td>
+                        <td>{{ event.type }}</td>
+                        <td>{{ event.status }}</td>
                         <td>{{ event.description }}</td>
                         <td>{{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</td>
                         <td>{{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</td>
@@ -65,7 +65,7 @@
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 const query = this.value;
-                fetch(`{{ path('app_event_index') }}?q=${encodeURIComponent(query)}`)
+                fetch(`{{ path('app_event_index') }}?search=${encodeURIComponent(query)}`)
                     .then(response => response.text())
                     .then(html => {
                         const parser = new DOMParser();
