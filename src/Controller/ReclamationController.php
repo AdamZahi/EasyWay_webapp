@@ -1,0 +1,441 @@
+<?php
+    namespace App\Controller;
+
+    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\HttpFoundation\Request;
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\Routing\Annotation\Route;
+    use App\Form\ReclamationType;
+    use App\Entity\Reclamation;
+    use Doctrine\ORM\EntityManagerInterface;
+    use Symfony\Component\Form\Extension\Core\Type\TextType;
+    use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+    use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+    use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+    use Symfony\Component\Security\Csrf\CsrfToken;
+    use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+    use App\Repository\ReclamationRepository;
+    use App\Entity\Reponse;
+    use App\Form\ReponseType;
+    use Symfony\Component\Mailer\MailerInterface;
+    use Symfony\Component\Mime\Email;
+    use Symfony\Component\HttpFoundation\JsonResponse;
+    use App\Repository\ReponseRepository;
+
+   
+
+
+
+    final class ReclamationController extends AbstractController
+    {
+        private $entityManager;
+
+        // Inject the EntityManagerInterface into the controller
+        public function __construct(EntityManagerInterface $entityManager)
+        {
+            $this->entityManager = $entityManager;
+        }
+
+        #[Route('/reclamation', name: 'app_reclamation')]
+        public function index(Request $request): Response
+        {
+            // Create a new Reclamation instance
+            $reclamation = new Reclamation();
+
+            // Create the form
+            $form = $this->createForm(ReclamationType::class, $reclamation);
+
+            // Handle the form submission
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                // Persist the data to the database
+                $this->entityManager->persist($reclamation);
+                $this->entityManager->flush();
+
+                // Redirect after successful submission to avoid resubmitting on refresh
+                return $this->redirectToRoute('app_reclamation');
+            }
+
+            // Render the form in the template
+            return $this->render('front-office/reclamation/index.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
+
+        public function sendEmail(MailerInterface $mailer, $toEmail, $subject, $body)
+        {
+            $email = (new Email())
+                ->from('sarrabennejma746@gmail.com')
+                ->to($toEmail)
+                ->subject($subject)
+                ->text($body);
+        
+            $mailer->send($email);
+        }
+        
+
+
+        #[Route('/add-reclamation', name: 'app_add_reclamation')]
+        public function addReclamation(Request $request, MailerInterface $mailer): Response
+        {
+            $reclamation = new Reclamation();
+            $form = $this->createForm(ReclamationType::class, $reclamation);
+        
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $reclamation->setDateCreation(new \DateTime());
+                $this->entityManager->persist($reclamation);
+                $this->entityManager->flush();
+        
+                // 📧 Envoi de l'email après l'ajout de la réclamation
+                try {
+                    $this->sendEmail(
+                        $mailer,
+                        $reclamation->getEmail(),
+                        'Confirmation de votre réclamation',
+                        'Votre réclamation a été reçue avec succès. Nous vous répondrons bientôt.'
+                    );
+        
+                    $this->addFlash('success', 'Réclamation ajoutée et email envoyé.');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Réclamation ajoutée, mais erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+                }
+        
+                return $this->redirectToRoute('app_reclamation');
+            }
+        
+            return $this->render('front-office/reclamation/index.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+        
+
+
+        
+        #[Route('/api/reclamation', name: 'api_add_reclamation', methods: ['POST'])]
+        public function addReclamationJson(Request $request, EntityManagerInterface $entityManager): JsonResponse
+        {
+            $data = json_decode($request->getContent(), true);
+        
+            if (!$data || !isset($data['email'], $data['sujet'], $data['description'])) {
+                return new JsonResponse(['error' => 'Données invalides'], 400);
+            }
+        
+            $reclamation = new Reclamation();
+            $reclamation->setEmail($data['email']);
+            $reclamation->setSujet($data['sujet']);
+            $reclamation->setDescription($data['description']);
+            $reclamation->setDateCreation(new \DateTime());
+            
+            // Assigner une valeur par défaut à 'statut'
+            $reclamation->setStatut('en_attente'); // Valeur par défaut
+        
+            $entityManager->persist($reclamation);
+            $entityManager->flush();
+        
+            return new JsonResponse(['message' => 'Réclamation ajoutée avec succès'], 201);
+        }
+
+        /*{
+  "email": "test@example.com",
+  "sujet": "Problème",
+  "description": "Description du problème"
+}
+*/
+
+
+
+
+#[Route('/list', name: 'admin_reclamations')]
+public function listReclamations(ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
+{
+    $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
+    
+    // Récupérer les réclamations ayant des réponses
+    $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
+    
+    // Récupérer les ID des réclamations ayant des réponses
+    $reclamationsWithReponsesIds = array_map(function($reponse) {
+        return $reponse->getReclamation()->getId();
+    }, $reclamationsWithReponses);
+    dump($reclamationsWithReponsesIds);
+
+
+    return $this->render('back-office/reclamation/listreclamation.html.twig', [
+        'reclamations' => $reclamations,
+        'reclamationsWithReponsesIds' => $reclamationsWithReponsesIds, // Passer les IDs des réclamations avec réponses
+    ]);
+}
+
+
+
+
+
+    #[Route('/api/reclamations', name: 'api_list_reclamations', methods: ['GET'])]
+public function listReclamationsApi(): JsonResponse
+{
+    $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
+    
+    $data = array_map(function ($reclamation) {
+        return [
+            'id' => $reclamation->getId(),
+            'email' => $reclamation->getEmail(),
+            'sujet' => $reclamation->getSujet(),
+            'description' => $reclamation->getDescription(),
+            'dateCreation' => $reclamation->getDateCreation()->format('Y-m-d H:i:s'),
+        ];
+    }, $reclamations);
+
+    return new JsonResponse($data, Response::HTTP_OK);
+}
+
+
+        #[Route('/edit/{id}', name: 'reclamation_edit')]
+        public function edit(Reclamation $reclamation, Request $request, EntityManagerInterface $entityManager): Response
+        {
+            // Sauvegarder les champs à ne pas modifier
+            $emailOriginal = $reclamation->getEmail();
+            $sujetOriginal = $reclamation->getSujet();
+            $descriptionOriginal = $reclamation->getDescription();
+
+            $form = $this->createFormBuilder($reclamation)
+                ->add('sujet', TextType::class, [
+                    'label' => 'Sujet',
+                    'disabled' => true,
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->add('email', TextType::class, [
+                    'label' => 'Email',
+                    'disabled' => true,
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->add('description', TextareaType::class, [
+                    'label' => 'Description',
+                    'disabled' => true,
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->add('statut', ChoiceType::class, [
+                    'label' => 'Statut',
+                    'choices' => [
+                        'En attend' => 'en_attente',
+                        'En cours' => 'en_cours',
+                        'Terminer' => 'Terminer',
+                    ],
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->getForm();
+
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                // Restaurer les valeurs originales
+                $reclamation->setEmail($emailOriginal);
+                $reclamation->setSujet($sujetOriginal);
+                $reclamation->setDescription($descriptionOriginal);
+
+                $entityManager->flush();
+                $this->addFlash('success', 'Réclamation modifiée avec succès !');
+                return $this->redirectToRoute('admin_reclamations');
+            }
+
+            return $this->render('back-office/reclamation/edit.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
+        
+
+
+        #[Route('/delete/{id}', name:'reclamation_delete', methods:["POST"])]
+        
+        public function delete(Request $request, Reclamation $reclamation, EntityManagerInterface $entityManager, CsrfTokenManagerInterface $csrfTokenManager): Response
+        {
+            $submittedToken = $request->request->get('_token');
+
+            if ($csrfTokenManager->isTokenValid(new CsrfToken('delete' . $reclamation->getId(), $submittedToken))) {
+                $entityManager->remove($reclamation);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Réclamation supprimée avec succès !');
+            } else {
+                $this->addFlash('danger', 'Token CSRF invalide.');
+            }
+
+            return $this->redirectToRoute('admin_reclamations');
+        }
+
+
+        #[Route('/api/reclamation/{id}', name: 'api_delete_reclamation', methods: ['DELETE'])]
+public function deleteReclamationJson($id, EntityManagerInterface $entityManager): JsonResponse
+{
+    // Recherche de la réclamation par son ID
+    $reclamation = $entityManager->getRepository(Reclamation::class)->find($id);
+
+    if (!$reclamation) {
+        // Si la réclamation n'existe pas, renvoyer une erreur 404
+        return new JsonResponse(['error' => 'Réclamation non trouvée'], 404);
+    }
+
+    // Supprimer la réclamation
+    $entityManager->remove($reclamation);
+    $entityManager->flush();
+
+    // Réponse JSON de succès
+    return new JsonResponse(['message' => 'Réclamation supprimée avec succès'], 200);
+}
+
+/*delete + http://127.0.0.1:8000/api/reclamation/16 */
+
+
+
+        
+        #[Route('/admin/reclamation/{id}/repondre', name:'admin_repondre_reclamation')]
+        public function repondre(int $id, Request $request, EntityManagerInterface $em, ReclamationRepository $reclamationRepository, MailerInterface $mailer): Response
+        {
+            // Récupérer la réclamation
+            $reclamation = $reclamationRepository->find($id);
+        
+            if (!$reclamation) {
+                throw $this->createNotFoundException('Réclamation non trouvée');
+            }
+        
+            // Créer une nouvelle réponse
+            $reponse = new Reponse();
+            $form = $this->createForm(ReponseType::class, $reponse);
+            $form->handleRequest($request);
+        
+            if ($form->isSubmitted() && $form->isValid()) {
+                // Lier la réponse à la réclamation
+                $reponse->setReclamation($reclamation);
+                $reponse->setCreatedAt(new \DateTime());
+        
+                // Sauvegarder la réponse
+                $em->persist($reponse);
+                $em->flush();
+                $to = $reclamation->getEmail();
+        
+                // ✉ Envoi de l'email après l'ajout de la réponse
+                $email = (new Email())
+                ->from('tayssirbennejma@gmail.com')
+                ->to('tayssirbennejma@gmail.com')
+                ->subject('Test email')
+                ->text('Ceci est un test d\'envoi.');
+        
+                // Envoi de l'email
+                try {
+                    $mailer->send($email);
+                    $this->addFlash('success', 'Réponse envoyée par email avec succès.');
+                } catch (\Exception $e) {
+                    // Si une erreur se produit lors de l'envoi de l'email
+                    $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+                }
+        
+                // Ajouter un message flash et rediriger
+                $this->addFlash('success', 'Réponse envoyée avec succès.');
+                return $this->redirectToRoute('admin_reclamations');
+            }
+        
+            return $this->render('back-office/reclamation/repondre.html.twig', [
+                'reclamation' => $reclamation,
+                'form' => $form->createView(),
+            ]);
+        }
+        
+
+
+
+
+        #[Route('/admin/reclamation/search', name: 'admin_search_reclamation', methods: ['GET'])]
+public function search(Request $request, ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
+{
+    $query = $request->query->get('q'); // Récupérer la recherche
+    
+    if ($query) {
+        $reclamations = $reclamationRepository->createQueryBuilder('r')
+            ->where('r.email LIKE :query')
+            ->orWhere('r.sujet LIKE :query')
+            ->orWhere('r.description LIKE :query')
+            ->orWhere('r.statut LIKE :query')
+            ->orWhere('r.dateCreation LIKE :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    } else {
+        $reclamations = $reclamationRepository->findAll();
+    }
+
+    // Récupérer les réclamations ayant des réponses
+    $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
+    
+    // Récupérer les ID des réclamations ayant des réponses
+    $reclamationsWithReponsesIds = array_map(function($reponse) {
+        return $reponse->getReclamation()->getId();
+    }, $reclamationsWithReponses);
+
+    // Passer la variable à Twig
+    return $this->render('back-office/reclamation/listreclamation.html.twig', [
+        'reclamations' => $reclamations,
+        'reclamationsWithReponsesIds' => $reclamationsWithReponsesIds, // Passer les IDs des réclamations avec réponses
+    ]);
+}
+
+        
+        #[Route('/statistiques', name: 'admin_statistiques_reclamation')]
+        public function statistiquesReclamations(ReclamationRepository $reclamationRepository): Response
+        {
+            $reclamations = $reclamationRepository->findAll();
+        
+            // Compter le nombre total de réclamations
+            $totalReclamations = count($reclamations);
+        
+            // Compter par statut
+            $statutCount = [
+                'en_attente' => 0,
+                'en_cours' => 0,
+                'Terminer' => 0
+            ];
+            foreach ($reclamations as $reclamation) {
+                $statut = $reclamation->getStatut();
+                if (isset($statutCount[$statut])) {
+                    $statutCount[$statut]++;
+                }
+            }
+        
+            // Compter par catégorie
+            $categoriesCount = [];
+            foreach ($reclamations as $reclamation) {
+                $categorie = $reclamation->getCategoryId() ? $reclamation->getCategoryId()->getType() : 'Non spécifiée';
+                if (!isset($categoriesCount[$categorie])) {
+                    $categoriesCount[$categorie] = 0;
+                }
+                $categoriesCount[$categorie]++;
+            }
+        
+            // Évolution des réclamations par jour
+            $evolutionReclamations = [];
+            foreach ($reclamations as $reclamation) {
+                $jour = $reclamation->getDateCreation()->format('Y-m-d'); // format correct pour jour
+                if (!isset($evolutionReclamations[$jour])) {
+                    $evolutionReclamations[$jour] = 0;
+                }
+                $evolutionReclamations[$jour]++;
+            }
+        
+            // Tri des jours pour afficher du plus ancien au plus récent
+            ksort($evolutionReclamations);
+        
+            // Dump pour vérifier
+            dump($evolutionReclamations); 
+        
+            return $this->render('back-office/reclamation/statistiques.html.twig', [
+                'totalReclamations' => $totalReclamations,
+                'statutCount' => $statutCount,
+                'categoriesCount' => $categoriesCount,
+                'evolutionReclamations' => $evolutionReclamations, // Passer l'évolution par jour au template
+            ]);
+        }
+           
+    }
+
+    

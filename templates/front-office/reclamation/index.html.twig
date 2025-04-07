@@ -1,0 +1,28 @@
+{% extends 'front-office/test.html.twig' %}
+
+{% block content %}
+     
+            <h1>Reclamation Form</h1>
+
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <button type="submit" class="btn-submit">Submit</button>
+            {{ form_end(form) }}
+        
+{% endblock %}
+
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#datepicker').datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose: true,
+                todayHighlight: true
+            });
+        });
+    </script>
+{% endblock %}

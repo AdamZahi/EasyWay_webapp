@@ -1,0 +1,36 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %} Modifier la Réclamation {% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="text-center">Modifier la Réclamation</h1>
+
+        {{ form_start(form) }}
+
+            <div class="mb-3">
+                {{ form_label(form.email) }}
+                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.sujet) }}
+                {{ form_widget(form.sujet, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+              <div class="mb-3">
+                {{ form_label(form.statut) }}
+                {{ form_widget(form.statut, {'attr': {'class': 'form-control'}}) }}
+            </div>
+
+
+            <button type="submit" class="btn btn-success">💾 Sauvegarder</button>
+            <a href="{{ path('admin_reclamations') }}" class="btn btn-secondary">🔙 Retour</a>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
