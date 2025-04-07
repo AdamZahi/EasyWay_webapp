@@ -35,7 +35,7 @@ class Event
     private ?string $status = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank(message: 'La description est obligatoire')]
+    #[Assert\NotBlank(message: 'Description is required')]
     #[Assert\Length(
         min: 10,
         max: 1000,
@@ -45,12 +45,12 @@ class Event
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotBlank(message: 'La date de début est obligatoire')]
+    #[Assert\NotBlank(message: 'Starting date is required')]
     #[Assert\Type("\DateTimeInterface")]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotBlank(message: 'La date de fin est obligatoire')]
+    #[Assert\NotBlank(message: 'Ending date is required')]
     #[Assert\Type("\DateTimeInterface")]
     #[Assert\Expression(
         "this.getDateFin() > this.getDateDebut()",

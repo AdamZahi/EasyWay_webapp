@@ -1,0 +1,121 @@
+{% extends 'back-office/pages/back-office.html.twig' %}
+
+{% block title %}Edit Event{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-title {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            font-weight: 500;
+            color: #34495e;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        .btn-group {
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 10px 25px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        .btn-secondary {
+            background-color: #95a5a6;
+            border-color: #95a5a6;
+        }
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            border-color: #7f8c8d;
+        }
+        .alert {
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="form-container">
+                    <h1 class="form-title text-center">Edit Event</h1>
+
+                    {{ form_start(form, {'attr': {'id': 'eventForm', 'class': 'needs-validation'}}) }}
+                        <div class="form-group">
+                            {{ form_label(form.type, 'Event Type', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.type, {'attr': {'class': 'alert alert-danger'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(form.status, 'Event Status', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.status, {'attr': {'class': 'alert alert-danger'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': '4'}}) }}
+                            {{ form_errors(form.description, {'attr': {'class': 'alert alert-danger'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(form.dateDebut, 'Start Date', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.dateDebut, {'attr': {'class': 'alert alert-danger'}}) }}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form_label(form.dateFin, 'End Date', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.dateFin, {'attr': {'class': 'alert alert-danger'}}) }}
+                        </div>
+
+                        <div class="btn-group d-flex justify-content-between">
+                            <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to list
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Event
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} 
