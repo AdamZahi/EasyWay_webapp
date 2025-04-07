@@ -2,15 +2,15 @@
 
 namespace App\Repository;
 
-use App\Entity\Admin;
+use App\Entity\Paiement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class AdminRepository extends ServiceEntityRepository
+class PaiementRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Admin::class);
+        parent::__construct($registry, Paiement::class);
     }
 
     // Add custom methods as needed

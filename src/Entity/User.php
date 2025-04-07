@@ -3,222 +3,182 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Validator\Constraints as Assert; // Importation des contraintes de validation
-use App\Repository\UserRepository;
+use App\Entity\Paiement;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'user')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+#[ORM\Entity]
+class User
 {
+
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_user = null;
+    #[ORM\Column(type: "integer")]
+    private int $id_user;
 
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
-    #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
-    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
-    private ?string $email = null;
+    #[ORM\Column(type: "string", length: 255)]
+    private string $nom;
 
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $roles = [];
+    #[ORM\Column(type: "string", length: 255)]
+    private string $prenom;
 
-    #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.")]
-    private ?string $mot_de_passe = null;
+    #[ORM\Column(type: "string", length: 255)]
+    private string $email;
 
-    #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank(message: "Le nom ne peut pas être vide.")]
-    private ?string $nom = null;
+    #[ORM\Column(type: "string", length: 255)]
+    private string $mot_de_passe;
 
-    #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide.")]
-    private ?string $prenom = null;
+    #[ORM\Column(type: "integer")]
+    private int $telephonne;
 
-    #[ORM\Column(type: 'integer')]
-    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide.")]
-    #[Assert\Length(min: 8, max: 15, exactMessage: "Le numéro de téléphone doit contenir entre 10 et 15 chiffres.")]
-    private ?int $telephonne = null;
+    #[ORM\Column(type: "datetime")]
+    private \DateTimeInterface $date_creation_compte;
 
-    #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $date_creation_compte = null;
+    #[ORM\Column(type: "text")]
+    private string $photo_profil;
 
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $photo_profil = null;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $isVerified = false;
-
-    #[ORM\OneToMany(targetEntity: Admin::class, mappedBy: 'user')]
-    private Collection $admins;
-
-    public function __construct()
-    {
-        $this->admins = new ArrayCollection();
-    }
-
-    public function getIdUser(): ?int
+    public function getId_user()
     {
         return $this->id_user;
     }
 
-    public function getEmail(): ?string
+    public function setId_user($value)
     {
-        return $this->email;
+        $this->id_user = $value;
     }
 
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-        return $this;
-    }
-
-    /**
-     * A visual identifier that represents this user.
-     */
-    public function getUserIdentifier(): string
-    {
-        return (string) $this->email;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        // Guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-        return $this;
-    }
-
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
-    public function getPassword(): string
-    {
-        return $this->mot_de_passe;
-    }
-
-    public function setPassword(string $mot_de_passe): self
-    {
-        $this->mot_de_passe = $mot_de_passe;
-        return $this;
-    }
-
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials(): void
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
-    }
-
-    public function getNom(): ?string
+    public function getNom()
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom($value)
     {
-        $this->nom = $nom;
-        return $this;
+        $this->nom = $value;
     }
 
-    public function getPrenom(): ?string
+    public function getPrenom()
     {
         return $this->prenom;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenom($value)
     {
-        $this->prenom = $prenom;
-        return $this;
+        $this->prenom = $value;
     }
 
-    public function getTelephonne(): ?int
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    public function setEmail($value)
+    {
+        $this->email = $value;
+    }
+
+    public function getMot_de_passe()
+    {
+        return $this->mot_de_passe;
+    }
+
+    public function setMot_de_passe($value)
+    {
+        $this->mot_de_passe = $value;
+    }
+
+    public function getTelephonne()
     {
         return $this->telephonne;
     }
 
-    public function setTelephonne(int $telephonne): self
+    public function setTelephonne($value)
     {
-        $this->telephonne = $telephonne;
-        return $this;
+        $this->telephonne = $value;
     }
 
-    public function getDateCreationCompte(): ?\DateTimeInterface
+    public function getDate_creation_compte()
     {
         return $this->date_creation_compte;
     }
 
-    public function setDateCreationCompte(\DateTimeInterface $date_creation_compte): self
+    public function setDate_creation_compte($value)
     {
-        $this->date_creation_compte = $date_creation_compte;
-        return $this;
+        $this->date_creation_compte = $value;
     }
 
-    public function getPhotoProfil(): ?string
+    public function getPhoto_profil()
     {
         return $this->photo_profil;
     }
 
-    public function setPhotoProfil(string $photo_profil): self
+    public function setPhoto_profil($value)
     {
-        $this->photo_profil = $photo_profil;
-        return $this;
+        $this->photo_profil = $value;
     }
 
-    /**
-     * @return Collection<int, Admin>
-     */
-    public function getAdmins(): Collection
-    {
-        return $this->admins;
-    }
+    #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Admin::class)]
+    private Collection $admins;
 
-    public function addAdmin(Admin $admin): self
-    {
-        if (!$this->admins->contains($admin)) {
-            $this->admins->add($admin);
-            $admin->setUser($this);
+        public function getAdmins(): Collection
+        {
+            return $this->admins;
         }
-
-        return $this;
-    }
-
-    public function removeAdmin(Admin $admin): self
-    {
-        if ($this->admins->removeElement($admin)) {
-            // set the owning side to null (unless already changed)
-            if ($admin->getUser() === $this) {
-                $admin->setUser(null);
+    
+        public function addAdmin(Admin $admin): self
+        {
+            if (!$this->admins->contains($admin)) {
+                $this->admins[] = $admin;
+                $admin->setId_user($this);
             }
+    
+            return $this;
+        }
+    
+        public function removeAdmin(Admin $admin): self
+        {
+            if ($this->admins->removeElement($admin)) {
+                // set the owning side to null (unless already changed)
+                if ($admin->getId_user() === $this) {
+                    $admin->setId_user(null);
+                }
+            }
+    
+            return $this;
         }
 
-        return $this;
-    }
+    #[ORM\OneToMany(mappedBy: "id_user", targetEntity: Conducteur::class)]
+    private Collection $conducteurs;
 
-    public function isVerified(): bool
-    {
-        return $this->isVerified;
-    }
+    #[ORM\OneToMany(mappedBy: "user_id", targetEntity: Reservation::class)]
+    private Collection $reservations;
 
-    public function setIsVerified(bool $isVerified): self
-    {
-        $this->isVerified = $isVerified;
-        return $this;
-    }
+        public function getReservations(): Collection
+        {
+            return $this->reservations;
+        }
+    
+        public function addReservation(Reservation $reservation): self
+        {
+            if (!$this->reservations->contains($reservation)) {
+                $this->reservations[] = $reservation;
+                $reservation->setUser_id($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeReservation(Reservation $reservation): self
+        {
+            if ($this->reservations->removeElement($reservation)) {
+                // set the owning side to null (unless already changed)
+                if ($reservation->getUser_id() === $this) {
+                    $reservation->setUser_id(null);
+                }
+            }
+    
+            return $this;
+        }
+
+    #[ORM\OneToMany(mappedBy: "user_id", targetEntity: Paiement::class)]
+    private Collection $paiements;
 }

@@ -3,129 +3,178 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
+
+use App\Entity\User;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Station;
 
-use App\Repository\AdminRepository;
-
-#[ORM\Entity(repositoryClass: AdminRepository::class)]
-#[ORM\Table(name: 'admin')]
+#[ORM\Entity]
 class Admin
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
-    private ?int $id_admin = null;
 
-    public function getId_admin(): ?int
+    #[ORM\Id]
+    #[ORM\Column(type: "integer")]
+    private int $id_admin;
+
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "admins")]
+    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
+    private User $id_user;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private string $nom;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private string $prenom;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private string $email;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private string $mot_de_passe;
+
+    #[ORM\Column(type: "string", length: 255)]
+    private string $telephonne;
+
+    #[ORM\Column(type: "text")]
+    private string $photo_profil;
+
+    public function getId_admin()
     {
         return $this->id_admin;
     }
 
-    public function setId_admin(int $id_admin): self
+    public function setId_admin($value)
     {
-        $this->id_admin = $id_admin;
-        return $this;
+        $this->id_admin = $value;
     }
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'admins')]
-    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user')]
-    private ?User $user = null;
-
-    public function getUser(): ?User
+    public function getId_user()
     {
-        return $this->user;
+        return $this->id_user;
     }
 
-    public function setUser(?User $user): self
+    public function setId_user($value)
     {
-        $this->user = $user;
-        return $this;
+        $this->id_user = $value;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $nom = null;
-
-    public function getNom(): ?string
+    public function getNom()
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom($value)
     {
-        $this->nom = $nom;
-        return $this;
+        $this->nom = $value;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $prenom = null;
-
-    public function getPrenom(): ?string
+    public function getPrenom()
     {
         return $this->prenom;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenom($value)
     {
-        $this->prenom = $prenom;
-        return $this;
+        $this->prenom = $value;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $email = null;
-
-    public function getEmail(): ?string
+    public function getEmail()
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail($value)
     {
-        $this->email = $email;
-        return $this;
+        $this->email = $value;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $mot_de_passe = null;
-
-    public function getMot_de_passe(): ?string
+    public function getMot_de_passe()
     {
         return $this->mot_de_passe;
     }
 
-    public function setMot_de_passe(string $mot_de_passe): self
+    public function setMot_de_passe($value)
     {
-        $this->mot_de_passe = $mot_de_passe;
-        return $this;
+        $this->mot_de_passe = $value;
     }
 
-    #[ORM\Column(type: 'string', nullable: false)]
-    private ?string $telephonne = null;
-
-    public function getTelephonne(): ?string
+    public function getTelephonne()
     {
         return $this->telephonne;
     }
 
-    public function setTelephonne(string $telephonne): self
+    public function setTelephonne($value)
     {
-        $this->telephonne = $telephonne;
-        return $this;
+        $this->telephonne = $value;
     }
 
-    #[ORM\Column(type: 'text', nullable: false)]
-    private ?string $photo_profil = null;
-
-    public function getPhoto_profil(): ?string
+    public function getPhoto_profil()
     {
         return $this->photo_profil;
     }
 
-    public function setPhoto_profil(string $photo_profil): self
+    public function setPhoto_profil($value)
     {
-        $this->photo_profil = $photo_profil;
-        return $this;
+        $this->photo_profil = $value;
     }
 
-  
+    #[ORM\OneToMany(mappedBy: "id_createur", targetEntity: Evenement::class)]
+    private Collection $evenements;
+
+        public function getEvenements(): Collection
+        {
+            return $this->evenements;
+        }
+    
+        public function addEvenement(Evenement $evenement): self
+        {
+            if (!$this->evenements->contains($evenement)) {
+                $this->evenements[] = $evenement;
+                $evenement->setId_createur($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeEvenement(Evenement $evenement): self
+        {
+            if ($this->evenements->removeElement($evenement)) {
+                // set the owning side to null (unless already changed)
+                if ($evenement->getId_createur() === $this) {
+                    $evenement->setId_createur(null);
+                }
+            }
+    
+            return $this;
+        }
+
+    #[ORM\OneToMany(mappedBy: "id_admin", targetEntity: Station::class)]
+    private Collection $stations;
+
+        public function getStations(): Collection
+        {
+            return $this->stations;
+        }
+    
+        public function addStation(Station $station): self
+        {
+            if (!$this->stations->contains($station)) {
+                $this->stations[] = $station;
+                $station->setId_admin($this);
+            }
+    
+            return $this;
+        }
+    
+        public function removeStation(Station $station): self
+        {
+            if ($this->stations->removeElement($station)) {
+                // set the owning side to null (unless already changed)
+                if ($station->getId_admin() === $this) {
+                    $station->setId_admin(null);
+                }
+            }
+    
+            return $this;
+        }
 }
