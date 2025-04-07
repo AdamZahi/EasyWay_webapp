@@ -1,3 +1,14 @@
+#framework:
+ #   mailer:
+  #      dsn: '%env(MAILER_DSN)%'
+   #     envelope:
+    #        sender: 'tayssirbennejma@gmail.com'
+     #   headers:
+      #      From: 'tayssirbennejma@gmail.com'
+
+
+
+
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'

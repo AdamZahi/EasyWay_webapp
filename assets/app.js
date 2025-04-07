@@ -1,4 +1,6 @@
 import './bootstrap.js';
+import './css/formulaire.css';
+
 /*
  * Welcome to your app's main JavaScript file!
  *

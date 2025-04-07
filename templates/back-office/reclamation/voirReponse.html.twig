@@ -1,0 +1,85 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %} Réponses de la réclamation {% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="text-center text-primary mb-4">💬 Réponses pour "<strong>{{ reclamation.sujet }}</strong>"</h1>
+
+        <div class="row">
+            <!-- Colonne gauche : Liste des réponses -->
+            <div class="col-md-6">
+                {% if reponses|length > 0 %}
+                    <div class="list-group">
+                        {% for reponse in reponses %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">📝 Réponse N°{{ loop.index }}</h6>
+                                    <p class="small text-muted"> Date : {{ reponse.createdAt|date('d/m/Y H:i') }}</p>
+                                    <p class="mb-0"><strong>🗨 Votre réponse :</strong> {{ reponse.contenu }}</p>
+                                </div>
+
+                                <div>
+                                    <button class="btn btn-sm btn-warning modify-btn" data-id="{{ reponse.id }}" data-content="{{ reponse.Contenu }}">
+                                        ✏ Modifier
+                                    </button>
+                                    <a href="{{ path('supprimer_reponse', { id: reponse.id }) }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réponse ?')">
+                                        🗑 Supprimer
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning text-center">
+                        📭 Aucune réponse disponible pour cette réclamation.
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Colonne droite : Formulaire de modification -->
+            <div class="col-md-6">
+                <div id="modification-section" class="card p-4 shadow-sm d-none">
+                    <h5 class="text-center">✏ Modifier la réponse</h5>
+                    <form id="modification-form" method="post" action="">
+                        <input type="hidden" name="id" id="response-id">
+                        <div class="mb-3">
+                            <label for="response-content" class="form-label">Contenu de la réponse</label>
+                            <textarea class="form-control" id="response-content" name="content" rows="4"></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{{ path('admin_reclamations') }}" class="btn btn-outline-primary px-4 py-2">
+                ⬅ Retour à la liste des réclamations
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".modify-btn").forEach(button => {
+                button.addEventListener("click", function () {
+                    let responseId = this.getAttribute("data-id");
+                    let responseContent = this.getAttribute("data-content");
+
+                    document.getElementById("response-id").value = responseId;
+                    document.getElementById("response-content").value = responseContent;
+                    document.getElementById("modification-section").classList.remove("d-none");
+
+                    // Modifier l'action du formulaire avec l'URL correcte
+                    document.getElementById("modification-form").action = "/reponse/modifier_reponse/" + responseId;
+                });
+            });
+        });
+    </script>
+
+{% endblock %}
