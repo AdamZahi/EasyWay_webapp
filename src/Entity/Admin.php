@@ -16,9 +16,9 @@ class Admin
     #[ORM\Column(type: "integer")]
     private int $id_admin;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "admins")]
-    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
-    private User $id_user;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "admins")]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id_user")]
+    private ?User $user = null;
 
     #[ORM\Column(type: "string", length: 255)]
     private string $nom;
@@ -48,16 +48,16 @@ class Admin
         $this->id_admin = $value;
     }
 
-    public function getId_user()
+    public function getUser(): ?User
     {
-        return $this->id_user;
+        return $this->user;
     }
 
-    public function setId_user($value)
+    public function setUser(?User $user): self
     {
-        $this->id_user = $value;
+        $this->user = $user;
+        return $this;
     }
-
     public function getNom()
     {
         return $this->nom;

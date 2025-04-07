@@ -14,14 +14,13 @@ class Commentaire
     #[ORM\Column(type: "integer")]
     private int $id_com;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commentaires")]
-    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
-    private User $id_user;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commentaires")]
+#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id_user", onDelete: "CASCADE")]
+private User $user;
 
-        #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: "commentaires")]
-    #[ORM\JoinColumn(name: 'id_post', referencedColumnName: 'id_post', onDelete: 'CASCADE')]
-    private Posts $id_post;
-
+#[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: "commentaires")]
+#[ORM\JoinColumn(name: "id_post", referencedColumnName: "id_post", onDelete: "CASCADE")]
+private Posts $post;
     #[ORM\Column(type: "string", length: 255)]
     private string $contenu;
 
@@ -41,15 +40,7 @@ class Commentaire
         $this->id_com = $value;
     }
 
-    public function getId_user()
-    {
-        return $this->id_user;
-    }
-
-    public function setId_user($value)
-    {
-        $this->id_user = $value;
-    }
+  
 
     public function getId_post()
     {
@@ -89,5 +80,15 @@ class Commentaire
     public function setNom($value)
     {
         $this->nom = $value;
+    }
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
     }
 }

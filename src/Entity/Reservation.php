@@ -16,9 +16,9 @@ class Reservation
     #[ORM\Column(type: "integer")]
     private int $id;
 
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "reservations")]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
-    private User $user_id;
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "reservations")]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id_user")]
+    private ?User $user = null;
 
     #[ORM\Column(type: "string", length: 200)]
     private string $depart;
@@ -41,17 +41,16 @@ class Reservation
     {
         $this->id = $value;
     }
-
-    public function getUser_id()
+    public function getUser(): ?User
     {
-        return $this->user_id;
+        return $this->user;
     }
 
-    public function setUser_id($value)
+    public function setUser(?User $user): self
     {
-        $this->user_id = $value;
+        $this->user = $user;
+        return $this;
     }
-
     public function getDepart()
     {
         return $this->depart;
