@@ -64,6 +64,12 @@
             padding: 15px;
             margin-bottom: 20px;
         }
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
     </style>
 {% endblock %}
 
@@ -74,35 +80,47 @@
                 <div class="form-container">
                     <h1 class="form-title text-center">Edit Event</h1>
 
-                    {{ form_start(form, {'attr': {'id': 'eventForm', 'class': 'needs-validation'}}) }}
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {{ form_start(form, {'attr': {'id': 'eventForm', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
                         <div class="form-group">
                             {{ form_label(form.type, 'Event Type', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.type, {'attr': {'class': 'alert alert-danger'}}) }}
+                            {{ form_errors(form.type) }}
                         </div>
 
                         <div class="form-group">
                             {{ form_label(form.status, 'Event Status', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.status, {'attr': {'class': 'alert alert-danger'}}) }}
+                            {{ form_errors(form.status) }}
                         </div>
 
                         <div class="form-group">
                             {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': '4'}}) }}
-                            {{ form_errors(form.description, {'attr': {'class': 'alert alert-danger'}}) }}
+                            {{ form_errors(form.description) }}
                         </div>
 
                         <div class="form-group">
                             {{ form_label(form.dateDebut, 'Start Date', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.dateDebut, {'attr': {'class': 'alert alert-danger'}}) }}
+                            {{ form_errors(form.dateDebut) }}
                         </div>
 
                         <div class="form-group">
                             {{ form_label(form.dateFin, 'End Date', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.dateFin, {'attr': {'class': 'alert alert-danger'}}) }}
+                            {{ form_errors(form.dateFin) }}
                         </div>
 
                         <div class="btn-group d-flex justify-content-between">
