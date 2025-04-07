@@ -1,0 +1,31 @@
+{% extends 'back-office/pages/back-office.html.twig' %}
+
+{% block title %}Event Details{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h1>Event Details</h1>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Event #{{ event.id }}</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Type:</strong> {{ event.type.value }}</p>
+                        <p><strong>Status:</strong> {{ event.status.value }}</p>
+                        <p><strong>Description:</strong> {{ event.description }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Date Debut:</strong> {{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</p>
+                        <p><strong>Date Fin:</strong> {{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning">Edit</a>
+            <a href="{{ path('app_event_index') }}" class="btn btn-secondary">Back to list</a>
+        </div>
+    </div>
+{% endblock %} 
