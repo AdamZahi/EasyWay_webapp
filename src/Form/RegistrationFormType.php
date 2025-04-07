@@ -25,28 +25,31 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer un email']),
+                    new NotBlank(['message' => 'Veuillez entrer un email.']),
+                    new \Symfony\Component\Validator\Constraints\Email([
+                        'message' => 'L\'email "{{ value }}" n\'est pas valide.',
+                    ]),
                 ],
             ])
             ->add('nom', TextType::class, [
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer votre nom']),
+                    new NotBlank(['message' => 'Veuillez entrer votre nom.']),
                 ],
             ])
             ->add('prenom', TextType::class, [
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer votre prénom']),
+                    new NotBlank(['message' => 'Veuillez entrer votre prénom.']),
                 ],
             ])
             ->add('telephonne', IntegerType::class, [
                 'constraints' => [
-                    new NotBlank(['message' => 'Veuillez entrer votre téléphone']),
-                    new Positive(['message' => 'Le téléphone doit être positif']),
+                    new NotBlank(['message' => 'Veuillez entrer votre téléphone.']),
+                    new Positive(['message' => 'Le numéro de téléphone doit être positif.']),
                     new Length([
                         'min' => 8,
                         'max' => 15,
-                        'minMessage' => 'Le téléphone doit avoir au moins {{ limit }} chiffres',
-                        'maxMessage' => 'Le téléphone ne peut pas dépasser {{ limit }} chiffres'
+                        'minMessage' => 'Le numéro de téléphone doit contenir au moins {{ limit }} chiffres.',
+                        'maxMessage' => 'Le numéro de téléphone ne peut pas dépasser {{ limit }} chiffres.',
                     ]),
                 ],
             ])
@@ -58,9 +61,9 @@ class RegistrationFormType extends AbstractType
                     new \Symfony\Component\Validator\Constraints\Image([
                         'maxSize' => '2M',
                         'mimeTypes' => ['image/jpeg', 'image/png'],
-                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG ou PNG)'
-                    ])
-                ]
+                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG ou PNG).',
+                    ]),
+                ],
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'label' => "J'accepte les conditions",
@@ -77,11 +80,11 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['autocomplete' => 'new-password'],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Veuillez entrer un mot de passe',
+                        'message' => 'Veuillez entrer un mot de passe.',
                     ]),
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                        'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères.',
                         'max' => 4096,
                     ]),
                 ],

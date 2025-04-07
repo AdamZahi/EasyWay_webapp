@@ -1,7 +1,8 @@
 parameters:
     profile_photos_directory: '%kernel.project_dir%/public/uploads/profile_photos'
-
+    mailer_dsn: '%env(MAILER_DSN)%'
 services:
     App\Controller\RegistrationController:
         arguments:
             $profilePhotosDirectory: '%profile_photos_directory%'
+

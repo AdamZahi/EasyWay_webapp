@@ -20,11 +20,11 @@ class EmailVerifier
     ) {
     }
 
-    public function sendEmailConfirmation(string $verifyEmailRouteName, UserInterface $user, TemplatedEmail $email): void
+    public function sendEmailConfirmation(string $verifyEmailRouteName, User $user, TemplatedEmail $email): void
     {
         $signatureComponents = $this->verifyEmailHelper->generateSignature(
             $verifyEmailRouteName,
-            (string) $user->getId(),
+            (string) $user->getIdUser(),
             $user->getEmail()
         );
 
@@ -41,11 +41,11 @@ class EmailVerifier
     /**
      * @throws VerifyEmailExceptionInterface
      */
-    public function handleEmailConfirmation(Request $request, UserInterface $user): void
+    public function handleEmailConfirmation(Request $request, User $user): void
     {
         $this->verifyEmailHelper->validateEmailConfirmationFromRequest(
             $request,
-            (string) $user->getId(),
+            (string) $user->getIdUser(),
             $user->getEmail()
         );
 

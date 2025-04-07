@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert; // Importation des contraintes de validation
 use App\Repository\UserRepository;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -19,21 +20,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id_user = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
+    #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     private ?string $email = null;
 
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide.")]
     private ?string $mot_de_passe = null;
 
     #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message: "Le nom ne peut pas être vide.")]
     private ?string $nom = null;
 
     #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide.")]
     private ?string $prenom = null;
 
     #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide.")]
+    #[Assert\Length(min: 8, max: 15, exactMessage: "Le numéro de téléphone doit contenir entre 10 et 15 chiffres.")]
     private ?int $telephonne = null;
 
     #[ORM\Column(type: 'datetime')]
