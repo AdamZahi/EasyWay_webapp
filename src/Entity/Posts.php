@@ -1,5 +1,4 @@
 <?php
-// src/Entity/Posts.php
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -13,13 +12,9 @@ use App\Entity\Commentaire;
 class Posts
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
-    private ?int $id_post = null;
-
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "postss")]
-    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', onDelete: 'CASCADE')]
-    private ?User $id_user = null;
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column(name: 'id_post', type: 'integer')]
+    private ?int $idPost = null;
 
     #[ORM\Column(type: "string", length: 255)]
     #[Assert\NotBlank(message: "La ville de départ est obligatoire")]
@@ -34,10 +29,10 @@ class Posts
     #[Assert\GreaterThanOrEqual("today", message: "La date doit être aujourd'hui ou dans le futur")]
     private ?\DateTimeInterface $date = null;
 
-#[ORM\Column(type: "string", length: 255)]
-#[Assert\NotBlank(message: "Veuillez fournir des détails sur le trajet")]
-#[Assert\Length(min: 10, minMessage: "Les détails doivent contenir au moins {{ limit }} caractères")]
-private string $message = ''; // Initialize with empty string
+    #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: "Veuillez fournir des détails sur le trajet")]
+    #[Assert\Length(min: 10, minMessage: "Les détails doivent contenir au moins {{ limit }} caractères")]
+    private string $message = '';
 
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank(message: "Le nombre de places est obligatoire")]
@@ -49,34 +44,39 @@ private string $message = ''; // Initialize with empty string
     #[Assert\Positive(message: "Le prix doit être positif")]
     private float $prix = 0.0;
 
-    #[ORM\OneToMany(mappedBy: "id_post", targetEntity: Commentaire::class)]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "posts")]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", onDelete: "CASCADE")]
+    private User $user;
+    
+    #[ORM\OneToMany(mappedBy: "post", targetEntity: Commentaire::class)]
     private Collection $commentaires;
 
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
         $this->date = new \DateTime();
-        $this->nombreDePlaces = 1;
     }
 
-    public function getId_post()
+    public function getId_post(): ?int
     {
         return $this->id_post;
     }
 
-    public function setId_post($value)
+    public function setId_post(int $value): self
     {
         $this->id_post = $value;
+        return $this;
     }
 
-    public function getId_user()
+    public function getIdUser(): ?User
     {
         return $this->id_user;
     }
 
-    public function setId_user($value)
+    public function setIdUser(?User $user): self
     {
-        $this->id_user = $value;
+        $this->id_user = $user;
+        return $this;
     }
 
     public function getVilleDepart(): string 
@@ -139,7 +139,16 @@ private string $message = ''; // Initialize with empty string
     {
         $this->prix = $value;
     }
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
 
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
     // #[ORM\OneToMany(mappedBy: "id_post", targetEntity: Commentaire::class)]
     // private Collection $commentaires;
 
@@ -169,14 +178,5 @@ private string $message = ''; // Initialize with empty string
     
     //         return $this;
     //     }
-        public function getIdUser(): ?User
-{
-    return $this->id_user;
-}
-
-public function setIdUser(?User $user): self
-{
-    $this->id_user = $user;
-    return $this;
-}
+       
 }
