@@ -15,27 +15,27 @@ class Event
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_evenement')]
+    #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le type d\'événement est obligatoire')]
     #[Assert\Choice(
-        choices: ['ACCIDENT', 'PANNES', 'INCIDENT', 'TRAVAUX'],
-        message: 'Le type d\'événement doit être ACCIDENT, PANNES, INCIDENT ou TRAVAUX'
+        choices: ['GREVE', 'RETARD', 'INCIDENT'],
+        message: 'Le type d\'événement doit être GREVE, RETARD ou INCIDENT'
     )]
     private ?string $type = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'The status is required')]
+    #[Assert\NotBlank(message: 'Le statut est obligatoire')]
     #[Assert\Choice(
-        choices: ['EN_COURS', 'ANNULE', 'RESOLU'],
-        message: 'The statut should be EN_COURS, ANNULE ou RESOLU'
+        choices: ['EN_COUR', 'ANNULE', 'RESOLU'],
+        message: 'Le statut doit être EN_COUR, RESOLU ou ANNULE'
     )]
     private ?string $status = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank(message: 'Description is required')]
+    #[Assert\NotBlank(message: 'La description est obligatoire')]
     #[Assert\Length(
         min: 10,
         max: 1000,
@@ -45,12 +45,12 @@ class Event
     private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotBlank(message: 'Starting date is required')]
+    #[Assert\NotBlank(message: 'La date de début est obligatoire')]
     #[Assert\Type("\DateTimeInterface")]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[Assert\NotBlank(message: 'Ending date is required')]
+    #[Assert\NotBlank(message: 'La date de fin est obligatoire')]
     #[Assert\Type("\DateTimeInterface")]
     #[Assert\Expression(
         "this.getDateFin() > this.getDateDebut()",
@@ -63,25 +63,25 @@ class Event
         return $this->id;
     }
 
-    public function getType(): ?TypeEvent
+    public function getType(): ?string
     {
-        return $this->type ? TypeEvent::from($this->type) : null;
+        return $this->type;
     }
 
-    public function setType(TypeEvent|string $type): static
+    public function setType(string $type): static
     {
-        $this->type = $type instanceof TypeEvent ? $type->value : $type;
+        $this->type = $type;
         return $this;
     }
 
-    public function getStatus(): ?EventStatus
+    public function getStatus(): ?string
     {
-        return $this->status ? EventStatus::from($this->status) : null;
+        return $this->status;
     }
 
-    public function setStatus(EventStatus|string $status): static
+    public function setStatus(string $status): static
     {
-        $this->status = $status instanceof EventStatus ? $status->value : $status;
+        $this->status = $status;
         return $this;
     }
 

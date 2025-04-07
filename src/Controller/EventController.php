@@ -17,12 +17,17 @@ class EventController extends AbstractController
     #[Route('/', name: 'app_event_index', methods: ['GET'])]
     public function index(Request $request, EventRepository $eventRepository): Response
     {
-        $query = $request->query->get('q');
-        $events = $eventRepository->search($query);
-
+        $searchQuery = $request->query->get('search');
+        
+        if ($searchQuery) {
+            $events = $eventRepository->search($searchQuery);
+        } else {
+            $events = $eventRepository->findAll();
+        }
+        
         return $this->render('event/index.html.twig', [
             'events' => $events,
-            'query' => $query,
+            'searchQuery' => $searchQuery,
         ]);
     }
 
@@ -37,6 +42,7 @@ class EventController extends AbstractController
             $entityManager->persist($event);
             $entityManager->flush();
 
+            $this->addFlash('success', 'L\'événement a été créé avec succès.');
             return $this->redirectToRoute('app_event_index');
         }
 
@@ -63,6 +69,7 @@ class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            $this->addFlash('success', 'L\'événement a été modifié avec succès.');
             return $this->redirectToRoute('app_event_index');
         }
 
@@ -78,6 +85,7 @@ class EventController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->request->get('_token'))) {
             $entityManager->remove($event);
             $entityManager->flush();
+            $this->addFlash('success', 'L\'événement a été supprimé avec succès.');
         }
 
         return $this->redirectToRoute('app_event_index');
