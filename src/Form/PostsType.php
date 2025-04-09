@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType; // Changed from IntegerType
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType; // Correct import for integer fields
 
 
 class PostsType extends AbstractType
@@ -59,15 +60,11 @@ class PostsType extends AbstractType
         'placeholder' => "🕒 Heure : \n📍 Point de départ : "
     ]
 ])
-            ->add('nombreDePlaces', NumberType::class, [
-                'label' => 'Nombre de places',
-                'html5' => true,
-                'attr' => [
-                    'min' => 1,
-                    'class' => 'form-control'
-                ],
-                'scale' => 0 // Ensures integer values
-            ])
+->add('nombre_de_places', IntegerType::class, [
+    'label' => 'Nombre de places',
+    'attr' => ['min' => 1, 'class' => 'form-control'],
+    'empty_data' => 1,
+])
             
             ->add('prix', NumberType::class, [
                 'label' => 'Prix (DT)',

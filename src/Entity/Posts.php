@@ -35,9 +35,9 @@ class Posts
     private string $message = '';
 
     #[ORM\Column(type: "integer")]
-    #[Assert\NotBlank(message: "Le nombre de places est obligatoire")]
-    #[Assert\Positive(message: "Le nombre de places doit être positif")]
-    private int $nombreDePlaces = 1;
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $nombre_de_places;
 
     #[ORM\Column(type: "float")]
     #[Assert\NotBlank(message: "Le prix est obligatoire")]
@@ -45,9 +45,9 @@ class Posts
     private float $prix = 0.0;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "posts")]
-    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", onDelete: "CASCADE")]
-    private User $user;
-    
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user")]
+    private ?User $user = null;
+
     #[ORM\OneToMany(mappedBy: "post", targetEntity: Commentaire::class)]
     private Collection $commentaires;
 
@@ -57,25 +57,14 @@ class Posts
         $this->date = new \DateTime();
     }
 
-    public function getId_post(): ?int
+    public function getIdPost(): ?int
     {
-        return $this->id_post;
+        return $this->idPost;
     }
 
-    public function setId_post(int $value): self
+    public function setIdPost(int $idPost): self
     {
-        $this->id_post = $value;
-        return $this;
-    }
-
-    public function getIdUser(): ?User
-    {
-        return $this->id_user;
-    }
-
-    public function setIdUser(?User $user): self
-    {
-        $this->id_user = $user;
+        $this->idPost = $idPost;
         return $this;
     }
 
@@ -89,6 +78,7 @@ class Posts
         $this->ville_depart = $ville_depart;
         return $this;
     }
+
     public function getVilleArrivee(): string
     {
         return $this->ville_arrivee;
@@ -110,35 +100,40 @@ class Posts
         $this->date = $date;
         return $this;
     }
-    public function getMessage()
+
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    public function setMessage($value)
+    public function setMessage(string $message): self
     {
-        $this->message = $value;
+        $this->message = $message;
+        return $this;
     }
 
-    public function getNombreDePlaces()
+    public function getNombreDePlaces(): int
     {
-        return $this->nombreDePlaces;
+        return $this->nombre_de_places;
     }
 
-    public function setNombreDePlaces($value)
+    public function setNombreDePlaces(int $nombre_de_places): self
     {
-        $this->nombreDePlaces = $value;
+        $this->nombre_de_places = $nombre_de_places;
+        return $this;
     }
 
-    public function getPrix()
+    public function getPrix(): float
     {
         return $this->prix;
     }
 
-    public function setPrix($value)
+    public function setPrix(float $prix): self
     {
-        $this->prix = $value;
+        $this->prix = $prix;
+        return $this;
     }
+
     public function getUser(): ?User
     {
         return $this->user;
@@ -149,34 +144,28 @@ class Posts
         $this->user = $user;
         return $this;
     }
-    // #[ORM\OneToMany(mappedBy: "id_post", targetEntity: Commentaire::class)]
-    // private Collection $commentaires;
 
-    //     public function getCommentaires(): Collection
-    //     {
-    //         return $this->commentaires;
-    //     }
-    
-    //     public function addCommentaire(Commentaire $commentaire): self
-    //     {
-    //         if (!$this->commentaires->contains($commentaire)) {
-    //             $this->commentaires[] = $commentaire;
-    //             $commentaire->setId_post($this);
-    //         }
-    
-    //         return $this;
-    //     }
-    
-    //     public function removeCommentaire(Commentaire $commentaire): self
-    //     {
-    //         if ($this->commentaires->removeElement($commentaire)) {
-    //             // set the owning side to null (unless already changed)
-    //             if ($commentaire->getId_post() === $this) {
-    //                 $commentaire->setId_post(null);
-    //             }
-    //         }
-    
-    //         return $this;
-    //     }
-       
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaire $commentaire): self
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires[] = $commentaire;
+            $commentaire->setPost($this);
+        }
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaire $commentaire): self
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            if ($commentaire->getPost() === $this) {
+                $commentaire->setPost(null);
+            }
+        }
+        return $this;
+    }
 }

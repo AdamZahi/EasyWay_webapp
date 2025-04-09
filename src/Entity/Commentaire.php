@@ -4,23 +4,25 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use App\Entity\Posts;
+use App\Entity\User;
 
 #[ORM\Entity]
 class Commentaire
 {
 
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id_com;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private ?int $id = null;
+
+    #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: "commentaires")]
+    #[ORM\JoinColumn(name: "id_post", referencedColumnName: "id_post")]
+    private ?Posts $post = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "commentaires")]
-#[ORM\JoinColumn(name: "user_id", referencedColumnName: "id_user", onDelete: "CASCADE")]
-private User $user;
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id_user")]
+    private ?User $user = null;
 
-#[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: "commentaires")]
-#[ORM\JoinColumn(name: "id_post", referencedColumnName: "id_post", onDelete: "CASCADE")]
-private Posts $post;
     #[ORM\Column(type: "string", length: 255)]
     private string $contenu;
 
@@ -40,8 +42,6 @@ private Posts $post;
         $this->id_com = $value;
     }
 
-  
-
     public function getId_post()
     {
         return $this->id_post;
@@ -50,6 +50,16 @@ private Posts $post;
     public function setId_post($value)
     {
         $this->id_post = $value;
+    }
+
+    public function getUser_id()
+    {
+        return $this->user_id;
+    }
+
+    public function setUser_id($value)
+    {
+        $this->user_id = $value;
     }
 
     public function getContenu()
@@ -80,15 +90,5 @@ private Posts $post;
     public function setNom($value)
     {
         $this->nom = $value;
-    }
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-        return $this;
     }
 }
