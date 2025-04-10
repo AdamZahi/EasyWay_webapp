@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmer Réservation{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-danger text-white">
+            <h2>Confirmer votre réservation</h2>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Détails du covoiturage</h5>
+            <p><strong>De:</strong> {{ post.villeDepart }}</p>
+            <p><strong>À:</strong> {{ post.villeArrivee }}</p>
+            <p><strong>Date:</strong> {{ post.date|date('Y-m-d') }}</p>
+            <p><strong>Prix:</strong> {{ post.prix }} €</p>
+            <p><strong>Places restantes:</strong> {{ post.nombreDePlaces }}</p>
+            
+            <form method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('reserve' ~ post.id) }}">
+                <button type="submit" class="btn btn-danger">Confirmer la réservation</button>
+                <a href="{{ path('app_covoiturage_rechercher') }}" class="btn btn-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

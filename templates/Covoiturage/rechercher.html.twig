@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Offres{% endblock %}
+{% block title %}Rechercher Covoiturage{% endblock %}
 
 {% block body %}
 <div class="container-fluid" style="width: 100%; margin: 0 auto;">
@@ -50,6 +50,25 @@
 
         <!-- Main Content (Posts List) -->
         <div class="col-md-9" style="padding: 20px;">
+            <!-- Search Bar -->
+            <div class="mb-4">
+                <form action="{{ path('app_covoiturage_rechercher') }}" method="GET">
+                    <div class="input-group">
+                        <input type="text" 
+                               name="q" 
+                               class="form-control" 
+                               placeholder="Rechercher par lieu d'arrivée..." 
+                               value="{{ app.request.query.get('q') }}"
+                               style="font-size: 14px; padding: 10px;">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="submit" style="background-color: #A11010; color: white;">
+                                <i class="fas fa-search"></i> Rechercher
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <div class="scroll-container" style="width: 100%; overflow-y: auto;">
                 <div class="post-list" style="padding: 10px; background-color: #F4EFE2;">
                     {% for post in posts %}
@@ -65,37 +84,60 @@
                                 <p><strong>Prix:</strong> {{ post.prix ? post.prix : 'Non spécifié' }} €</p>
                             </div>
 
+                            <!-- Reservation Button -->
                             <div class="d-flex justify-content-end mt-3">
-                                <a href="{{ path('app_covoiturage_modifier', {'id_post': post.getIdPost()}) }}" class="btn btn-warning mr-2" style="font-size: 14px;">Modifier</a>
-                                <!-- Trigger modal -->
-                                <button class="btn btn-danger" style="font-size: 14px;" data-toggle="modal" data-target="#deleteModal{{ post.getIdPost() }}">
-                                    Supprimer
-                                </button>
+                                <a href="{{ path('app_covoiturage_reserver', {'id_post': post.getIdPost() }) }}" 
+                                   class="btn btn-danger" 
+                                   style="font-size: 14px; background-color: #AA1010;">
+                                    Réserver
+                                </a>
                             </div>
-                            
-                            <!-- Delete Confirmation Modal -->
-                            <div class="modal fade" id="deleteModal{{ post.getIdPost() }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ post.getIdPost() }}" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteModalLabel{{ post.getIdPost() }}">Confirmation de suppression</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Êtes-vous sûr de vouloir supprimer cette offre de covoiturage ? Cette action est irréversible.
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
-                                            <a href="{{ path('app_covoiturage_supprimer', {'id_post': post.getIdPost()}) }}" class="btn btn-danger">Supprimer</a>
-                                        </div>
-                                    </div>
-                                </div>
+<!-- Comments Section -->
+<div class="mt-4">
+    <h5 style="font-size: 16px; font-weight: bold;">Commentaires :</h5>
+    
+    {% if post.getCommentaires() is empty %}
+        <p class="text-muted">Aucun commentaire pour ce post.</p>
+    {% else %}
+        <div class="comments-container" style="background-color: #f4f4f4; border-radius: 5px; padding: 10px;">
+            {% for commentaire in post.getCommentaires() %}
+                <div class="comment mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ commentaire.user.nom }}</strong>
+                            <small class="text-muted ml-2">
+                                ({{ commentaire.getDateCreat() ? commentaire.getDateCreat()|date('Y-m-d H:i') : 'Date inconnue' }})
+                            </small>
+                        </div>
+                        {% if commentaire.user.getIdUser() == 1 %}
+                            <div>
+                                <a href="{{ path('app_commentaire_edit', {'id': commentaire.getIdCom()}) }}" 
+                                   class="btn btn-sm btn-primary">✏️</a>
+                                <form action="{{ path('app_commentaire_delete', {'id': commentaire.getIdCom()}) }}" method="post" style="display: inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ commentaire.getIdCom()) }}">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire?')">❌</button>
+                                </form>
                             </div>
-                            
-
-                            
+                        {% endif %}
+                    </div>
+                    <p class="mt-2">{{ commentaire.getContenu() }}</p>
+                    <hr>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <!-- Add Comment Form -->
+    <form action="{{ path('app_commentaire_new', {'post_id': post.getIdPost()}) }}" method="POST" class="mt-3">
+        <div class="form-group">
+            <textarea name="contenu" class="form-control" rows="3" placeholder="Ajouter un commentaire..." required></textarea>
+        </div>
+        <input type="hidden" name="_token" value="{{ csrf_token('comment_' ~ post.getIdPost()) }}">
+        <button type="submit" class="btn btn-success" style="background-color: #E5FEB3; color: #333; font-weight: bold;">
+            Envoyer
+        </button>
+    </form>
+</div>
                         </div>
                     {% endfor %}
                 </div>
