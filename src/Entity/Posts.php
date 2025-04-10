@@ -1,20 +1,19 @@
 <?php
+
 namespace App\Entity;
 
+use App\Repository\PostsRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\User;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-use App\Entity\Commentaire;
 
-#[ORM\Entity(repositoryClass: "App\Repository\PostsRepository")]
+#[ORM\Entity(repositoryClass: PostsRepository::class)]
 class Posts
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[ORM\Column(name: 'id_post', type: 'integer')]
-    private ?int $idPost = null;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: "id_post", type: "integer")]
+    private ?int $id_post = null;
+
 
     #[ORM\Column(type: "string", length: 255)]
     #[Assert\NotBlank(message: "La ville de départ est obligatoire")]
@@ -37,56 +36,50 @@ class Posts
     #[ORM\Column(type: "integer")]
     #[Assert\NotBlank]
     #[Assert\Positive]
-    private int $nombre_de_places;
+    private int $nombreDePlaces;
 
     #[ORM\Column(type: "float")]
     #[Assert\NotBlank(message: "Le prix est obligatoire")]
+    #[Assert\Type(type: "float", message: "Le prix doit être un nombre")]
     #[Assert\Positive(message: "Le prix doit être positif")]
-    private float $prix = 0.0;
+    private ?float $prix = null;  // Changed from float to ?float to allow null
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "posts")]
-    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', nullable: false)]
     private ?User $user = null;
-
-    #[ORM\OneToMany(mappedBy: "post", targetEntity: Commentaire::class)]
-    private Collection $commentaires;
-
-    public function __construct()
-    {
-        $this->commentaires = new ArrayCollection();
-        $this->date = new \DateTime();
-    }
-
+    
     public function getIdPost(): ?int
     {
-        return $this->idPost;
+        return $this->id_post;
     }
 
-    public function setIdPost(int $idPost): self
+    public function setIdPost(int $id_post): static
     {
-        $this->idPost = $idPost;
+        $this->id_post = $id_post;
+
         return $this;
     }
-
-    public function getVilleDepart(): string 
+    public function getVilleDepart(): ?string
     {
         return $this->ville_depart;
     }
-    
-    public function setVilleDepart(string $ville_depart): self
+
+    public function setVilleDepart(string $ville_depart): static
     {
         $this->ville_depart = $ville_depart;
+
         return $this;
     }
 
-    public function getVilleArrivee(): string
+    public function getVilleArrivee(): ?string
     {
         return $this->ville_arrivee;
     }
-    
-    public function setVilleArrivee(string $ville_arrivee): self
+
+    public function setVilleArrivee(string $ville_arrivee): static
     {
         $this->ville_arrivee = $ville_arrivee;
+
         return $this;
     }
 
@@ -95,77 +88,59 @@ class Posts
         return $this->date;
     }
 
-    public function setDate(\DateTimeInterface $date): self
+    public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
+
         return $this;
     }
 
-    public function getMessage(): string
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
-    public function setMessage(string $message): self
+    public function setMessage(string $message): static
     {
         $this->message = $message;
+
         return $this;
     }
 
-    public function getNombreDePlaces(): int
+    public function getNombreDePlaces(): ?int
     {
-        return $this->nombre_de_places;
+        return $this->nombreDePlaces;
     }
 
-    public function setNombreDePlaces(int $nombre_de_places): self
+    public function setNombreDePlaces(int $nombreDePlaces): static
     {
-        $this->nombre_de_places = $nombre_de_places;
+        $this->nombreDePlaces = $nombreDePlaces;
+
         return $this;
     }
 
-    public function getPrix(): float
+    public function getPrix(): ?float
     {
         return $this->prix;
     }
 
-    public function setPrix(float $prix): self
+    public function setPrix(float $prix): static
     {
         $this->prix = $prix;
+
         return $this;
     }
-
     public function getUser(): ?User
     {
         return $this->user;
     }
-
-    public function setUser(?User $user): self
+    
+    public function setUser(?User $user): static
     {
         $this->user = $user;
         return $this;
     }
+    
+   
 
-    public function getCommentaires(): Collection
-    {
-        return $this->commentaires;
-    }
-
-    public function addCommentaire(Commentaire $commentaire): self
-    {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires[] = $commentaire;
-            $commentaire->setPost($this);
-        }
-        return $this;
-    }
-
-    public function removeCommentaire(Commentaire $commentaire): self
-    {
-        if ($this->commentaires->removeElement($commentaire)) {
-            if ($commentaire->getPost() === $this) {
-                $commentaire->setPost(null);
-            }
-        }
-        return $this;
-    }
 }

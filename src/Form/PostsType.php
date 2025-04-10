@@ -60,21 +60,23 @@ class PostsType extends AbstractType
         'placeholder' => "🕒 Heure : \n📍 Point de départ : "
     ]
 ])
-->add('nombre_de_places', IntegerType::class, [
+->add('nombreDePlaces', IntegerType::class, [
     'label' => 'Nombre de places',
     'attr' => ['min' => 1, 'class' => 'form-control'],
     'empty_data' => 1,
 ])
             
-            ->add('prix', NumberType::class, [
-                'label' => 'Prix (DT)',
-                'html5' => true,
-                'attr' => [
-                    'min' => 0.1,
-                    'step' => 'any',
-                    'class' => 'form-control'
-                ]
-            ])
+->add('prix', NumberType::class, [
+    'label' => 'Prix (DT)',
+    'html5' => true,
+    'attr' => [
+        'min' => 0.1,
+        'step' => 'any',
+        'class' => 'form-control'
+    ],
+    'empty_data' => 0.0,  // Default value if empty
+    'invalid_message' => 'Veuillez entrer un nombre valide'
+])
             ->add('submit', SubmitType::class, [
                 'label' => 'AJOUTER',
                 'attr' => ['class' => 'btn btn-primary']

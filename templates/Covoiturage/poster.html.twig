@@ -58,27 +58,32 @@
                 <div class="invalid-feedback">{{ form_errors(form.date) }}</div>
             </div>
         </div>
-        <div class="col-md-3 mb-3">
-            <div class="form-group">
-                {{ form_label(form.prix, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
-                <div class="input-group">
-                    <span class="input-group-text" style="background-color: #DDDEC6; border: 1px solid #A11010;">DT</span>
-                    {{ form_widget(form.prix, {'attr': {
-                        'class': 'form-control',
-                        'style': 'border: 1px solid #A11010; border-radius: 8px;'
-                    }}) }}
-                </div>
-                <div class="invalid-feedback">{{ form_errors(form.prix) }}</div>
-            </div>
+     <div class="col-md-3 mb-3">
+    <div class="form-group">
+        {{ form_label(form.prix, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+        <div class="input-group">
+            <span class="input-group-text" style="background-color: #DDDEC6; border: 1px solid #A11010;">DT</span>
+            {{ form_widget(form.prix, {'attr': {
+                'class': 'form-control',
+                'style': 'border: 1px solid #A11010; border-radius: 8px;',
+                'min': '0.1',
+                'step': '0.1',
+                'required': 'required'
+            }}) }}
         </div>
+        <div class="invalid-feedback">
+            {{ form_errors(form.prix) }}
+        </div>
+    </div>
+</div>
         <div class="col-md-3 mb-3">
             <div class="form-group">
-                {{ form_label(form.nombre_de_places, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
-                {{ form_widget(form.nombre_de_places, {'attr': {
+                {{ form_label(form.nombreDePlaces, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                {{ form_widget(form.nombreDePlaces, {'attr': {
                     'class': 'form-control',
                     'style': 'border: 1px solid #A11010; border-radius: 8px;'
                 }}) }}
-                <div class="invalid-feedback">{{ form_errors(form.nombre_de_places) }}</div>
+                <div class="invalid-feedback">{{ form_errors(form.nombreDePlaces) }}</div>
             </div>
         </div>
     </div>
@@ -114,4 +119,6 @@
         font-size: 0.875em;
     }
 </style>
+  <br>
+    <a href="{{ path('app_covoiturage_mes_offres') }}" class="btn btn-primary">Voir mes offres</a>
 {% endblock %}
