@@ -3,11 +3,21 @@
 namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Posts;
+use App\Form\PostsType;
+use App\Entity\Commentaire;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 
 
 class CovoiturageController extends AbstractController
@@ -86,10 +96,91 @@ class CovoiturageController extends AbstractController
     }
 
     #[Route('/covoiturage/rechercher', name: 'app_covoiturage_rechercher')]
-    public function rechercher(): Response
+    public function rechercher(Request $request, EntityManagerInterface $entityManager): Response
     {
-        return $this->render('covoiturage/rechercher.html.twig');
+        $searchTerm = $request->query->get('q');
+        
+        $queryBuilder = $entityManager->getRepository(Posts::class)
+            ->createQueryBuilder('p')
+            ->leftJoin('p.commentaires', 'c')
+            ->addSelect('c')
+            ->leftJoin('c.user', 'u')
+            ->addSelect('u');
+    
+        if ($searchTerm) {
+            $queryBuilder->where('p.ville_arrivee LIKE :searchTerm')
+                ->setParameter('searchTerm', '%'.$searchTerm.'%');
+        }
+        
+        $posts = $queryBuilder->getQuery()->getResult();
+    
+        return $this->render('covoiturage/rechercher.html.twig', [
+            'posts' => $posts,
+            'searchTerm' => $searchTerm
+        ]);
     }
+    
+    #[Route('/commentaire/new/{post_id}', name: 'app_commentaire_new', methods: ['POST'])]
+    public function newComment(
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        int $post_id
+    ): Response {
+      
+    
+        // Get the post
+        $post = $entityManager->getRepository(Posts::class)->find($post_id);
+        if (!$post) {
+            throw $this->createNotFoundException('Post not found');
+        }
+    
+        // For testing with static user ID 1
+        $user = $entityManager->getRepository(User::class)->find(1);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+    
+        // Create new comment
+        $commentaire = new Commentaire();
+        $commentaire->setContenu($request->request->get('contenu'));
+        $commentaire->setDateCreat(new \DateTime());
+        $commentaire->setUser($user);
+        $commentaire->setPost($post);
+    
+        $entityManager->persist($commentaire);
+        $entityManager->flush();
+    
+        return $this->redirectToRoute('app_covoiturage_rechercher');
+    }
+    #[Route('/covoiturage/reserver/{id_post}', name: 'app_covoiturage_reserver')]
+public function reserver(int $id_post, EntityManagerInterface $entityManager, Request $request): Response
+{
+    $post = $entityManager->getRepository(Posts::class)->find($id_post);
+    
+    if (!$post) {
+        throw $this->createNotFoundException('Post not found');
+    }
+    
+    // Check available seats
+    if ($post->getNombreDePlaces() <= 0) {
+        $this->addFlash('error', 'Désolé, il n\'y a plus de places disponibles pour ce covoiturage.');
+        return $this->redirectToRoute('app_covoiturage_rechercher');
+    }
+    
+    // Handle reservation form submission
+    if ($request->isMethod('POST')) {
+        // Decrement available seats
+        $post->setNombreDePlaces($post->getNombreDePlaces() - 1);
+        $entityManager->flush();
+        
+        $this->addFlash('success', 'Réservation confirmée!');
+        return $this->redirectToRoute('app_covoiturage_rechercher');
+    }
+    
+    return $this->render('covoiturage/reserver.html.twig', [
+        'post' => $post,
+    ]);
+}
     #[Route('/covoiturage/mes-offres', name: 'app_covoiturage_mes_offres')]
     public function mesOffres(EntityManagerInterface $entityManager): Response
     {
@@ -110,37 +201,132 @@ class CovoiturageController extends AbstractController
     }
 
     #[Route('/covoiturage/modifier/{id_post}', name: 'app_covoiturage_modifier')]
+
     public function modifier(int $id_post, EntityManagerInterface $entityManager, Request $request): Response
     {
-        // Get the post by ID using getIdPost() instead of id()
         $post = $entityManager->getRepository(Posts::class)->find($id_post);
-    
+
         if (!$post || $post->getUser()->getIdUser() !== 1) {
-            throw $this->createNotFoundException('Post not found or unauthorized');
+            throw $this->createNotFoundException('Post non trouvé ou accès non autorisé');
         }
-    
-        // Render the post for editing
+
+        // Création du formulaire manuellement
+        $form = $this->createFormBuilder($post)
+            ->add('message', TextareaType::class)
+            ->add('villeDepart', TextType::class)
+            ->add('villeArrivee', TextType::class)
+            ->add('date', DateType::class, ['widget' => 'single_text'])
+            ->add('nombreDePlaces', IntegerType::class)
+            ->add('prix', MoneyType::class, ['currency' => 'EUR'])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                // Contrôle de saisie personnalisé
+                $this->validateBusinessRules($post, $form);
+
+                if (!$form->getErrors(true)->count()) {
+                    $entityManager->flush();
+                    $this->addFlash('success', 'Le trajet a été modifié avec succès!');
+                    return $this->redirectToRoute('app_covoiturage_mes_offres');
+                }
+            }
+        }
+
         return $this->render('covoiturage/modifier_post.html.twig', [
-            'post' => $post,
+            'form' => $form->createView(),
         ]);
     }
+
+    private function validateBusinessRules(Posts $post, FormInterface $form): void
+    {
+        if ($post->getVilleDepart() === $post->getVilleArrivee()) {
+            $form->addError(new FormError("La ville de départ et la ville d'arrivée ne peuvent pas être identiques !"));
+        }
+
+        if (null === $post->getDate()) {
+            $form->addError(new FormError("La date est obligatoire !"));
+        } elseif ($post->getDate() < new \DateTime('today')) {
+            $form->addError(new FormError("La date de départ ne peut pas être dans le passé !"));
+        }
+
+        if ($post->getNombreDePlaces() <= 0) {
+            $form->addError(new FormError("Le nombre de places doit être supérieur à zéro !"));
+        }
+
+        if ($post->getPrix() === null || $post->getPrix() <= 0) {
+            $form->addError(new FormError("Le prix doit être supérieur à zéro !"));
+        }
+    }
+
+    
     
     #[Route('/covoiturage/supprimer/{id_post}', name: 'app_covoiturage_supprimer')]
     public function supprimer(int $id_post, EntityManagerInterface $entityManager): Response
     {
-        // Get the post by ID using getIdPost() instead of id()
         $post = $entityManager->getRepository(Posts::class)->find($id_post);
     
         if (!$post || $post->getUser()->getIdUser() !== 1) {
             throw $this->createNotFoundException('Post not found or unauthorized');
         }
     
-        // Delete the post
         $entityManager->remove($post);
         $entityManager->flush();
     
-        // Redirect back to the list of posts
         return $this->redirectToRoute('app_covoiturage_mes_offres');
     }
+    #[Route('/commentaire/edit/{id}', name: 'app_commentaire_edit', methods: ['GET', 'POST'])]
+public function editComment(Request $request, EntityManagerInterface $entityManager, int $id): Response
+{
+    $commentaire = $entityManager->getRepository(Commentaire::class)->find($id);
+    
+    if (!$commentaire) {
+        throw $this->createNotFoundException('Comment not found');
+    }
+
+    // For testing with static user ID 1
+    if ($commentaire->getUser()->getIdUser() !== 1) {
+        throw $this->createAccessDeniedException('You can only edit your own comments');
+    }
+
+    $form = $this->createFormBuilder($commentaire)
+        ->add('contenu', TextareaType::class)
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $entityManager->flush();
+        return $this->redirectToRoute('app_covoiturage_rechercher');
+    }
+
+    return $this->render('covoiturage/edit.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
+
+#[Route('/commentaire/delete/{id}', name: 'app_commentaire_delete', methods: ['POST'])]
+public function deleteComment(Request $request, EntityManagerInterface $entityManager, int $id): Response
+{
+    $commentaire = $entityManager->getRepository(Commentaire::class)->find($id);
+    
+    if (!$commentaire) {
+        throw $this->createNotFoundException('Comment not found');
+    }
+
+    // For testing with static user ID 1
+    if ($commentaire->getUser()->getIdUser() !== 1) {
+        throw $this->createAccessDeniedException('You can only delete your own comments');
+    }
+
+    if ($this->isCsrfTokenValid('delete'.$commentaire->getIdCom(), $request->request->get('_token'))) {
+        $entityManager->remove($commentaire);
+        $entityManager->flush();
+    }
+
+    return $this->redirectToRoute('app_covoiturage_rechercher');
+}
     
 }

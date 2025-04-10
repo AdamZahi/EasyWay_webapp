@@ -24,10 +24,12 @@ class Commentaire
      #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
      private ?User $user = null;
  
-     // 🔗 Relation ManyToOne vers Posts
-     #[ORM\ManyToOne(targetEntity: Posts::class)]
+     #[ORM\ManyToOne(targetEntity: Posts::class, inversedBy: 'commentaires')]
      #[ORM\JoinColumn(name: "id_post", referencedColumnName: "id_post", nullable: false)]
      private ?Posts $post = null;
+
+
+// ... getter and setter methods for $post
 
 
 
