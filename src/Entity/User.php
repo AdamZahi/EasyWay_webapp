@@ -2,158 +2,169 @@
 
 namespace App\Entity;
 
+use App\Repository\UserRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Commentaire;
 
-#[ORM\Entity]
+
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 class User
 {
-
     #[ORM\Id]
-    #[ORM\Column(type: "integer")]
-    private int $id_user;
+    #[ORM\GeneratedValue]
+    #[ORM\Column(name: "id_user", type: "integer")]
+    private ?int $id_user = null;
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $nom;
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $prenom;
+    #[ORM\Column(length: 255)]
+    private ?string $mot_de_passe = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $email;
+    #[ORM\Column(nullable: true)]
+    private ?int $telephonne = null;
 
-    #[ORM\Column(type: "string", length: 255)]
-    private string $mot_de_passe;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $date_creation_compte = null;
 
-    #[ORM\Column(type: "integer")]
-    private int $telephonne;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $photo_profil = null;
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $date_creation_compte;
+    #[ORM\Column(length: 255)]
+    private ?string $role = null;
+  
 
-    #[ORM\Column(type: "text")]
-    private string $photo_profil;
-
-    public function getId_user()
+    public function getIdUser(): ?int
     {
         return $this->id_user;
     }
 
-    public function setId_user($value)
+    public function setIdUser(int $id_user): static
     {
-        $this->id_user = $value;
-    }
+        $this->id_user = $id_user;
 
-    public function getNom()
+        return $this;
+    }
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom($value)
+    public function setNom(string $nom): static
     {
-        $this->nom = $value;
+        $this->nom = $nom;
+
+        return $this;
     }
 
-    public function getPrenom()
-    {
-        return $this->prenom;
-    }
-
-    public function setPrenom($value)
-    {
-        $this->prenom = $value;
-    }
-
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail($value)
+    public function setEmail(string $email): static
     {
-        $this->email = $value;
+        $this->email = $email;
+
+        return $this;
     }
 
-    public function getMot_de_passe()
+    public function getMotDePasse(): ?string
     {
         return $this->mot_de_passe;
     }
 
-    public function setMot_de_passe($value)
+    public function setMotDePasse(string $mot_de_passe): static
     {
-        $this->mot_de_passe = $value;
+        $this->mot_de_passe = $mot_de_passe;
+
+        return $this;
     }
 
-    public function getTelephonne()
+    public function getTelephonne(): ?int
     {
         return $this->telephonne;
     }
 
-    public function setTelephonne($value)
+    public function setTelephonne(?int $telephonne): static
     {
-        $this->telephonne = $value;
+        $this->telephonne = $telephonne;
+
+        return $this;
     }
 
-    public function getDate_creation_compte()
+    public function getDateCreationCompte(): ?\DateTimeInterface
     {
         return $this->date_creation_compte;
     }
 
-    public function setDate_creation_compte($value)
+    public function setDateCreationCompte(\DateTimeInterface $date_creation_compte): static
     {
-        $this->date_creation_compte = $value;
+        $this->date_creation_compte = $date_creation_compte;
+
+        return $this;
     }
 
-    public function getPhoto_profil()
+    public function getPhotoProfil(): ?string
     {
         return $this->photo_profil;
     }
 
-    public function setPhoto_profil($value)
+    public function setPhotoProfil(?string $photo_profil): static
     {
-        $this->photo_profil = $value;
-    }
+        $this->photo_profil = $photo_profil;
 
-    #[ORM\OneToMany(mappedBy: "user", targetEntity: Posts::class)]
-    private Collection $posts;
-
-    #[ORM\OneToMany(mappedBy: "user", targetEntity: Commentaire::class)]
-    private Collection $commentaires;
-
-
-    public function getPosts(): Collection
-    {
-        return $this->posts;
-    }
-    
-    public function addPost(Posts $post): self
-    {
-        if (!$this->posts->contains($post)) {
-            $this->posts[] = $post;
-            $post->setId_user($this);
-        }
-    
         return $this;
     }
-    public function __construct()
+
+    public function getRole(): ?string
     {
-        $this->posts = new ArrayCollection();
-        $this->commentaires = new ArrayCollection();
+        return $this->role;
     }
-    
-    public function removePost(Posts $post): self
+
+    public function setRole(string $role): static
     {
-        if ($this->posts->removeElement($post)) {
-            // set the owning side to null (unless already changed)
-            if ($post->getId_user() === $this) {
-                $post->setId_user(null);
-            }
-        }
-    
+        $this->role = $role;
+
         return $this;
     }
-  
+#[ORM\OneToMany(targetEntity: Posts::class, mappedBy: 'user')]
+private Collection $posts;
 
+public function __construct()
+{
+    $this->posts = new ArrayCollection();
+}
+
+// Add getPosts() and addPost()/removePost() methods
+
+public function getPosts(): Collection
+{
+    return $this->posts;
+}
+
+public function addPost(Posts $post): static
+{
+    if (!$this->posts->contains($post)) {
+        $this->posts[] = $post;
+        $post->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removePost(Posts $post): static
+{
+    if ($this->posts->removeElement($post)) {
+        if ($post->getUser() === $this) {
+            $post->setUser(null);
+        }
+    }
+
+    return $this;
+}
 }
