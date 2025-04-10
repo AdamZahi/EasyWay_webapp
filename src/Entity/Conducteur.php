@@ -13,9 +13,10 @@ class Conducteur
     #[ORM\Column]
     private ?int $id_conducteur = null;
 
-    #[ORM\Column]
-    private ?int $id_user = null;
-
+    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'conducteur')]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]  // Use id_user
+    private ?User $user = null;
+    
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
@@ -48,19 +49,6 @@ class Conducteur
     public function setIdConducteur(int $id_conducteur): static
     {
         $this->id_conducteur = $id_conducteur;
-
-        return $this;
-    }
-
-    public function getIdUser(): ?int
-    {
-        return $this->id_user;
-    }
-
-    public function setIdUser(int $id_user): static
-    {
-        $this->id_user = $id_user;
-
         return $this;
     }
 
@@ -72,7 +60,6 @@ class Conducteur
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -84,7 +71,6 @@ class Conducteur
     public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
-
         return $this;
     }
 
@@ -96,7 +82,6 @@ class Conducteur
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -108,7 +93,6 @@ class Conducteur
     public function setMotDePasse(string $mot_de_passe): static
     {
         $this->mot_de_passe = $mot_de_passe;
-
         return $this;
     }
 
@@ -120,7 +104,6 @@ class Conducteur
     public function setTelephonne(string $telephonne): static
     {
         $this->telephonne = $telephonne;
-
         return $this;
     }
 
@@ -132,7 +115,6 @@ class Conducteur
     public function setPhotoProfil(string $photo_profil): static
     {
         $this->photo_profil = $photo_profil;
-
         return $this;
     }
 
@@ -144,7 +126,6 @@ class Conducteur
     public function setNumeroPermis(string $numero_permis): static
     {
         $this->numero_permis = $numero_permis;
-
         return $this;
     }
 
@@ -156,7 +137,17 @@ class Conducteur
     public function setExperience(string $experience): static
     {
         $this->experience = $experience;
+        return $this;
+    }
 
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 }

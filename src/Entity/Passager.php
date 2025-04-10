@@ -13,8 +13,9 @@ class Passager
     #[ORM\Column]
     private ?int $id_passager = null;
 
-    #[ORM\Column]
-    private ?int $id_user = null;
+    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'passager')]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]  // Use id_user
+    private ?User $user = null;
 
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
@@ -37,6 +38,7 @@ class Passager
     #[ORM\Column]
     private ?int $nbTrajetEffectues = null;
 
+    // Getters and setters for Passager properties...
 
     public function getIdPassager(): ?int
     {
@@ -50,14 +52,14 @@ class Passager
         return $this;
     }
 
-    public function getIdUser(): ?int
+    public function getUser(): ?User
     {
-        return $this->id_user;
+        return $this->user;
     }
 
-    public function setIdUser(int $id_user): static
+    public function setUser(User $user): static
     {
-        $this->id_user = $id_user;
+        $this->user = $user;
 
         return $this;
     }
