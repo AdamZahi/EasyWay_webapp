@@ -1,23 +1,73 @@
-{% extends 'base.html.twig' %}
+{% extends 'front-office/front.html.twig' %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Créer un compte{% endblock %}
 
 {% block body %}
-    {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
-    {% endfor %}
+<div class="container" style="background-color: #B7D973; min-height: 100vh; padding: 40px 0;">
+    <div class="card mx-auto p-4 shadow" style="max-width: 800px; background-color: #ffffff;">
+        <div class="d-flex justify-content-between mb-3">
+            <div class="circle" style="width: 28px; height: 28px; background-color: #d1d1d1; border-radius: 50%; border: 1px solid lightgray;"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="mb-1" style="font-family: 'Arial Rounded MT Bold';">Créer un compte</h2>
+                <p style="font-size: 12px;">Vous avez déjà un compte ? <a href="">Connectez-vous</a></p>
 
-    <h1>Register</h1>
+                {{ form_start(registrationForm) }}
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.nom, 'Nom') }}
+                        {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom'}}) }}
+                    </div>
 
-    {{ form_errors(registrationForm) }}
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.prenom, 'Prénom') }}
+                        {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Votre prénom'}}) }}
+                    </div>
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.email, 'Adresse mail') }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@exemple.com'}}) }}
+                    </div>
 
-        <button type="submit" class="btn">Register</button>
-    {{ form_end(registrationForm) }}
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
+                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}}) }}
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.confirmPassword, 'Confirmer le mot de passe') }}
+                        {{ form_widget(registrationForm.confirmPassword, {'attr': {'class': 'form-control', 'placeholder': 'Confirmer le mot de passe'}}) }}
+                    </div>
+
+                    <small class="text-muted mt-1 d-block">Utilisez 8 caractères ou plus avec un mélange de lettres, de chiffres et de symboles</small>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.telephone, 'Téléphone') }}
+                        {{ form_widget(registrationForm.telephone, {'attr': {'class': 'form-control', 'placeholder': 'XX XXX XXX'}}) }}
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.role, 'Rôle') }}
+                        {{ form_widget(registrationForm.role, {'attr': {'class': 'form-select'}}) }}
+                    </div>
+
+                    {{ form_row(registrationForm.agreeTerms) }}
+
+                    <button type="submit" class="btn mt-4 px-4 py-2 text-white" style="background-color: #EFA9A9; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Créer un compte</button>
+                {{ form_end(registrationForm) }}
+
+                <p class="mt-3"><a href="" class="text-decoration-underline">Connectez-vous à la place</a></p>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 250px; margin-top: 30px;">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-4">
+            <span class="me-3">Aide</span>
+            <span class="me-3">Confidentialité</span>
+            <span>Termes</span>
+        </div>
+    </div>
+</div>
 {% endblock %}
+

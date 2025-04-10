@@ -20,17 +20,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id_user = null;
 
     #[ORM\Column(type: 'string', enumType: RoleEnum::class)]
-    private RoleEnum $role;
+    private RoleEnum $role;  
 
-    /**
-     * @var list<string> The user roles
-     */
-    
-    /**
-     * @var string The hashed password
-     */
-    #[ORM\Column(type: 'string')]
-    private ?string $mot_de_passe = null;
 
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
@@ -40,6 +31,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, unique: true)]
     private ?string $email = null;
+
+    #[ORM\Column(type: 'string')]
+    private ?string $mot_de_passe = null;  
 
     #[ORM\Column(type: 'bigint', nullable: true)]
     private ?int $telephonne = null;
@@ -102,17 +96,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    public function getPassword(): ?string
+    public function getMotDePasse(): ?string
     {
         return $this->mot_de_passe;
     }
 
-    public function setPassword(string $password): static
-    {
-        $this->mot_de_passe = $password;
+    public function getPassword(): ?string
+{
+    return $this->mot_de_passe;
+}
 
-        return $this;
-    }
+    
+
+public function setMotDePasse(string $password): self
+{
+    $this->mot_de_passe = $password;
+    return $this;
+}
+
 
     public function eraseCredentials(): void
     {
