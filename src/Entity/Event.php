@@ -46,12 +46,12 @@ class Event
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: 'La date de début est obligatoire')]
-    #[Assert\Type("\DateTimeInterface")]
+    #[Assert\Type("\DateTimeInterface", message: 'La date de début doit être une date valide')]
     private ?\DateTimeInterface $dateDebut = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: 'La date de fin est obligatoire')]
-    #[Assert\Type("\DateTimeInterface")]
+    #[Assert\Type("\DateTimeInterface", message: 'La date de fin doit être une date valide')]
     #[Assert\Expression(
         "this.getDateFin() > this.getDateDebut()",
         message: "La date de fin doit être postérieure à la date de début"
@@ -101,7 +101,7 @@ class Event
         return $this->dateDebut;
     }
 
-    public function setDateDebut(\DateTimeInterface $dateDebut): static
+    public function setDateDebut(?\DateTimeInterface $dateDebut): static
     {
         $this->dateDebut = $dateDebut;
         return $this;
@@ -112,7 +112,7 @@ class Event
         return $this->dateFin;
     }
 
-    public function setDateFin(\DateTimeInterface $dateFin): static
+    public function setDateFin(?\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
         return $this;
