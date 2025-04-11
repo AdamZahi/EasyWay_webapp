@@ -40,44 +40,76 @@ class RegistrationController extends AbstractController
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('plainPassword')->getData();
-            $confirmPassword = $form->get('confirmPassword')->getData();
-        
-            // Debugging
-            dump($plainPassword, $confirmPassword);
-        
-            if ($plainPassword !== $confirmPassword) {
-                $form->get('confirmPassword')->addError(new FormError('The password confirmation does not match.'));
-                return $this->render('security/register.html.twig', [
-                    'registrationForm' => $form->createView(),
-                ]);
+        if ($form->isSubmitted()) {
+            // Check for existing email
+            $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $form->get('email')->getData()]);
+            if ($existingUser) {
+                $form->get('email')->addError(new FormError('Il existe déjà un compte avec cette adresse email'));
             }
+            
+            if ($form->isValid()) {
+                $plainPassword = $form->get('plainPassword')->getData();
+                $confirmPassword = $form->get('confirmPassword')->getData();
+            
+                // Debugging
+                dump($plainPassword, $confirmPassword);
+            
+                if ($plainPassword !== $confirmPassword) {
+                    $form->get('confirmPassword')->addError(new FormError('La confirmation du mot de passe ne correspond pas.'));
+                    return $this->render('security/register.html.twig', [
+                        'registrationForm' => $form->createView(),
+                    ]);
+                }
 
-            $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-            $user->setMotDePasse($hashedPassword);
-            $user->setDateCreationCompte(new \DateTime());
+                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+                $user->setMotDePasse($hashedPassword);
+                $user->setDateCreationCompte(new \DateTime());
 
-            $this->entityManager->persist($user);
-            $this->entityManager->flush();
+                // Gestion de la photo de profil
+                $photoFile = $form->get('photo_profil')->getData();
+                if ($photoFile) {
+                    $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    // Sécurisation du nom de fichier
+                    $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
 
-            // Send verification email
-            $email = (new TemplatedEmail())
-                ->from(new Address('no-reply@example.com', 'EasyWay'))
-                ->to($user->getEmail())
-                ->subject('Please Confirm Your Email')
-                ->htmlTemplate('security/registration_email.html.twig')  // Ensure you have this template created
-                ->context([
-                    'user' => $user,
-                    'verificationUrl' => $this->generateUrl('app_verify_email', ['id' => $user->getIdUser()], UrlGeneratorInterface::ABSOLUTE_URL),
-                ]);
+                    // Déplacement du fichier dans le répertoire des photos de profil
+                    try {
+                        $photoFile->move(
+                            $this->getParameter('profile_pictures_directory'),
+                            $newFilename
+                        );
 
-            $this->mailer->send($email);
+                        // Mise à jour du chemin de la photo dans l'entité User
+                        $user->setPhotoProfil($newFilename);
+                    } catch (\Exception $e) {
+                        $form->get('photo_profil')->addError(new FormError('Une erreur est survenue lors du téléchargement de votre photo.'));
+                        return $this->render('security/register.html.twig', [
+                            'registrationForm' => $form->createView(),
+                        ]);
+                    }
+                }
 
-            // Flash success message
-            $this->addFlash('success', 'Registration successful! Please check your email to verify your account.');
+                $this->entityManager->persist($user);
+                $this->entityManager->flush();
 
-            return $this->redirectToRoute('app_login');
+                // Send verification email
+                $email = (new TemplatedEmail())
+                    ->from(new Address('mejrieya384@gmail.com', 'EasyWay'))
+                    ->to($user->getEmail())
+                    ->subject('Please Confirm Your Email')
+                    ->htmlTemplate('security/registration_email.html.twig')
+                    ->context([
+                        'user' => $user,
+                    ]);
+
+                $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user, $email);
+
+                // Flash success message
+                $this->addFlash('success', 'Inscription réussie! Veuillez vérifier votre email pour confirmer votre compte.');
+
+                return $this->redirectToRoute('app_login');
+            }
         }
 
         return $this->render('security/register.html.twig', [
@@ -88,12 +120,25 @@ class RegistrationController extends AbstractController
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // We don't need to check for authenticated user as the signature in the URL validates the user
+        // $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        // validate email confirmation link, sets User::isVerified=true and persists
         try {
             /** @var User $user */
-            $user = $this->getUser();
+            // Get user ID from the request if it exists, otherwise use the current user
+            $userId = $request->query->get('id');
+            if ($userId) {
+                $user = $this->entityManager->getRepository(User::class)->find($userId);
+                if (!$user) {
+                    throw $this->createNotFoundException('User not found');
+                }
+            } else {
+                $user = $this->getUser();
+                if (!$user) {
+                    throw $this->createNotFoundException('User not found');
+                }
+            }
+            
             $this->emailVerifier->handleEmailConfirmation($request, $user);
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('verify_email_error', $translator->trans($exception->getReason(), [], 'VerifyEmailBundle'));
@@ -101,7 +146,6 @@ class RegistrationController extends AbstractController
             return $this->redirectToRoute('app_register');
         }
 
-        // @TODO Change the redirect on success and handle or remove the flash message in your templates
         $this->addFlash('success', 'Your email address has been verified.');
 
         return $this->redirectToRoute('app_login');
