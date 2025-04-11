@@ -1,0 +1,51 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Conducteur Dashboard{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Conducteur Dashboard</h1>
+    <p>Welcome to the driver dashboard.</p>
+    
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    My Trips
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Manage Trips</h5>
+                    <p class="card-text">View and manage your upcoming and past trips.</p>
+                    <a href="#" class="btn btn-primary">Go to Trips</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Vehicle
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">My Vehicle</h5>
+                    <p class="card-text">Manage your vehicle information.</p>
+                    <a href="#" class="btn btn-primary">Go to Vehicle</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Earnings
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">My Earnings</h5>
+                    <p class="card-text">View your earnings and payment history.</p>
+                    <a href="#" class="btn btn-primary">Go to Earnings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

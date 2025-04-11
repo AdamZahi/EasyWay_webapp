@@ -1,0 +1,281 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Créer un compte{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+    #password-complexity-feedback div {
+        margin-bottom: 3px;
+    }
+    #password-complexity-feedback i {
+        margin-right: 5px;
+    }
+    .text-success i {
+        color: #28a745;
+    }
+    .text-danger i {
+        color: #dc3545;
+    }
+    .input-group-text {
+        cursor: pointer;
+    }
+    .input-group-text:hover {
+        background-color: #e9ecef;
+    }
+    .bi-eye, .bi-eye-slash {
+        font-size: 1.2rem;
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Fonction très simple pour basculer la visibilité des mots de passe
+    function togglePasswordVisibility(fieldId) {
+        var field = document.getElementById(fieldId);
+        var eyeIcon = field.parentNode.querySelector('i');
+        
+        if (field.type === "password") {
+            field.type = "text";
+            eyeIcon.classList.remove("bi-eye-slash");
+            eyeIcon.classList.add("bi-eye");
+        } else {
+            field.type = "password";
+            eyeIcon.classList.remove("bi-eye");
+            eyeIcon.classList.add("bi-eye-slash");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const passwordField = document.getElementById('plainPassword');
+        const confirmPasswordField = document.getElementById('confirmPassword');
+        const submitButton = document.querySelector('button[type="submit"]');
+        const feedbackElement = document.getElementById('password-match-feedback');
+        const complexityFeedback = document.getElementById('password-complexity-feedback');
+        
+        // Vérifier la complexité du mot de passe
+        function checkPasswordComplexity() {
+            const password = passwordField.value;
+            const minLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasDigit = /\d/.test(password);
+            const hasSpecial = /[@$!%*?&]/.test(password);
+            
+            let feedbackHtml = '';
+            let isValid = true;
+            
+            if (password === '') {
+                complexityFeedback.innerHTML = '';
+                return;
+            }
+            
+            feedbackHtml += `<div class="${minLength ? 'text-success' : 'text-danger'}">
+                <i class="${minLength ? 'bi bi-check-circle' : 'bi bi-x-circle'}"></i> 
+                Au moins 8 caractères
+            </div>`;
+            
+            feedbackHtml += `<div class="${hasUppercase ? 'text-success' : 'text-danger'}">
+                <i class="${hasUppercase ? 'bi bi-check-circle' : 'bi bi-x-circle'}"></i> 
+                Au moins une lettre majuscule
+            </div>`;
+            
+            feedbackHtml += `<div class="${hasLowercase ? 'text-success' : 'text-danger'}">
+                <i class="${hasLowercase ? 'bi bi-check-circle' : 'bi bi-x-circle'}"></i> 
+                Au moins une lettre minuscule
+            </div>`;
+            
+            feedbackHtml += `<div class="${hasDigit ? 'text-success' : 'text-danger'}">
+                <i class="${hasDigit ? 'bi bi-check-circle' : 'bi bi-x-circle'}"></i> 
+                Au moins un chiffre
+            </div>`;
+            
+            feedbackHtml += `<div class="${hasSpecial ? 'text-success' : 'text-danger'}">
+                <i class="${hasSpecial ? 'bi bi-check-circle' : 'bi bi-x-circle'}"></i> 
+                Au moins un caractère spécial (@$!%*?&)
+            </div>`;
+            
+            complexityFeedback.innerHTML = feedbackHtml;
+            
+            // Désactiver le bouton si le mot de passe n'est pas valide
+            if (!minLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecial) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        
+        // Fonction de vérification des mots de passe
+        function checkPasswordMatch() {
+            if (confirmPasswordField.value === '') {
+                feedbackElement.textContent = '';
+                feedbackElement.className = '';
+                return;
+            }
+            
+            if (passwordField.value === confirmPasswordField.value) {
+                feedbackElement.textContent = 'Les mots de passe correspondent';
+                feedbackElement.className = 'text-success mt-1';
+                return true;
+            } else {
+                feedbackElement.textContent = 'Les mots de passe ne correspondent pas';
+                feedbackElement.className = 'text-danger mt-1';
+                return false;
+            }
+        }
+        
+        // Fonction pour vérifier l'ensemble et gérer le bouton
+        function validateForm() {
+            const isComplexityValid = checkPasswordComplexity();
+            const isMatchValid = checkPasswordMatch();
+            
+            // Désactiver le bouton si l'un des critères n'est pas valide
+            submitButton.disabled = !(isComplexityValid && isMatchValid);
+        }
+        
+        // Écouter les événements input sur les deux champs
+        passwordField.addEventListener('input', validateForm);
+        confirmPasswordField.addEventListener('input', validateForm);
+        
+        // Vérifier au chargement
+        validateForm();
+    });
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="container" style="background-color: #B7D973; min-height: 100vh; padding: 40px 0;">
+    <div class="card mx-auto p-4 shadow" style="max-width: 800px; background-color: #ffffff;">
+        <div class="d-flex justify-content-between mb-3">
+            <div class="circle" style="width: 28px; height: 28px; background-color: #d1d1d1; border-radius: 50%; border: 1px solid lightgray;"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h2 class="mb-1" style="font-family: 'Arial Rounded MT Bold';">Créer un compte</h2>
+                <p style="font-size: 12px;">Vous avez déjà un compte ? <a href="{{ path('app_login') }}">Connectez-vous</a></p>
+
+                {% for flashError in app.flashes('verify_email_error') %}
+                    <div class="alert alert-danger" role="alert">{{ flashError }}</div>
+                {% endfor %}
+
+                {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
+                    {% if registrationForm.vars.errors|length > 0 %}
+                        <div class="alert alert-danger">
+                            {{ form_errors(registrationForm) }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.nom, 'Nom') }}
+                        {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-control', 'placeholder': 'Votre nom'}}) }}
+                        {% if registrationForm.nom.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.nom) }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.prenom, 'Prénom') }}
+                        {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-control', 'placeholder': 'Votre prénom'}}) }}
+                        {% if registrationForm.prenom.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.prenom) }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.email, 'Adresse mail') }}
+                        {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@exemple.com'}}) }}
+                        {% if registrationForm.email.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
+                        <div class="input-group">
+                            <input type="password" id="plainPassword" name="{{ registrationForm.plainPassword.vars.full_name }}" class="form-control" placeholder="Mot de passe" required>
+                            <span class="input-group-text" onclick="togglePasswordVisibility('plainPassword')">
+                                <i class="bi bi-eye-slash"></i>
+                            </span>
+                        </div>
+                        {% if registrationForm.plainPassword.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.plainPassword) }}
+                            </div>
+                        {% endif %}
+                        <div id="password-complexity-feedback" class="mt-2 small"></div>
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.confirmPassword, 'Confirmer le mot de passe') }}
+                        <div class="input-group">
+                            <input type="password" id="confirmPassword" name="{{ registrationForm.confirmPassword.vars.full_name }}" class="form-control" placeholder="Confirmer le mot de passe" required>
+                            <span class="input-group-text" onclick="togglePasswordVisibility('confirmPassword')">
+                                <i class="bi bi-eye-slash"></i>
+                            </span>
+                        </div>
+                        {% if registrationForm.confirmPassword.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.confirmPassword) }}
+                            </div>
+                        {% endif %}
+                        <div id="password-match-feedback"></div>
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.telephonne, 'Téléphone') }}
+                        {{ form_widget(registrationForm.telephonne, {'attr': {'class': 'form-control', 'placeholder': 'XX XXX XXX'}}) }}
+                        {% if registrationForm.telephonne.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.telephonne) }}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">Le numéro de téléphone doit contenir au moins 8 chiffres</small>
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.photo_profil, 'Photo de profil') }}
+                        {{ form_widget(registrationForm.photo_profil, {'attr': {'class': 'form-control'}}) }}
+                        {% if registrationForm.photo_profil.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.photo_profil) }}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">Format JPEG, PNG ou GIF (max. 1Mo)</small>
+                    </div>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.role, 'Rôle') }}
+                        {{ form_widget(registrationForm.role, {'attr': {'class': 'form-select'}}) }}
+                        {% if registrationForm.role.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(registrationForm.role) }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="btn mt-4 px-4 py-2 text-white" style="background-color: #EFA9A9; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Créer un compte</button>
+                {{ form_end(registrationForm, {'render_rest': false}) }}
+
+                <p class="mt-3"><a href="{{ path('app_login') }}" class="text-decoration-underline">Connectez-vous à la place</a></p>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 250px; margin-top: 30px;">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-4">
+            <span class="me-3">Aide</span>
+            <span class="me-3">Confidentialité</span>
+            <span>Termes</span>
+        </div>
+    </div>
+</div>
+{% endblock %} 
