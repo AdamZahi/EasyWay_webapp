@@ -1,0 +1,20 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Ajouter Reservation
+{% endblock %}
+{% block main_content %}
+<br><br><br><br><br><br>
+	<div class="container mt-4">
+		<h2>Ajouter Reservation</h2>
+
+		{{ form_start(form) }}
+		{{ form_row(form.depart) }}
+		{{ form_row(form.arret) }}
+		{{ form_row(form.vehicule) }}
+		{{ form_row(form.nb) }}
+		{{ form_row(form.user_id) }}
+
+		<button type="submit" class="btn btn-primary">Submit</button>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}

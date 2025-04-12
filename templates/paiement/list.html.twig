@@ -1,0 +1,47 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Paiements{% endblock %}
+
+{% block main_content %}
+<br><br><br><br><br><br>
+    <div class="container mt-4">
+        <h1>Paiement</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <table class="table table-striped" border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>DEPART</th>
+                    <th>ARRET</th>
+                    <th>TYPE</th>
+                    <th>Administrateur</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for paiement in paiements %}
+                    <tr>
+                        <td>{{ paiement.id }}</td>
+                        <td>{{ paiement.pay_id }}</td>
+                        <td>{{ paiement.montant }}</td>
+                        <td>{{ paiement.res_id }}</td>
+                        <td>{{ paiement.user_id }}</td>
+                        <td>
+                            <a href="{{ path('paiement_delete', {'id': paiement.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No paiements found</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ path('paiement_add') }}" class="btn btn-primary">Passer au paiement</a>
+    </div>
+{% endblock %}
