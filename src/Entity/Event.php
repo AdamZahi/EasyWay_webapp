@@ -2,15 +2,13 @@
 
 namespace App\Entity;
 
-use App\Enum\EventStatus;
-use App\Enum\TypeEvent;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-#[ORM\Table(name: 'evenement')]
+#[ORM\Table(name: 'event')]
 class Event
 {
     #[ORM\Id]
@@ -21,16 +19,16 @@ class Event
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le type d\'événement est obligatoire')]
     #[Assert\Choice(
-        choices: ['GREVE', 'RETARD', 'INCIDENT'],
-        message: 'Le type d\'événement doit être GREVE, RETARD ou INCIDENT'
+        choices: ['Greve', 'Retard', 'Incident'],
+        message: 'Le type d\'événement doit être Greve, Retard ou Incident'
     )]
     private ?string $type = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire')]
     #[Assert\Choice(
-        choices: ['EN_COUR', 'ANNULE', 'RESOLU'],
-        message: 'Le statut doit être EN_COUR, RESOLU ou ANNULE'
+        choices: ['En cours', 'Annulé', 'Résolu'],
+        message: 'Le statut doit être En cours, Résolu ou Annulé'
     )]
     private ?string $status = null;
 

@@ -1,3 +1,4 @@
+
 {% extends 'back-office/pages/back-office.html.twig' %}
 
 {% block title %}Event Details{% endblock %}
@@ -11,8 +12,8 @@
                 <h5 class="card-title">Event #{{ event.id }}</h5>
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Type:</strong> {{ event.type.value }}</p>
-                        <p><strong>Status:</strong> {{ event.status.value }}</p>
+                        <p><strong>Type:</strong> {{ event.type }}</p>
+                        <p><strong>Status:</strong> {{ event.status }}</p>
                         <p><strong>Description:</strong> {{ event.description }}</p>
                     </div>
                     <div class="col-md-6">
