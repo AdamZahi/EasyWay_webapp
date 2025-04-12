@@ -18,82 +18,69 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(name: "id_user")]
     private ?int $id_user = null;
 
-    #[ORM\Column(type: 'string', enumType: RoleEnum::class)]
-    #[Assert\NotBlank(message: 'Le rôle ne peut pas être vide')]
-    private RoleEnum $role;  
+    #[ORM\Column(length: 180, unique: true)]
+    #[Assert\NotBlank(message: "L'email ne peut pas être vide")]
+    #[Assert\Email(message: "L'email n'est pas valide")]
+    private ?string $email = null;
+
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
+    #[Assert\NotBlank(message: "Le nom ne peut pas être vide")]
     #[Assert\Length(
-        min: 2, 
-        max: 50, 
-        minMessage: 'Le nom doit contenir au moins {{ limit }} caractères',
-        maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères'
+        min: 2,
+        max: 50,
+        minMessage: "Le nom doit contenir au moins 2 caractères",
+        maxMessage: "Le nom ne peut pas dépasser 50 caractères"
     )]
     #[Assert\Regex(
-        pattern: '/^[a-zA-ZÀ-ÿ\s\-]+$/',
-        message: 'Le nom ne doit contenir que des lettres, espaces et tirets'
+        pattern: "/^[a-zA-ZÀ-ÿ\s\-]+$/",
+        message: "Le nom ne doit contenir que des lettres, des espaces et des tirets"
     )]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
+    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide")]
     #[Assert\Length(
-        min: 2, 
-        max: 50, 
-        minMessage: 'Le prénom doit contenir au moins {{ limit }} caractères',
-        maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères'
+        min: 2,
+        max: 50,
+        minMessage: "Le prénom doit contenir au moins 2 caractères",
+        maxMessage: "Le prénom ne peut pas dépasser 50 caractères"
     )]
     #[Assert\Regex(
-        pattern: '/^[a-zA-ZÀ-ÿ\s\-]+$/',
-        message: 'Le prénom ne doit contenir que des lettres, espaces et tirets'
+        pattern: "/^[a-zA-ZÀ-ÿ\s\-]+$/",
+        message: "Le prénom ne doit contenir que des lettres, des espaces et des tirets"
     )]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 255, unique: true)]
-    #[Assert\NotBlank(message: 'L\'email ne peut pas être vide')]
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide")]
     #[Assert\Regex(
-        pattern: '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
-        message: 'L\'email doit être au format exemple@exemple.exemple'
+        pattern: "/^[0-9]{8,15}$/",
+        message: "Le numéro de téléphone doit contenir entre 8 et 15 chiffres"
     )]
-    #[Assert\Length(
-        max: 180,
-        maxMessage: 'L\'email ne peut pas dépasser {{ limit }} caractères'
-    )]
-    private ?string $email = null;
-
-    #[ORM\Column(type: 'string')]
-    #[Assert\NotBlank(message: 'Le mot de passe ne peut pas être vide')]
-    #[Assert\Regex(
-        pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
-        message: 'Le mot de passe doit contenir au moins 8 caractères avec au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial'
-    )]
-    private ?string $mot_de_passe = null;  
-
-    #[ORM\Column(type: 'bigint', nullable: true)]
-    #[Assert\Type(
-        type: 'numeric',
-        message: 'Le numéro de téléphone doit être un nombre'
-    )]
-    #[Assert\Regex(
-        pattern: '/^[0-9]{8,}$/',
-        message: 'Le numéro de téléphone doit contenir au moins 8 chiffres'
-    )]
-    private ?int $telephonne = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $date_creation_compte = null;
+    private ?string $telephonne = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\File(
-        maxSize: '1024k',
-        mimeTypes: ['image/jpeg', 'image/png', 'image/gif'],
-        mimeTypesMessage: 'Veuillez télécharger une image valide (JPEG, PNG, GIF)'
-    )]
     private ?string $photo_profil = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $role = null;
+
+    private ?string $plainPassword = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $date_creation_compte = null;
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Admin $admin = null;
@@ -105,7 +92,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Passager $passager = null;
 
     #[ORM\Column]
-    private bool $isVerified = false;
+    private bool $is_verified = false;
+
+    public function __construct()
+    {
+        $this->date_creation_compte = new \DateTimeImmutable();
+        $this->is_verified = false;
+    }
 
     public function getIdUser(): ?int
     {
@@ -119,56 +112,80 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRoles(): array
-{
-    return match($this->role) {
-        RoleEnum::ADMIN => ['ROLE_ADMIN'],
-        RoleEnum::CONDUCTEUR => ['ROLE_CONDUCTEUR'],
-        RoleEnum::PASSAGER => ['ROLE_PASSAGER'],
-        default => ['ROLE_USER'],
-    };
-}
-
-
-    public function getRole(): RoleEnum
+    public function getEmail(): ?string
     {
-        return $this->role;
+        return $this->email;
     }
 
-    public function setRole(RoleEnum $role): static
+    public function setEmail(string $email): static
     {
-        $this->role = $role;
+        $this->email = $email;
+
         return $this;
     }
 
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-
-    public function getMotDePasse(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        return $this->mot_de_passe;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
-    public function getPassword(): ?string
-{
-    return $this->mot_de_passe;
-}
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
 
-    
+        return $this;
+    }
 
-public function setMotDePasse(string $password): self
-{
-    $this->mot_de_passe = $password;
-    return $this;
-}
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
 
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
+        return $this;
+    }
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
     public function eraseCredentials(): void
     {
-        // clear sensitive data if any
+        $this->plainPassword = null;
     }
 
     public function getNom(): ?string
@@ -195,38 +212,14 @@ public function setMotDePasse(string $password): self
         return $this;
     }
 
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): static
-    {
-        $this->email = $email;
-
-        return $this;
-    }
-
-    public function getTelephonne(): ?int
+    public function getTelephonne(): ?string
     {
         return $this->telephonne;
     }
 
-    public function setTelephonne(?int $telephonne): static
+    public function setTelephonne(string $telephonne): static
     {
         $this->telephonne = $telephonne;
-
-        return $this;
-    }
-
-    public function getDateCreationCompte(): ?\DateTimeInterface
-    {
-        return $this->date_creation_compte;
-    }
-
-    public function setDateCreationCompte(\DateTimeInterface $date_creation_compte): static
-    {
-        $this->date_creation_compte = $date_creation_compte;
 
         return $this;
     }
@@ -239,6 +232,34 @@ public function setMotDePasse(string $password): self
     public function setPhotoProfil(?string $photo_profil): static
     {
         $this->photo_profil = $photo_profil;
+
+        return $this;
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(RoleEnum|string $role): static
+    {
+        if ($role instanceof RoleEnum) {
+            $this->role = $role->value;
+        } else {
+            $this->role = $role;
+        }
+
+        return $this;
+    }
+
+    public function getDateCreationCompte(): ?\DateTimeInterface
+    {
+        return $this->date_creation_compte;
+    }
+
+    public function setDateCreationCompte(\DateTimeInterface $date_creation_compte): static
+    {
+        $this->date_creation_compte = $date_creation_compte;
 
         return $this;
     }
@@ -281,12 +302,12 @@ public function setMotDePasse(string $password): self
 
     public function isVerified(): bool
     {
-        return $this->isVerified;
+        return $this->is_verified;
     }
 
-    public function setIsVerified(bool $isVerified): static
+    public function setIsVerified(bool $is_verified): static
     {
-        $this->isVerified = $isVerified;
+        $this->is_verified = $is_verified;
 
         return $this;
     }

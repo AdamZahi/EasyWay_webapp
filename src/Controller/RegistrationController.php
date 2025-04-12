@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Passager;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +18,10 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface as HasherUserPasswordHasherInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use App\Security\AppAuthenticator;
+use App\Enum\RoleEnum;
 
 class RegistrationController extends AbstractController
 {
@@ -34,82 +38,41 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, HasherUserPasswordHasherInterface $passwordHasher): Response
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, UserAuthenticatorInterface $userAuthenticator, AppAuthenticator $authenticator, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            // Check for existing email
-            $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $form->get('email')->getData()]);
-            if ($existingUser) {
-                $form->get('email')->addError(new FormError('Il existe déjà un compte avec cette adresse email'));
+        if ($form->isSubmitted() && $form->isValid()) {
+            // encode the plain password
+            $user->setPassword(
+                $userPasswordHasher->hashPassword(
+                    $user,
+                    $form->get('plainPassword')->getData()
+                )
+            );
+
+            // Set the role
+            $role = $form->get('role')->getData();
+            $user->setRole($role);
+            $user->setRoles([$role->value]);
+
+            // If the user is a passenger, create a Passager entity
+            if ($role === RoleEnum::PASSAGER) {
+                $passager = new Passager();
+                $passager->setUser($user);
+                $entityManager->persist($passager);
             }
-            
-            if ($form->isValid()) {
-                $plainPassword = $form->get('plainPassword')->getData();
-                $confirmPassword = $form->get('confirmPassword')->getData();
-            
-                // Debugging
-                dump($plainPassword, $confirmPassword);
-            
-                if ($plainPassword !== $confirmPassword) {
-                    $form->get('confirmPassword')->addError(new FormError('La confirmation du mot de passe ne correspond pas.'));
-                    return $this->render('security/register.html.twig', [
-                        'registrationForm' => $form->createView(),
-                    ]);
-                }
 
-                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-                $user->setMotDePasse($hashedPassword);
-                $user->setDateCreationCompte(new \DateTime());
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-                // Gestion de la photo de profil
-                $photoFile = $form->get('photo_profil')->getData();
-                if ($photoFile) {
-                    $originalFilename = pathinfo($photoFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Sécurisation du nom de fichier
-                    $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-                    $newFilename = $safeFilename.'-'.uniqid().'.'.$photoFile->guessExtension();
-
-                    // Déplacement du fichier dans le répertoire des photos de profil
-                    try {
-                        $photoFile->move(
-                            $this->getParameter('profile_pictures_directory'),
-                            $newFilename
-                        );
-
-                        // Mise à jour du chemin de la photo dans l'entité User
-                        $user->setPhotoProfil($newFilename);
-                    } catch (\Exception $e) {
-                        $form->get('photo_profil')->addError(new FormError('Une erreur est survenue lors du téléchargement de votre photo.'));
-                        return $this->render('security/register.html.twig', [
-                            'registrationForm' => $form->createView(),
-                        ]);
-                    }
-                }
-
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                // Send verification email
-                $email = (new TemplatedEmail())
-                    ->from(new Address('mejrieya384@gmail.com', 'EasyWay'))
-                    ->to($user->getEmail())
-                    ->subject('Please Confirm Your Email')
-                    ->htmlTemplate('security/registration_email.html.twig')
-                    ->context([
-                        'user' => $user,
-                    ]);
-
-                $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user, $email);
-
-                // Flash success message
-                $this->addFlash('success', 'Inscription réussie! Veuillez vérifier votre email pour confirmer votre compte.');
-
-                return $this->redirectToRoute('app_login');
-            }
+            return $userAuthenticator->authenticateUser(
+                $user,
+                $authenticator,
+                $request
+            );
         }
 
         return $this->render('security/register.html.twig', [
