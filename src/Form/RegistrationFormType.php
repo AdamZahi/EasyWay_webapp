@@ -148,6 +148,7 @@ class RegistrationFormType extends AbstractType
             ->add('role', ChoiceType::class, [
                 'mapped' => false,
                 'choices' => [
+                    'Administrateur' => RoleEnum::ADMIN,
                     'Passager' => RoleEnum::PASSAGER,
                     'Conducteur' => RoleEnum::CONDUCTEUR,
                 ],
