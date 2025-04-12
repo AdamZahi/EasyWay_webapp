@@ -46,6 +46,11 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
+        // Check if user has ROLE_ADMIN
+        if (in_array('ROLE_ADMIN', $token->getUser()->getRoles())) {
+            return new RedirectResponse($this->urlGenerator->generate('app_admin'));
+        }
+
         return new RedirectResponse($this->urlGenerator->generate('app_home'));
     }
 

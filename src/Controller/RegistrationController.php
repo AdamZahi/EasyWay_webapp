@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\Passager;
 use App\Entity\Conducteur;
+use App\Entity\Admin;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -46,6 +47,13 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Set all user fields
+            $user->setEmail($form->get('email')->getData());
+            $user->setNom($form->get('nom')->getData());
+            $user->setPrenom($form->get('prenom')->getData());
+            $user->setTelephonne($form->get('telephonne')->getData());
+            $user->setPhotoProfil('default_profile.png');
+
             // encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
@@ -69,6 +77,17 @@ class RegistrationController extends AbstractController
                 $conducteur = new Conducteur();
                 $conducteur->setUser($user);
                 $entityManager->persist($conducteur);
+            }
+            // If the user is an admin, create an Admin entity
+            elseif ($role === RoleEnum::ADMIN) {
+                $admin = new Admin();
+                $admin->setUser($user);
+                $admin->setNom($user->getNom());
+                $admin->setPrenom($user->getPrenom());
+                $admin->setEmail($user->getEmail());
+                $admin->setMotDePasse($user->getPassword());
+                $admin->setTelephonne((int)$user->getTelephonne());
+                $entityManager->persist($admin);
             }
 
             $entityManager->persist($user);
