@@ -1,0 +1,19 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Ajouter station
+{% endblock %}
+{% block main_content %}
+<br><br><br><br><br><br>
+	<div class="container mt-4">
+		<h2>Ajouter Station</h2>
+
+		{{ form_start(form) }}
+		{{ form_row(form.nom) }}
+		{{ form_row(form.localisation) }}
+		{{ form_row(form.id_ligne) }}
+		{{ form_row(form.id_admin) }}
+
+		<button type="submit" class="btn btn-primary">Submit</button>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Ajouter Paiement
+{% endblock %}
+{% block main_content %}
+<br><br><br><br><br><br>
+	<div class="container mt-4">
+		<h2>Ajouter Paiement</h2>
+
+		{{ form_start(form) }}
+		{{ form_row(form.pay_id) }}
+		{{ form_row(form.montant) }}
+		{{ form_row(form.res_id) }}
+		{{ form_row(form.user_id) }}
+
+		<button type="submit" class="btn btn-primary">Submit</button>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}

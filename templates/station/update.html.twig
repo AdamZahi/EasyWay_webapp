@@ -1,0 +1,17 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block main_content %}Edit Station
+{% endblock %}
+
+{% block main_content %}
+<br><br><br><br><br><br>
+	<div class="container mt-4">
+		<h1>Edit Station #{{ station.id }}</h1>
+
+		{{ form_start(form) }}
+		{{ form_widget(form) }}
+		<button type="submit" class="btn btn-primary">Update</button>
+		<a href="{{ path('station_list') }}" class="btn btn-secondary">Cancel</a>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}
