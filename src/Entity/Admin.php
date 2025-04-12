@@ -4,48 +4,69 @@ namespace App\Entity;
 
 use App\Repository\AdminRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 class Admin
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column]
     private ?int $id_admin = null;
 
-    // This is where the relation should reference the user using the correct column
-    #[ORM\OneToOne(targetEntity: User::class, inversedBy: 'admin')]
+    #[ORM\OneToOne(inversedBy: 'admin', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', nullable: false)]
     private ?User $user = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom ne peut pas être vide")]
+    #[Assert\Length(min: 2, max: 50, minMessage: "Le nom doit contenir au moins 2 caractères", maxMessage: "Le nom ne peut pas dépasser 50 caractères")]
+    #[Assert\Regex(pattern: "/^[a-zA-ZÀ-ÿ\s\-]+$/", message: "Le nom ne doit contenir que des lettres, des espaces et des tirets")]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le prénom ne peut pas être vide")]
+    #[Assert\Length(min: 2, max: 50, minMessage: "Le prénom doit contenir au moins 2 caractères", maxMessage: "Le prénom ne peut pas dépasser 50 caractères")]
+    #[Assert\Regex(pattern: "/^[a-zA-ZÀ-ÿ\s\-]+$/", message: "Le prénom ne doit contenir que des lettres, des espaces et des tirets")]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'email ne peut pas être vide")]
+    #[Assert\Email(message: "L'email n'est pas valide")]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le mot de passe ne peut pas être vide")]
+    #[Assert\Length(min: 8, minMessage: "Le mot de passe doit contenir au moins 8 caractères")]
     private ?string $mot_de_passe = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide")]
+    #[Assert\Type(type: 'integer', message: "Le numéro de téléphone doit être un nombre")]
+    #[Assert\Length(min: 8, max: 15, minMessage: "Le numéro de téléphone doit contenir au moins 8 chiffres", maxMessage: "Le numéro de téléphone ne peut pas dépasser 15 chiffres")]
     private ?int $telephonne = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\File(
+        maxSize: "1024k",
+        mimeTypes: ["image/jpeg", "image/png", "image/gif"],
+        mimeTypesMessage: "Veuillez télécharger une image valide (JPEG, PNG, GIF)"
+    )]
     private ?string $photo_profil = null;
-
-    // Getters and setters for the Admin entity properties
 
     public function getIdAdmin(): ?int
     {
         return $this->id_admin;
     }
 
-    public function setIdAdmin(int $id_admin): static
+    public function getUser(): ?User
     {
-        $this->id_admin = $id_admin;
+        return $this->user;
+    }
+
+    public function setUser(User $user): static
+    {
+        $this->user = $user;
         return $this;
     }
 
@@ -109,20 +130,9 @@ class Admin
         return $this->photo_profil;
     }
 
-    public function setPhotoProfil(string $photo_profil): static
+    public function setPhotoProfil(?string $photo_profil): static
     {
         $this->photo_profil = $photo_profil;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(User $user): static
-    {
-        $this->user = $user;
         return $this;
     }
 }
