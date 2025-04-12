@@ -2,18 +2,16 @@
 
 namespace App\Entity;
 
-use App\Enum\RoleEnum;
 use App\Repository\UserRepository;
-use Doctrine\DBAL\Types\Types;
+use App\Enum\RoleEnum;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'Il existe déjà un compte avec cette adresse email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -71,33 +69,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?string $telephonne = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $photo_profil = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $role = null;
-
-    private ?string $plainPassword = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $date_creation_compte = null;
-
-    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    private ?Admin $admin = null;
-
-    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    private ?Conducteur $conducteur = null;
+    #[ORM\Column(length: 255, nullable: false, options: ["default" => "default_profile.png"])]
+    private ?string $photo_profil = 'default_profile.png';
 
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Passager $passager = null;
 
-    #[ORM\Column]
-    private bool $is_verified = false;
+    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Conducteur $conducteur = null;
 
     public function __construct()
     {
-        $this->date_creation_compte = new \DateTimeImmutable();
-        $this->is_verified = false;
+        $this->photo_profil = 'default_profile.png';
     }
 
     public function getIdUser(): ?int
@@ -108,7 +91,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIdUser(int $id_user): static
     {
         $this->id_user = $id_user;
-
         return $this;
     }
 
@@ -120,7 +102,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -140,16 +121,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
@@ -164,19 +142,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
-        return $this;
-    }
-
-    public function getPlainPassword(): ?string
-    {
-        return $this->plainPassword;
-    }
-
-    public function setPlainPassword(?string $plainPassword): static
-    {
-        $this->plainPassword = $plainPassword;
-
         return $this;
     }
 
@@ -185,7 +150,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        $this->plainPassword = null;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
     public function getNom(): ?string
@@ -196,7 +162,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -208,7 +173,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPrenom(string $prenom): static
     {
         $this->prenom = $prenom;
-
         return $this;
     }
 
@@ -220,7 +184,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTelephonne(string $telephonne): static
     {
         $this->telephonne = $telephonne;
-
         return $this;
     }
 
@@ -231,60 +194,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPhotoProfil(?string $photo_profil): static
     {
-        $this->photo_profil = $photo_profil;
-
-        return $this;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function setRole(RoleEnum|string $role): static
-    {
-        if ($role instanceof RoleEnum) {
-            $this->role = $role->value;
-        } else {
-            $this->role = $role;
-        }
-
-        return $this;
-    }
-
-    public function getDateCreationCompte(): ?\DateTimeInterface
-    {
-        return $this->date_creation_compte;
-    }
-
-    public function setDateCreationCompte(\DateTimeInterface $date_creation_compte): static
-    {
-        $this->date_creation_compte = $date_creation_compte;
-
-        return $this;
-    }
-
-    public function getAdmin(): ?Admin
-    {
-        return $this->admin;
-    }
-
-    public function setAdmin(?Admin $admin): static
-    {
-        $this->admin = $admin;
-
-        return $this;
-    }
-
-    public function getConducteur(): ?Conducteur
-    {
-        return $this->conducteur;
-    }
-
-    public function setConducteur(?Conducteur $conducteur): static
-    {
-        $this->conducteur = $conducteur;
-
+        $this->photo_profil = $photo_profil ?? 'default_profile.png';
         return $this;
     }
 
@@ -296,19 +206,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassager(?Passager $passager): static
     {
         $this->passager = $passager;
-
         return $this;
     }
 
-    public function isVerified(): bool
+    public function getConducteur(): ?Conducteur
     {
-        return $this->is_verified;
+        return $this->conducteur;
     }
 
-    public function setIsVerified(bool $is_verified): static
+    public function setConducteur(?Conducteur $conducteur): static
     {
-        $this->is_verified = $is_verified;
-
+        $this->conducteur = $conducteur;
         return $this;
     }
 }

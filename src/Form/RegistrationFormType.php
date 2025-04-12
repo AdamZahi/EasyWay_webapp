@@ -83,7 +83,8 @@ class RegistrationFormType extends AbstractType
                 'label' => 'Mot de passe',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Votre mot de passe'
+                    'placeholder' => 'Votre mot de passe',
+                    'autocomplete' => 'new-password'
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -145,19 +146,18 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('role', ChoiceType::class, [
-                'label' => 'Rôle',
+                'mapped' => false,
                 'choices' => [
-                    'Conducteur' => RoleEnum::CONDUCTEUR,
                     'Passager' => RoleEnum::PASSAGER,
+                    'Conducteur' => RoleEnum::CONDUCTEUR,
                 ],
+                'expanded' => false,
+                'multiple' => false,
+                'label' => 'Je suis un',
                 'attr' => [
                     'class' => 'form-control'
                 ],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Le rôle ne peut pas être vide',
-                    ]),
-                ],
+                'placeholder' => 'Choisissez votre rôle'
             ]);
     }
 

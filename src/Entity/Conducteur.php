@@ -11,7 +11,7 @@ class Conducteur
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: "id_conducteur")]
     private ?int $id_conducteur = null;
 
     #[ORM\OneToOne(inversedBy: 'conducteur', cascade: ['persist', 'remove'])]
@@ -42,31 +42,43 @@ class Conducteur
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le numéro de téléphone ne peut pas être vide")]
-    #[Assert\Regex(pattern: "/^[0-9]{8,15}$/", message: "Le numéro de téléphone doit contenir entre 8 et 15 chiffres")]
+    #[Assert\Regex(
+        pattern: "/^[0-9]{8,15}$/",
+        message: "Le numéro de téléphone doit contenir entre 8 et 15 chiffres"
+    )]
     private ?string $telephonne = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "La photo de profil est obligatoire")]
-    #[Assert\File(
-        maxSize: "1024k",
-        mimeTypes: ["image/jpeg", "image/png", "image/gif"],
-        mimeTypesMessage: "Veuillez télécharger une image valide (JPEG, PNG, GIF)"
-    )]
-    private ?string $photo_profil = null;
+    #[ORM\Column(length: 255, nullable: false, options: ["default" => "default_profile.png"])]
+    private ?string $photo_profil = 'default_profile.png';
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le numéro de permis est obligatoire")]
-    #[Assert\Length(min: 8, max: 20, minMessage: "Le numéro de permis doit contenir au moins 8 caractères", maxMessage: "Le numéro de permis ne peut pas dépasser 20 caractères")]
-    private ?string $numero_permis = null;
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Le nombre de trajets effectués ne peut pas être vide")]
+    #[Assert\Type(type: 'integer', message: "Le nombre de trajets doit être un nombre")]
+    #[Assert\GreaterThanOrEqual(value: 0, message: "Le nombre de trajets ne peut pas être négatif")]
+    private ?int $nb_trajet_effectues = 0;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "L'expérience est obligatoire")]
-    #[Assert\Length(min: 1, max: 50, minMessage: "L'expérience doit être spécifiée", maxMessage: "L'expérience ne peut pas dépasser 50 caractères")]
-    private ?string $experience = null;
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Le nombre de passagers transportés ne peut pas être vide")]
+    #[Assert\Type(type: 'integer', message: "Le nombre de passagers doit être un nombre")]
+    #[Assert\GreaterThanOrEqual(value: 0, message: "Le nombre de passagers ne peut pas être négatif")]
+    private ?int $nb_passagers_transportes = 0;
+
+    public function __construct()
+    {
+        $this->photo_profil = 'default_profile.png';
+        $this->nb_trajet_effectues = 0;
+        $this->nb_passagers_transportes = 0;
+    }
 
     public function getIdConducteur(): ?int
     {
         return $this->id_conducteur;
+    }
+
+    public function setIdConducteur(int $id_conducteur): static
+    {
+        $this->id_conducteur = $id_conducteur;
+        return $this;
     }
 
     public function getUser(): ?User
@@ -77,6 +89,15 @@ class Conducteur
     public function setUser(User $user): static
     {
         $this->user = $user;
+        $this->nom = $user->getNom();
+        $this->prenom = $user->getPrenom();
+        $this->email = $user->getEmail();
+        $this->telephonne = $user->getTelephonne();
+        $this->mot_de_passe = $user->getPassword();
+        $this->photo_profil = $user->getPhotoProfil() ?? 'default_profile.png';
+        $this->nb_trajet_effectues = 0;
+        $this->nb_passagers_transportes = 0;
+
         return $this;
     }
 
@@ -140,31 +161,31 @@ class Conducteur
         return $this->photo_profil;
     }
 
-    public function setPhotoProfil(string $photo_profil): static
+    public function setPhotoProfil(?string $photo_profil): static
     {
-        $this->photo_profil = $photo_profil;
+        $this->photo_profil = $photo_profil ?? 'default_profile.png';
         return $this;
     }
 
-    public function getNumeroPermis(): ?string
+    public function getNbTrajetEffectues(): ?int
     {
-        return $this->numero_permis;
+        return $this->nb_trajet_effectues;
     }
 
-    public function setNumeroPermis(string $numero_permis): static
+    public function setNbTrajetEffectues(int $nb_trajet_effectues): static
     {
-        $this->numero_permis = $numero_permis;
+        $this->nb_trajet_effectues = $nb_trajet_effectues;
         return $this;
     }
 
-    public function getExperience(): ?string
+    public function getNbPassagersTransportes(): ?int
     {
-        return $this->experience;
+        return $this->nb_passagers_transportes;
     }
 
-    public function setExperience(string $experience): static
+    public function setNbPassagersTransportes(int $nb_passagers_transportes): static
     {
-        $this->experience = $experience;
+        $this->nb_passagers_transportes = $nb_passagers_transportes;
         return $this;
     }
 }

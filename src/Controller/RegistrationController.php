@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Passager;
+use App\Entity\Conducteur;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
@@ -53,9 +54,8 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            // Set the role
+            // Get the role from the form and set it in the roles array
             $role = $form->get('role')->getData();
-            $user->setRole($role);
             $user->setRoles([$role->value]);
 
             // If the user is a passenger, create a Passager entity
@@ -63,6 +63,12 @@ class RegistrationController extends AbstractController
                 $passager = new Passager();
                 $passager->setUser($user);
                 $entityManager->persist($passager);
+            }
+            // If the user is a driver, create a Conducteur entity
+            elseif ($role === RoleEnum::CONDUCTEUR) {
+                $conducteur = new Conducteur();
+                $conducteur->setUser($user);
+                $entityManager->persist($conducteur);
             }
 
             $entityManager->persist($user);
