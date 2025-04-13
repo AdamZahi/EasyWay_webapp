@@ -17,4 +17,11 @@ class AdminController extends AbstractController
             'controller_name' => 'AdminController',
         ]);
     }
+
+    #[Route('/admin/dashboard', name: 'admin_dashboard')]
+    public function adminDashboard(): Response
+    {
+        return $this->render('back-office/pages/admin/index.html.twig');
+    }
+    
 } 
