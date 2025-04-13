@@ -1,0 +1,138 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %} Liste des Réclamations {% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="text-center">Liste des Réclamations</h1>
+
+        <form method="get" action="{{ path('admin_search_reclamation') }}" class="mb-3">
+    <input type="text" name="q" class="form-control" id="searchInput" placeholder="Rechercher une réclamation..." onkeyup="fetchResults()">
+</form>
+
+
+<form method="get" action="{{ path('admin_reclamations') }}" class="form-inline mb-3">
+    <label for="statut" class="mr-2">Filtrer par statut :</label>
+    <select name="statut" id="statut" class="form-control" onchange="this.form.submit()">
+        <option value="">-- Tous les statuts --</option>
+        <option value="en_attente" {{ selected_statut == 'en_attente' ? 'selected' : '' }}>en attente</option>
+        <option value="en_cours" {{ selected_statut == 'en_cours' ? 'selected' : '' }}>En cours</option>
+        <option value="Terminer" {{ selected_statut == 'Terminer' ? 'selected' : '' }}>Terminer</option>
+    </select>
+</form>
+
+
+
+        <table class="table table-bordered table-striped mt-3">
+            <thead class="table-dark">
+               <thead class="table-dark">
+                <tr>
+                    <th><a href="#" onclick="sortTable(0)">Email ⬍</a></th>
+                    <th><a href="#" onclick="sortTable(1)">Sujet ⬍</a></th>
+                    <th><a href="#" onclick="sortTable(2)">Description ⬍</a></th>
+                    <th>Catégorie</th>
+                    <th>Status</th>
+                    <th><a href="#" onclick="sortTable(5)">Date ⬍</a></th>
+                    <th>Réponse</th>
+                    <th>Actions</th>
+                </tr>
+</thead>
+
+            </thead>
+            <tbody>
+                {% for reclamation in reclamations %}
+                    <tr>
+                         <td>{{ reclamation.email }}</td>
+                        <td>{{ reclamation.sujet }}</td>
+                        <td>{{ reclamation.description }}</td>
+                        <td>{{ reclamation.categoryId ? reclamation.categoryId.type : 'Non spécifiée' }}</td>
+                        <td>{{ reclamation.statut}}</td>
+                        <td>{{ reclamation.dateCreation|date('d/m/Y H:i') }}</td>
+                        <td>
+                            {% set hasReponse = reclamation.id in reclamationsWithReponsesIds %}
+                            <a href="{{ path('admin_repondre_reclamation', {'id': reclamation.id}) }}"
+                            class="btn btn-sm {{ hasReponse ? 'btn-success' : 'btn-primary' }}">
+                                ✍ Répondre
+                            </a>
+
+                            <a href="{{ path('admin_voir_reponses', {'id': reclamation.id}) }}" class="btn btn-info btn-sm">
+                                Voir Réponses >>
+                            </a>
+                        </td>
+                        <td>
+                            <!-- Bouton Modifier -->
+                          {#   <a href="{{ path('reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning btn-sm">
+                                ✏ Modifier
+                            </a>  #}
+
+                            <!-- Bouton Supprimer -->
+                            <form action="{{ path('reclamation_delete', {'id': reclamation.id}) }}" method="post" style="display:inline;">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?');">
+                                    🗑 Supprimer
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">Aucune réclamation trouvée.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+<!-- Lien vers les statistiques -->
+      <!-- Lien vers les statistiques -->
+<div class="text-center mt-4">
+    <a href="{{ path('admin_statistiques_reclamation') }}" class="link-stats">
+        Voir les Statistiques
+    </a>
+</div>
+
+
+
+
+    </div>
+
+  
+      <!-- Script pour la recherche dynamique -->
+   <script>
+    function fetchResults() {
+        let query = document.getElementById('searchInput').value;
+
+        fetch(`{{ path('admin_search_reclamation') }}?q=${encodeURIComponent(query)}`)
+            .then(response => response.text())
+            .then(html => {
+                let parser = new DOMParser();
+                let doc = parser.parseFromString(html, 'text/html');
+                let newTable = doc.querySelector("tbody"); // Récupère les nouvelles données
+                document.querySelector("tbody").innerHTML = newTable.innerHTML; // Met à jour la table
+            });
+    }
+
+    function sortTable(columnIndex) {
+    let table = document.querySelector("table tbody");
+    let rows = Array.from(table.rows);
+    let sortedRows = rows.sort((a, b) => {
+        let aText = a.cells[columnIndex].textContent.trim();
+        let bText = b.cells[columnIndex].textContent.trim();
+
+        // Vérifier si c'est une date
+        if (columnIndex === 5) {
+            return new Date(aText) - new Date(bText);
+        }
+
+        return aText.localeCompare(bText);
+    });
+
+    // Vider la table et réinsérer les lignes triées
+    table.innerHTML = "";
+    sortedRows.forEach(row => table.appendChild(row));
+}
+
+
+</script>
+
+{% endblock %}
