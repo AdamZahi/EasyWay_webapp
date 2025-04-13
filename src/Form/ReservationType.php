@@ -15,9 +15,7 @@ class ReservationType extends AbstractType
             ->add('depart')
             ->add('arret')
             ->add('vehicule')
-            ->add('nb')
-            ->add('user_id')
-        ;
+            ->add('nb');
     }
 
     public function configureOptions(OptionsResolver $resolver): void

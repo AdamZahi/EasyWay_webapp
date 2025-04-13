@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\StationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
 
 #[ORM\Entity(repositoryClass: StationRepository::class)]
 class Station
@@ -23,7 +25,7 @@ class Station
     private ?string $localisation = null;
 
     #[ORM\ManyToOne(inversedBy: 'stations')]
-    #[ORM\JoinColumn(name: "ligne_id", referencedColumnName: "id")]
+    #[ORM\JoinColumn(name: "id_ligne", referencedColumnName: "id")]
     #[Assert\NotBlank(message: "Ce champ est obligatoire")]
     private ?Ligne $ligne = null;
 
@@ -58,12 +60,12 @@ class Station
         return $this;
     }
 
-    public function getLigne(): ?Ligne
+    public function getIdLigne(): ?Ligne
     {
         return $this->ligne;
     }
 
-    public function setLigne(?Ligne $ligne): static
+    public function setIdLigne(?Ligne $ligne): static
     {
         $this->ligne = $ligne;
         return $this;
@@ -75,6 +77,27 @@ class Station
     }
 
     public function setIdAdmin(int $id_admin): static
+    {
+        $this->id_admin = $id_admin;
+        return $this;
+    }
+    public function getid_ligne(): ?Ligne
+    {
+        return $this->ligne;
+    }
+
+    public function setid_ligne(?Ligne $ligne): static
+    {
+        $this->ligne = $ligne;
+        return $this;
+    }
+
+    public function getid_admin(): ?int
+    {
+        return $this->id_admin;
+    }
+
+    public function setid_admin(int $id_admin): static
     {
         $this->id_admin = $id_admin;
         return $this;

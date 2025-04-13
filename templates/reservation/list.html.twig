@@ -19,7 +19,6 @@
                     <th>ARRET</th>
                     <th>VEHICULE</th>
                     <th>NOMBRE DE PLACES</th>
-                    <th>UTILISATEUR</th>
                     <th>ACTIONS</th>
                 </tr>
             </thead>
@@ -31,7 +30,6 @@
                         <td>{{ reservation.arret }}</td>
                         <td>{{ reservation.vehicule }}</td>
                         <td>{{ reservation.nb }}</td>
-                        <td>{{ reservation.user_id }}</td>
                         <td>
                             <a href="{{ path('reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-primary">Edit</a>
                             <a href="{{ path('reservation_delete', {'id': reservation.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>

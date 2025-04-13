@@ -14,12 +14,14 @@ final class ReservationController extends AbstractController
 {
     #[Route('/reservation/add', name: 'reservation_add')]
 public function add(Request $request, EntityManagerInterface $entityManager): Response
-{
+{   
+    $this->denyAccessUnlessGranted('ROLE_PASSAGER');
     $reservation = new Reservation();
     $form = $this->createForm(ReservationType::class, $reservation);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+        $reservation->setUser($this->getUser());
         $entityManager->persist($reservation);
         $entityManager->flush();
 
@@ -34,12 +36,17 @@ public function add(Request $request, EntityManagerInterface $entityManager): Re
 #[Route('/reservation/list', name: 'reservation_list')]
 public function list(EntityManagerInterface $entityManager): Response
 {
-    $reservations = $entityManager->getRepository(Reservation::class)->findAll();
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+    $user = $this->getUser();
+    $reservations = $entityManager->getRepository(Reservation::class)->findBy([
+        'user' => $user
+    ]);
 
     return $this->render('/reservation/list.html.twig', [
         'reservations' => $reservations
     ]);
 }
+
 
 #[Route('/reservation/edit/{id}', name: 'reservation_edit')]
 public function edit(Request $request, EntityManagerInterface $entityManager, int $id): Response

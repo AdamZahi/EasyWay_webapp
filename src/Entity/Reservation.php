@@ -1,9 +1,11 @@
 <?php
 
 namespace App\Entity;
-
+use App\Entity\User;
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 class Reservation
@@ -27,12 +29,17 @@ class Reservation
     private ?string $vehicule = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]
+    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]#[Assert\Range(
+        min: 1,
+        max: 5,
+        notInRangeMessage: "Le nombre de places doit être entre {{ min }} et {{ max }}."
+    )]
     private ?int $nb = null;
 
-    #[ORM\Column]
-    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]
-    private ?int $user_id = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id_user", nullable: false)]
+     private ?User $user = null;
+
 
     public function getId(): ?int
     {
@@ -87,25 +94,16 @@ class Reservation
         return $this;
     }
 
-    public function getUser_Id(): ?int
-    {
-        return $this->user_id;
-    }
-
-    public function setUser_Id(int $user_id): static
-    {
-        $this->user_id = $user_id;
-
-        return $this;
-    }
-    public function getUserId(): ?int
+    public function getUser(): ?User
 {
-    return $this->user_id;
+    return $this->user;
 }
 
-public function setUserId(int $user_id): static
+public function setUser(?User $user): self
 {
-    $this->user_id = $user_id;
+    $this->user = $user;
     return $this;
 }
+
+    
 }

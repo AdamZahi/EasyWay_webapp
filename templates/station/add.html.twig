@@ -1,19 +1,82 @@
 {% extends 'front-office/front.html.twig' %}
 
-{% block title %}Ajouter station
+{% block title %}Ajouter Station{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-control {
+            max-width: 100%;
+        }
+        .submit-btn {
+            margin-top: 20px;
+        }
+    </style>
 {% endblock %}
+
 {% block main_content %}
-<br><br><br><br><br><br>
-	<div class="container mt-4">
-		<h2>Ajouter Station</h2>
+    <br><br><br><br><br><br>
+    <div class="container mt-4">
+        <div class="form-container">
+            <h2 class="text-center mb-4">Ajouter Station</h2>
 
-		{{ form_start(form) }}
-		{{ form_row(form.nom) }}
-		{{ form_row(form.localisation) }}
-		{{ form_row(form.id_ligne) }}
-		{{ form_row(form.id_admin) }}
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
 
-		<button type="submit" class="btn btn-primary">Submit</button>
-		{{ form_end(form) }}
-	</div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form_label(form.nom) }}
+                    {{ form_widget(form.nom, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'Nom de la station'
+                        }
+                    }) }}
+                    {{ form_errors(form.nom) }}  {# Render error for nom #}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.localisation) }}
+                    {{ form_widget(form.localisation, {
+                        'attr': {
+                            'class': 'form-control',
+                            'placeholder': 'Localisation'
+                        }
+                    }) }}
+                    {{ form_errors(form.localisation) }}  {# Render error for localisation #}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form_label(form.id_ligne) }}
+                    {{ form_widget(form.id_ligne, {
+                        'attr': {
+                            'class': 'form-control'
+                        }
+                    }) }}
+                    {{ form_errors(form.id_ligne) }}  {# Render error for id_ligne #}
+                </div>
+
+                <div class="col-md-6">
+                    {{ form_label(form.id_admin) }}
+                    {{ form_widget(form.id_admin, {
+                        'attr': {
+                            'class': 'form-control'
+                        }
+                    }) }}
+                    {{ form_errors(form.id_admin) }}  {# Render error for id_admin #}
+                </div>
+            </div>
+
+            <div class="text-center submit-btn">
+                <button type="submit" class="btn btn-primary px-4">Ajouter</button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
 {% endblock %}

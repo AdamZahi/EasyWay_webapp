@@ -1,20 +1,84 @@
 {% extends 'front-office/front.html.twig' %}
 
-{% block title %}Ajouter Reservation
+{% block title %}Ajouter Réservation{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .form-control {
+            max-width: 100%;
+        }
+        .submit-btn {
+            margin-top: 20px;
+        }
+    </style>
 {% endblock %}
+
 {% block main_content %}
-<br><br><br><br><br><br>
-	<div class="container mt-4">
-		<h2>Ajouter Reservation</h2>
+    <br><br><br><br><br><br>
+    <div class="container mt-4">
+        <div class="form-container">
+            <h2 class="text-center mb-4">Ajouter Réservation</h2>
 
-		{{ form_start(form) }}
-		{{ form_row(form.depart) }}
-		{{ form_row(form.arret) }}
-		{{ form_row(form.vehicule) }}
-		{{ form_row(form.nb) }}
-		{{ form_row(form.user_id) }}
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
 
-		<button type="submit" class="btn btn-primary">Submit</button>
-		{{ form_end(form) }}
-	</div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form_row(form.depart, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Départ'
+                            },
+                            'label': 'Départ',
+                            'row_attr': {'class': 'form-group'}
+                        }) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(form.arret, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Arrêt'
+                            },
+                            'label': 'Arrêt',
+                            'row_attr': {'class': 'form-group'}
+                        }) }}
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form_row(form.vehicule, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Véhicule'
+                            },
+                            'label': 'Véhicule',
+                            'row_attr': {'class': 'form-group'}
+                        }) }}
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_row(form.nb, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Nombre de places'
+                            },
+                            'label': 'Nombre de places',
+                            'row_attr': {'class': 'form-group'}
+                        }) }}
+                    </div>
+                </div>
+
+                <div class="text-center submit-btn">
+                    <button type="submit" class="btn btn-primary px-4">Réserver</button>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
 {% endblock %}
