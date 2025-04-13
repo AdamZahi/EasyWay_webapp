@@ -1,0 +1,48 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Reservations{% endblock %}
+
+{% block main_content %}
+<br><br><br><br><br><br>
+    <div class="container mt-4">
+        <h1>Reservations</h1>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <table class="table table-striped" border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>DEPART</th>
+                    <th>ARRET</th>
+                    <th>VEHICULE</th>
+                    <th>NOMBRE DE PLACES</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in reservations %}
+                    <tr>
+                        <td>{{ reservation.id }}</td>
+                        <td>{{ reservation.depart }}</td>
+                        <td>{{ reservation.arret }}</td>
+                        <td>{{ reservation.vehicule }}</td>
+                        <td>{{ reservation.nb }}</td>
+                        <td>
+                            <a href="{{ path('reservation_edit', {'id': reservation.id}) }}" class="btn btn-sm btn-primary">Edit</a>
+                            <a href="{{ path('reservation_delete', {'id': reservation.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No reservations found</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ path('reservation_add') }}" class="btn btn-primary">Add New Reservation</a>
+    </div>
+{% endblock %}

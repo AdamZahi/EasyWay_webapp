@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Form;
+
+use App\Entity\Ligne;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class LigneType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('depart')
+            ->add('arret')
+            ->add('type')
+            ->add('admin_id')
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Ligne::class,
+        ]);
+    }
+}
