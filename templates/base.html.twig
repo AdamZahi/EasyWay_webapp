@@ -1,104 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>{% block title %}Esprit Template - Index{% endblock %}</title>
-    <meta name="description" content="Esprit is a modern and creative template for your professional portfolio.">
-    <meta name="keywords" content="portfolio, personal website, creative, professional">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>{% block title %}EasyWay{% endblock %}</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
 
-    {% block css %}
-        <!-- Favicons -->
-        <link href="{{ asset('img/favicon.png') }}" rel="icon" type="image/png">
-        <link href="{{ asset('img/apple-touch-icon.png') }}" rel="apple-touch-icon" sizes="180x180">
+    <!-- Favicons -->
+    <link href="{{ asset('img/favicon.ico') }}" rel="icon">
 
-        <!-- Google Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
 
-        <!-- Libraries CSS Files -->
-        <link href="{{ asset('libraries/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('libraries/icofont/icofont.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('libraries/owl.carousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('libraries/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
-        <link href="{{ asset('libraries/venobox/venobox.css') }}" rel="stylesheet">
-        <link href="{{ asset('libraries/aos/aos.css') }}" rel="stylesheet">
-        <link href="{{ asset('libraries/nav/nav_bar.css') }}" rel="stylesheet">
-        <!-- Template Main CSS File -->
-        <link href="{{ asset('css/style.css') }}" rel="stylesheet">
-    {% endblock %}
+    <!-- CSS Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="{{ asset('lib/animate/animate.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('lib/owlcarousel/assets/owl.carousel.min.css') }}" rel="stylesheet">
+    <!-- Add Animate.css CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{{ asset('css/style.css') }}" rel="stylesheet">
+    
+    {% block stylesheets %}{% endblock %}
 </head>
 
 <body>
-    <!-- ======= Header ======= -->
-    <header id="header" class="fixed-top">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-        <h1 class="logo"><a href="home">Esprit</a></h1>
-        <nav class="nav-menu d-none d-lg-block">
-            <ul class="nav-links">
-                <li class="active"><a href="home">Home</a></li>
-                <li><a href="about">About</a></li>
-                <li><a href="resume">Resume</a></li>
-                <li><a href="services">Services</a></li>
-                <li><a href="portfolio">Portfolio</a></li>
-                <li><a href="contact">Contact</a></li>
-            </ul>
-        </nav><!-- .nav-menu -->
-        <div class="header-social-links">
-            <a href="#" class="twitter" aria-label="Twitter"><i class="icofont-twitter"></i></a>
-            <a href="#" class="facebook" aria-label="Facebook"><i class="icofont-facebook"></i></a>
-            <a href="#" class="instagram" aria-label="Instagram"><i class="icofont-instagram"></i></a>
-            <a href="#" class="linkedin" aria-label="LinkedIn"><i class="icofont-linkedin"></i></a>
-        </div>
-    </div>
-</header>
+    {% block body %}{% endblock %}
 
-    <!-- ======= Hero Section ======= -->
-    <section id="hero" class="d-flex align-items-center">
-        <div class="container d-flex flex-column align-items-center" data-aos="zoom-in" data-aos-delay="100">
-            <h1>Esprit - Creative Web Solutions</h1>
-            <a href="about" class="btn-about">About Me</a>
-        </div>
-    </section><!-- End Hero -->
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('lib/wow/wow.min.js') }}"></script>
+    <script src="{{ asset('lib/easing/easing.min.js') }}"></script>
+    <script src="{{ asset('lib/waypoints/waypoints.min.js') }}"></script>
+    <script src="{{ asset('lib/counterup/counterup.min.js') }}"></script>
+    <script src="{{ asset('lib/owlcarousel/owl.carousel.min.js') }}"></script>
+    <!-- jQuery and Bootstrap JS for modal functionality -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    {% block body %}
-        <!-- Content specific to each page will go here -->
-    {% endblock %}
 
-    <!-- ======= Footer ======= -->
-    <footer id="footer">
-        <div class="container">
-            <div class="copyright">
-                &copy; Copyright <strong><span>Esprit</span></strong>. All Rights Reserved
-            </div>
-            <div class="credits">
-                Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-            </div>
-        </div>
-    </footer><!-- End Footer -->
+    <!-- Initialize WOW.js -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new WOW().init();
+        });
+    </script>
 
-    <div id="preloader"></div>
-    <a href="#" class="back-to-top"><i class="bx bx-up-arrow-alt"></i></a>
-
-    <!-- Libraries JS Files -->
-    <script src="{{ asset('libraries/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('libraries/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('libraries/jquery.easing/jquery.easing.min.js') }}"></script>
-    <script src="{{ asset('libraries/php-email-form/validate.js') }}"></script>
-    <script src="{{ asset('libraries/waypoints/jquery.waypoints.min.js') }}"></script>
-    <script src="{{ asset('libraries/counterup/counterup.min.js') }}"></script>
-    <script src="{{ asset('libraries/owl.carousel/owl.carousel.min.js') }}"></script>
-    <script src="{{ asset('libraries/isotope-layout/isotope.pkgd.min.js') }}"></script>
-    <script src="{{ asset('libraries/venobox/venobox.min.js') }}"></script>
-    <script src="{{ asset('libraries/aos/aos.js') }}"></script>
-
-    <!-- Template Main JS File -->
+    <!-- Template Javascript -->
     <script src="{{ asset('js/main.js') }}"></script>
-
-    {% block javascript %}
-        <!-- Additional JavaScript for page-specific scripts -->
-    {% endblock %}
-
+    
+    {% block javascripts %}{% endblock %}
 </body>
-
 </html>

@@ -1,4 +1,5 @@
 
+
 /**
 * Template Name: Kelly - v2.1.1
 * Template URL: https://bootstrapmade.com/kelly-free-bootstrap-cv-resume-html-template/
@@ -176,6 +177,7 @@
   });
 
 })(jQuery);
+
 
 (function ($) {
     "use strict";
