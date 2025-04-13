@@ -85,6 +85,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Conducteur $conducteur = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Admin::class, cascade: ['persist', 'remove'])]
+    private ?Admin $admin = null;
+
     public function __construct()
     {
         $this->photo_profil = 'default_profile.png';
@@ -112,6 +115,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
         return $this;
     }
+
+    public function getAdmin(): ?Admin
+{
+    return $this->admin;
+}
+
+public function setAdmin(?Admin $admin): static
+{
+    $this->admin = $admin;
+    return $this;
+}
 
     /**
      * A visual identifier that represents this user.
