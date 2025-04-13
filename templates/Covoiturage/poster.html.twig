@@ -1,0 +1,209 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block body %}
+<!-- Navbar Start -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">    
+    <a href="#" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <h2 class="mb-2 text-white">EasyWay</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a href="#" class="nav-item nav-link">Acceuil</a>
+            <a href="#" class="nav-item nav-link active">Événements</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
+                <div class="dropdown-menu fade-up m-0">
+                    <a href="#" class="dropdown-item">Co-voiturage</a>
+                    <a href="#" class="dropdown-item">Transport public</a>
+                    <a href="#" class="dropdown-item">Véhicules</a>
+                    <a href="#" class="dropdown-item">Réclamation</a>
+                </div>
+            </div>
+            <a href="#" class="nav-item nav-link">Contact</a>
+        </div>
+        <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="fa fa-headphones text-primary me-3"></i>+216 77 777 777</h4>
+    </div>
+</nav>
+<!-- Navbar End -->
+<main style="margin-top: 30px;">
+    <div class="container-fluid" style="width: 100%; margin: 0 ;">
+        
+        <!-- <div class="border" style="background-color: #DDDEC6; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); margin-bottom: 30px;">
+            <div class="d-flex justify-content-between align-items-center p-4">
+                
+                <div class="d-flex">
+                    <button class="btn" style="font-size: 16px; font-weight: bold; background-color: #DDDEC6; color: #A11010; border: none; margin-right: 15px; transition: all 0.3s;">
+                        Accueil
+                    </button>
+                    <button class="btn" style="font-size: 16px; font-weight: bold; background-color: #DDDEC6; color: #A11010; border: none; margin-right: 15px; transition: all 0.3s;">
+                        Notre Solution
+                    </button>
+                    <button class="btn" style="font-size: 16px; font-weight: bold; background-color: #DDDEC6; color: #A11010; border: none; transition: all 0.3s;">
+                        Communauté
+                    </button>
+                </div>
+                
+                <div class="d-flex justify-content-start align-items-center">
+                    <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo" style="height: 60px; width: auto;">
+                </div>
+            </div>
+        </div> -->
+
+        <!-- Sidebar and Main Content Layout -->
+        <div class="d-flex">
+            <!-- Sidebar -->
+            <div class="col-md-3" style="width: 250px; background-color: transparent; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); padding: 20px;">
+                <h3 style="text-align: center; padding-top: 20px; font-size: 20px; font-weight: bold; color: #A11010;">Service de covoiturage</h3>
+
+                <div class="p-3">
+                    <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
+                        <div class="d-flex align-items-center">
+                            <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
+                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
+                        </div>
+                    </a>
+                
+                    <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
+                        <div class="d-flex align-items-center mt-3">
+                            <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
+                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
+                        </div>
+                    </a>
+                
+                    <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
+                        <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                            <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
+                        </div>
+                    </a>
+
+                    <a href="{{ path('app_covoiturage_mes_offres') }}" style="text-decoration: none;">
+                        <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                            <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Mes offres</label>
+                        </div>
+                    </a>
+                </div>
+            </div>  
+    <div class="container" style="max-width: 800px; margin: 0 auto;">
+        <h1 class="text-center mb-4" style="color: #A11010; font-weight: bold;">
+            Besoin d'un passager ? Publiez ici !
+        </h1>
+
+        {# Flash messages #}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                <i class="fas fa-check-circle me-2"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {{ form_start(form, {'attr': {'class': 'form-horizontal', 'novalidate': 'novalidate'}}) }}
+
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    {{ form_label(form.ville_depart, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                    {{ form_widget(form.ville_depart, {'attr': {
+                        'class': 'form-control form-select',
+                        'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                    }}) }}
+                    <div class="invalid-feedback">{{ form_errors(form.ville_depart) }}</div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    {{ form_label(form.ville_arrivee, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                    {{ form_widget(form.ville_arrivee, {'attr': {
+                        'class': 'form-control form-select',
+                        'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                    }}) }}
+                    <div class="invalid-feedback">{{ form_errors(form.ville_arrivee) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="form-group">
+                    {{ form_label(form.date, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                    {{ form_widget(form.date, {'attr': {
+                        'class': 'form-control',
+                        'required': 'required',
+                        'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                    }}) }}
+                    <div class="invalid-feedback">{{ form_errors(form.date) }}</div>
+                </div>
+            </div>
+        <div class="col-md-3 mb-3">
+        <div class="form-group">
+            {{ form_label(form.prix, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+            <div class="input-group">
+                <!-- <span class="input-group-text" style="background-color: transparent; border: 0px solid #A11010;">DT</span> -->
+                {{ form_widget(form.prix, {'attr': {
+                    'class': 'form-control',
+                    'style': 'border: 1px solid #A11010; border-radius: 8px;',
+                    'min': '0.1',
+                    'step': '0.1',
+                    'required': 'required'
+                }}) }}
+            </div>
+            <div class="invalid-feedback">
+                {{ form_errors(form.prix) }}
+            </div>
+        </div>
+    </div>
+            <div class="col-md-3 mb-3">
+                <div class="form-group">
+                    {{ form_label(form.nombreDePlaces, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #A11010;'}}) }}
+                    {{ form_widget(form.nombreDePlaces, {'attr': {
+                        'class': 'form-control',
+                        'style': 'border: 1px solid #A11010; border-radius: 8px;'
+                    }}) }}
+                    <div class="invalid-feedback">{{ form_errors(form.nombreDePlaces) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <div class="form-group">
+                {{ form_label(form.message, 'Quand et comment voyagez-vous ?', {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #8b0e0e;'}}) }}
+                {{ form_widget(form.message, {'attr': {
+                    'class': 'form-control',
+                    'style': 'border: 1px solid #A11010; border-radius: 8px; height: 120px;',
+                    'placeholder': "🕒 Heure : \n📍 Point de départ : "
+                }}) }}
+                <div class="invalid-feedback">{{ form_errors(form.message) }}</div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            {{ form_widget(form.submit, {'attr': {
+                'class': 'btn fw-bold py-2 px-4',
+                'style': 'background-color: transparent; color: #331414; border: 2px solid #A11010; border-radius: 10px;'
+            }}) }}
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+
+    <style>
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+    </style>
+</main>
+    {% endblock %}

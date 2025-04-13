@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le commentaire{% endblock %}
+
+{% block body %}
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="card p-4 shadow-lg" style="width: 100%; max-width: 650px;">
+        <div class="text-center mb-4">
+            <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo" style="max-height: 80px;">
+            <h2 class="mt-3">Modifier votre commentaire</h2>
+        </div>
+
+        <div class="alert alert-info text-center mb-4">
+            Vous pouvez modifier votre message ici.<br>
+            <strong>Veuillez respecter nos règles :</strong> aucun propos offensant, injurieux ou inapproprié ne sera toléré.<br>
+            Tout manquement entraînera la suppression du commentaire et l’élimination de l'utilisateur concerné.
+        </div>
+
+     {{ form_start(form) }}
+
+    <!-- Espacement entre le titre et le champ de texte -->
+    <div class="mt-4 form-group mb-3">
+    
+        {{ form_widget(form, {'attr': {'class': 'form-control', 'style': 'min-height: 120px; font-size: 16px;'}}) }}
+    </div>
+
+    <div class="d-flex justify-content-between">
+
+        <button type="submit" class="btn btn-success w-50 me-2">Enregistrer</button>
+        <a href="{{ path('app_covoiturage_rechercher') }}" class="btn btn-outline-secondary w-50 ms-2">Annuler</a>
+    </div>
+
+{{ form_end(form) }}
+
+    </div>
+</div>
+{% endblock %}
