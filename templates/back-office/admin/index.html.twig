@@ -1,0 +1,103 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %}Liste des Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">Liste des Utilisateurs</h1>
+
+    <!-- Recherche -->
+    <form method="get" action="{{ path('admin_users') }}" class="mb-3">
+        <input type="text" name="q" class="form-control" id="searchInput" placeholder="Rechercher par nom ou email..." onkeyup="fetchUserResults()">
+    </form>
+
+    <!-- Filtrage par rôle -->
+    <form method="get" action="{{ path('admin_users') }}" class="form-inline mb-3">
+        <label for="role" class="mr-2">Filtrer par rôle :</label>
+        <select name="role" id="role" class="form-control" onchange="this.form.submit()">
+<option value="">-- Tous les rôles --</option>
+<option value="ROLE_PASSAGER">Passager</option>
+<option value="ROLE_CONDUCTEUR">Conducteur</option>
+<option value="ROLE_ADMIN">Administrateur</option>
+        </select>
+    </form>
+
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th><a href="#" onclick="sortTable(0)">Nom ⬍</a></th>
+                <th><a href="#" onclick="sortTable(1)">Prénom ⬍</a></th>
+                <th><a href="#" onclick="sortTable(2)">Email ⬍</a></th>
+                <th>Téléphone</th>
+                <th>Rôle</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.nom }}</td>
+                    <td>{{ user.prenom }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.telephonne }}</td>
+                    <td>{{ user.roles[0] }}</td>
+                    <td>
+                        {# Suppression #}
+                        <form action="{{ path('user_delete', {'id': user.idUser}) }}" method="post" style="display:inline;">
+                            <input type="hidden" name="_method" value="DELETE">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.idUser) }}">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr ?')">🗑 Supprimer</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="text-center">Aucun utilisateur trouvé.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Zone d'affichage des messages -->
+<div id="searchMessage"></div>
+
+
+<!-- Scripts tri/recherche -->
+<script>
+function sortTable(columnIndex) {
+    let table = document.querySelector("table tbody");
+    let rows = Array.from(table.rows);
+    let sortedRows = rows.sort((a, b) => {
+        let aText = a.cells[columnIndex].textContent.trim();
+        let bText = b.cells[columnIndex].textContent.trim();
+        return aText.localeCompare(bText);
+    });
+    table.innerHTML = "";
+    sortedRows.forEach(row => table.appendChild(row));
+}
+
+function fetchUserResults() {
+    let query = document.getElementById('searchInput').value;
+    fetch(`{{ path('admin_users') }}?q=${encodeURIComponent(query)}`)
+        .then(response => response.text())
+        .then(html => {
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(html, 'text/html');
+            let newTableBody = doc.querySelector("tbody");
+            let currentTbody = document.querySelector("tbody");
+
+            currentTbody.innerHTML = newTableBody.innerHTML;
+
+            // Gestion du message si aucun utilisateur trouvé
+            let messageDiv = document.getElementById('searchMessage');
+            if (newTableBody.querySelectorAll('tr').length === 1 && newTableBody.querySelector('td[colspan]')) {
+                messageDiv.innerHTML = `
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        Aucun utilisateur trouvé pour cette recherche.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    </div>`;
+            } else {
+                messageDiv.innerHTML = ''; // Nettoyer si des résultats sont trouvés
+            }
+        });
+}
+</script>
+{% endblock %}

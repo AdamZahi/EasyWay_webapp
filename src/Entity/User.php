@@ -9,15 +9,22 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Entity\Reclamation;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: "id_user")]
+    #[ORM\Column(name: "id_user", type: "integer")]
     private ?int $id_user = null;
+    
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reclamation::class)]
+    private Collection $reclamations;
+    
+
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(message: "L'email ne peut pas être vide")]
@@ -78,9 +85,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Conducteur $conducteur = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Admin::class, cascade: ['persist', 'remove'])]
+    private ?Admin $admin = null;
+
     public function __construct()
     {
         $this->photo_profil = 'default_profile.png';
+        $this->reclamations = new ArrayCollection();
     }
 
     public function getIdUser(): ?int
@@ -104,6 +115,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
         return $this;
     }
+
+    public function getAdmin(): ?Admin
+{
+    return $this->admin;
+}
+
+public function setAdmin(?Admin $admin): static
+{
+    $this->admin = $admin;
+    return $this;
+}
 
     /**
      * A visual identifier that represents this user.
@@ -219,4 +241,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->conducteur = $conducteur;
         return $this;
     }
+
+    public function getReclamations(): Collection
+{
+    return $this->reclamations;
+}
+
+public function addReclamation(Reclamation $reclamation): static
+{
+    if (!$this->reclamations->contains($reclamation)) {
+        $this->reclamations[] = $reclamation;
+        $reclamation->setUser($this);
+    }
+
+    return $this;
+}
+
+public function removeReclamation(Reclamation $reclamation): static
+{
+    if ($this->reclamations->removeElement($reclamation)) {
+        if ($reclamation->getUser() === $this) {
+            $reclamation->setUser(null);
+        }
+    }
+
+    return $this;
+}
 }

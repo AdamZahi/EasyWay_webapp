@@ -1,0 +1,16 @@
+
+.link-stats {
+    font-size: 1.25rem; /* Augmente la taille du texte */
+    color: #007bff; /* Couleur bleue, ou utilisez la couleur que vous préférez */
+    text-decoration: none; /* Retire le soulignement */
+    font-weight: bold; /* Rendre le texte plus audacieux */
+    padding: 10px 20px; /* Ajoute un peu d'espace autour du lien */
+    border-radius: 5px; /* Coins arrondis pour un aspect plus doux */
+    transition: color 0.3s, transform 0.2s; /* Effet de transition au survol */
+}
+
+.link-stats:hover {
+    color: #0056b3; /* Change la couleur au survol */
+    transform: scale(1.05); /* Agrandissement léger au survol */
+    text-decoration: underline; /* Ajoute un soulignement au survol pour plus d'interactivité */
+}
