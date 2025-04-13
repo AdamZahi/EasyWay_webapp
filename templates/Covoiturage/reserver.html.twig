@@ -12,7 +12,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-4">
-                        <img src="{{ asset('LOGOEASY.png') }}" style="height: 77px; width: 87px; margin-right: 15px;">
+                        <img src="{{ asset('img/LOGOEASY.png') }}" style="height: 77px; width: 87px; margin-right: 15px;">
                         <div>
                             <h3 style="color: #c40000; font-weight: bold;">{{ post.villeDepart }}</h3>
                             <span style="color: #c40000; font-weight: bold; font-size: 24px;">Vers</span>
@@ -23,74 +23,49 @@
                     <form method="post">
                         <div class="form-group">
                             <label for="email" style="font-weight: bold;">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required 
-                                   style="height: 50px; width: 100%; max-width: 264px;">
+                            <input type="email" class="form-control" id="email" name="email" required>
                         </div>
 
                         <div class="form-group mt-3">
                             <label for="card_id" style="font-weight: bold;">Numéro de carte</label>
-                            <input type="text" class="form-control" id="card_id" name="card_id" required 
-                                   style="height: 50px; width: 100%; max-width: 264px;">
+                            <input type="text" class="form-control" id="card_id" name="card_id" required>
                         </div>
 
                         <div class="form-group mt-3">
                             <label for="places" style="font-weight: bold;">Nombre de places</label>
-                            <div class="d-flex align-items-center">
-                                <input type="number" class="form-control" id="places" name="places" 
-                                       min="1" max="{{ post.nombreDePlaces }}" value="1" 
-                                       style="height: 50px; width: 100px;"
-                                       onchange="calculateAmount()">
-                            </div>
+                            <input type="number" class="form-control" id="places" name="places" 
+                                   min="1" max="{{ post.nombreDePlaces }}" value="1">
                         </div>
 
                         <div class="form-group mt-3">
                             <label for="montant" style="font-weight: bold;">Montant</label>
                             <input type="text" class="form-control" id="montant" name="montant" 
-                                   value="{{ post.prix }} €" readonly 
-                                   style="height: 50px; width: 100%; max-width: 163px;">
+                                   value="{{ post.prix }} €" readonly>
                         </div>
 
-                        <input type="hidden" name="_token" value="{{ csrf_token('reserve' ~ post.id) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('reserve' ~ post.getIdPost() ) }}">
                         
-                        <button type="submit" class="btn btn-danger mt-3" 
-                                style="background-color: #AA1010; height: 39px; width: 163px;">
+                        <button type="submit" class="btn btn-danger mt-3" style="background-color: #AA1010;">
                             Valider
                         </button>
-                        
-                        {% if error %}
-                            <div class="text-danger mt-2">{{ error }}</div>
-                        {% endif %}
                     </form>
                 </div>
 
                 <div class="col-md-6">
                     <div class="mt-4">
                         <h5>Accédez à un transport abordable et fiable</h5>
-                        <p style="font-size: 15px;">
-                            Avec notre application, vous pouvez<br>
-                            voyager à travers la Tunisie<br>
-                            à des prix imbattables.
-                        </p>
+                        <p>Avec notre application, vous pouvez voyager à travers la Tunisie à des prix imbattables.</p>
                     </div>
-                    <img src="{{ asset('car.png') }}" style="height: 195px; width: 333px; margin-top: 20px;">
+                    <img src="{{asset('img/car.png') }}" style="height: 195px; width: 333px; margin-top: 20px;">
                 </div>
             </div>
 
             <div class="mt-4">
-                <a href="{{ path('app_covoiturage_rechercher') }}" class="text-primary mr-3" style="font-size: 17px;">Retour</a>
-                <a href="#" class="text-primary mr-3" style="font-size: 17px;">Consulter reservations</a>
-                <a href="#" class="text-primary" style="font-size: 17px;">facebook</a>
+                <a href="{{ path('app_covoiturage_rechercher') }}" class="text-primary mr-3">Retour</a>
+                <a href="#" class="text-primary mr-3">Consulter reservations</a>
+                <a href="#" class="text-primary">facebook</a>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-function calculateAmount() {
-    const places = document.getElementById('places').value;
-    const pricePerPlace = {{ post.prix }};
-    const totalAmount = places * pricePerPlace;
-    document.getElementById('montant').value = totalAmount + ' €';
-}
-</script>
 {% endblock %}

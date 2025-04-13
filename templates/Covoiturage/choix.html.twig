@@ -62,14 +62,29 @@
         <!-- Sidebar -->
         <div class="col-md-3 p-4 sidebar">
             <h4 class="text-center mb-4 fw-bold" style="color: var(--primary-color);">EasyWay</h4>
-            <div class="d-flex flex-column gap-2">
-                <a href="#" class="btn text-start fw-bold bg-transparent">Mon profile</a>
-                <a href="#" class="btn text-start fw-bold bg-transparent">Suivre les trajets</a>
-                <a href="#" class="btn text-start fw-bold bg-transparent">Découvrir nos lignes</a>
-                <a href="{{ path('app_covoiturage') }}" class="btn text-start fw-bold bg-transparent">Espace covoiturage</a>
-                <a href="#" class="btn text-start fw-bold bg-transparent">Réclamation</a>
-                <a href="#" class="btn mt-5 text-white fw-bold" style="background-color: var(--primary-color);">Déconnexion</a>
+      <div class="p-3">
+                <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3">
+                        <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3" style="background-color: #F4EFE2;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
+                    </div>
+                </a>
             </div>
+            
         </div>
         
         <!-- Main Content -->

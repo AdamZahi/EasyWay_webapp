@@ -5,7 +5,7 @@ use App\Entity\User;
 use App\Entity\Posts;
 use App\Form\PostsType;
 use App\Entity\Commentaire;
-
+use App\Service\BadWordFilter; 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,10 +18,12 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;  
 
 
 class CovoiturageController extends AbstractController
 {
+    
     #[Route('/covoiturage', name: 'app_covoiturage')]
     public function index(): Response
     {
@@ -124,14 +126,22 @@ class CovoiturageController extends AbstractController
     public function newComment(
         Request $request, 
         EntityManagerInterface $entityManager, 
+        BadWordFilter $badWordFilter, // Inject the service
         int $post_id
     ): Response {
-      
-    
         // Get the post
         $post = $entityManager->getRepository(Posts::class)->find($post_id);
         if (!$post) {
             throw $this->createNotFoundException('Post not found');
+        }
+    
+        // Get the comment content
+        $commentText = $request->request->get('contenu');
+    
+        // Check for bad words
+        if ($badWordFilter->containsBadWords($commentText)) {
+            $this->addFlash('error', '⚠️ Votre commentaire contient des mots interdits.');
+            return $this->redirectToRoute('app_covoiturage_rechercher');
         }
     
         // For testing with static user ID 1
@@ -140,9 +150,9 @@ class CovoiturageController extends AbstractController
             throw $this->createNotFoundException('User not found');
         }
     
-        // Create new comment
+        // Create and save the comment
         $commentaire = new Commentaire();
-        $commentaire->setContenu($request->request->get('contenu'));
+        $commentaire->setContenu($commentText);
         $commentaire->setDateCreat(new \DateTime());
         $commentaire->setUser($user);
         $commentaire->setPost($post);
@@ -150,37 +160,23 @@ class CovoiturageController extends AbstractController
         $entityManager->persist($commentaire);
         $entityManager->flush();
     
+        $this->addFlash('success', 'Commentaire ajouté avec succès!');
         return $this->redirectToRoute('app_covoiturage_rechercher');
     }
     #[Route('/covoiturage/reserver/{id_post}', name: 'app_covoiturage_reserver')]
-public function reserver(int $id_post, EntityManagerInterface $entityManager, Request $request): Response
-{
-    $post = $entityManager->getRepository(Posts::class)->find($id_post);
-    
-    if (!$post) {
-        throw $this->createNotFoundException('Post not found');
-    }
-    
-    // Check available seats
-    if ($post->getNombreDePlaces() <= 0) {
-        $this->addFlash('error', 'Désolé, il n\'y a plus de places disponibles pour ce covoiturage.');
-        return $this->redirectToRoute('app_covoiturage_rechercher');
-    }
-    
-    // Handle reservation form submission
-    if ($request->isMethod('POST')) {
-        // Decrement available seats
-        $post->setNombreDePlaces($post->getNombreDePlaces() - 1);
-        $entityManager->flush();
+    public function reserver(int $id_post, EntityManagerInterface $entityManager): Response
+    {
+        // Get the post from database
+        $post = $entityManager->getRepository(Posts::class)->find($id_post);
         
-        $this->addFlash('success', 'Réservation confirmée!');
-        return $this->redirectToRoute('app_covoiturage_rechercher');
+        if (!$post) {
+            throw $this->createNotFoundException('Post not found');
+        }
+        
+        return $this->render('covoiturage/reserver.html.twig', [
+            'post' => $post,
+        ]);
     }
-    
-    return $this->render('covoiturage/reserver.html.twig', [
-        'post' => $post,
-    ]);
-}
     #[Route('/covoiturage/mes-offres', name: 'app_covoiturage_mes_offres')]
     public function mesOffres(EntityManagerInterface $entityManager): Response
     {
@@ -201,32 +197,39 @@ public function reserver(int $id_post, EntityManagerInterface $entityManager, Re
     }
 
     #[Route('/covoiturage/modifier/{id_post}', name: 'app_covoiturage_modifier')]
-
     public function modifier(int $id_post, EntityManagerInterface $entityManager, Request $request): Response
     {
         $post = $entityManager->getRepository(Posts::class)->find($id_post);
-
+    
         if (!$post || $post->getUser()->getIdUser() !== 1) {
             throw $this->createNotFoundException('Post non trouvé ou accès non autorisé');
         }
-
+    
         // Création du formulaire manuellement
         $form = $this->createFormBuilder($post)
             ->add('message', TextareaType::class)
-            ->add('villeDepart', TextType::class)
-            ->add('villeArrivee', TextType::class)
+            ->add('villeDepart', ChoiceType::class, [
+                'choices' => $this->getTunisianCities(),
+                'placeholder' => 'Choisissez une ville de départ',
+                'label' => 'Ville de départ',
+            ])
+            ->add('villeArrivee', ChoiceType::class, [
+                'choices' => $this->getTunisianCities(),
+                'placeholder' => 'Choisissez une ville d\'arrivée',
+                'label' => 'Ville d\'arrivée',
+            ])
             ->add('date', DateType::class, ['widget' => 'single_text'])
             ->add('nombreDePlaces', IntegerType::class)
             ->add('prix', MoneyType::class, ['currency' => 'EUR'])
             ->getForm();
-
+    
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 // Contrôle de saisie personnalisé
                 $this->validateBusinessRules($post, $form);
-
+    
                 if (!$form->getErrors(true)->count()) {
                     $entityManager->flush();
                     $this->addFlash('success', 'Le trajet a été modifié avec succès!');
@@ -234,7 +237,7 @@ public function reserver(int $id_post, EntityManagerInterface $entityManager, Re
                 }
             }
         }
-
+    
         return $this->render('covoiturage/modifier_post.html.twig', [
             'form' => $form->createView(),
         ]);
@@ -267,46 +270,64 @@ public function reserver(int $id_post, EntityManagerInterface $entityManager, Re
     public function supprimer(int $id_post, EntityManagerInterface $entityManager): Response
     {
         $post = $entityManager->getRepository(Posts::class)->find($id_post);
-    
-        if (!$post || $post->getUser()->getIdUser() !== 1) {
-            throw $this->createNotFoundException('Post not found or unauthorized');
+        
+        if (!$post) {
+            $this->addFlash('error', 'Post not found');
+            return $this->redirectToRoute('app_covoiturage_mes_offres');
+        }
+        
+        if ($post->getUser()->getIdUser() !== 1) {
+            $this->addFlash('error', 'Unauthorized to delete this post');
+            return $this->redirectToRoute('app_covoiturage_mes_offres');
         }
     
         $entityManager->remove($post);
         $entityManager->flush();
-    
+        
+        $this->addFlash('success', 'Post deleted successfully');
         return $this->redirectToRoute('app_covoiturage_mes_offres');
     }
-    #[Route('/commentaire/edit/{id}', name: 'app_commentaire_edit', methods: ['GET', 'POST'])]
-public function editComment(Request $request, EntityManagerInterface $entityManager, int $id): Response
-{
-    $commentaire = $entityManager->getRepository(Commentaire::class)->find($id);
     
-    if (!$commentaire) {
-        throw $this->createNotFoundException('Comment not found');
+    #[Route('/commentaire/edit/{id}', name: 'app_commentaire_edit', methods: ['GET', 'POST'])]
+    public function editComment(
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        BadWordFilter $badWordFilter, // Inject the service
+        int $id
+    ): Response {
+        $commentaire = $entityManager->getRepository(Commentaire::class)->find($id);
+        
+        if (!$commentaire) {
+            throw $this->createNotFoundException('Comment not found');
+        }
+    
+        // Restrict editing to user ID 1 (or use $this->getUser() in a real app)
+        if ($commentaire->getUser()->getIdUser() !== 1) {
+            throw $this->createAccessDeniedException('You can only edit your own comments');
+        }
+    
+        $form = $this->createFormBuilder($commentaire)
+            ->add('contenu', TextareaType::class)
+            ->getForm();
+    
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Check for bad words
+            if ($badWordFilter->containsBadWords($commentaire->getContenu())) {
+                $this->addFlash('error', '⚠️ Le commentaire contient des mots interdits.');
+                return $this->redirectToRoute('app_covoiturage_rechercher');
+            }
+    
+            $entityManager->flush();
+            $this->addFlash('success', 'Commentaire modifié avec succès!');
+            return $this->redirectToRoute('app_covoiturage_rechercher');
+        }
+    
+        return $this->render('covoiturage/edit.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
-
-    // For testing with static user ID 1
-    if ($commentaire->getUser()->getIdUser() !== 1) {
-        throw $this->createAccessDeniedException('You can only edit your own comments');
-    }
-
-    $form = $this->createFormBuilder($commentaire)
-        ->add('contenu', TextareaType::class)
-        ->getForm();
-
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-        $entityManager->flush();
-        return $this->redirectToRoute('app_covoiturage_rechercher');
-    }
-
-    return $this->render('covoiturage/edit.html.twig', [
-        'form' => $form->createView(),
-    ]);
-}
-
 #[Route('/commentaire/delete/{id}', name: 'app_commentaire_delete', methods: ['POST'])]
 public function deleteComment(Request $request, EntityManagerInterface $entityManager, int $id): Response
 {
@@ -328,5 +349,37 @@ public function deleteComment(Request $request, EntityManagerInterface $entityMa
 
     return $this->redirectToRoute('app_covoiturage_rechercher');
 }
+
+private function getTunisianCities(): array
+{
+    $cities = [
+        'Tunis' => 'Tunis',
+        'Sfax' => 'Sfax',
+        'Sousse' => 'Sousse',
+        'Gabès' => 'Gabès',
+        'Bizerte' => 'Bizerte',
+        'Nabeul' => 'Nabeul',
+        'Kairouan' => 'Kairouan',
+        'Monastir' => 'Monastir',
+        'Mahdia' => 'Mahdia',
+        'Tozeur' => 'Tozeur',
+        'Médenine' => 'Médenine',
+        'Gafsa' => 'Gafsa',
+        'Tataouine' => 'Tataouine',
+        'Kasserine' => 'Kasserine',
+        'Le Kef' => 'Le Kef',
+        'Siliana' => 'Siliana',
+        'Beja' => 'Beja',
+        'Zaghouan' => 'Zaghouan',
+        'Ben Arous' => 'Ben Arous',
+        'Ariana' => 'Ariana',
+        'Manouba' => 'Manouba',
+        'Jendouba' => 'Jendouba',
+        'Kebili' => 'Kebili'
+    ];
+
+    return $cities;
+}
+
     
 }
