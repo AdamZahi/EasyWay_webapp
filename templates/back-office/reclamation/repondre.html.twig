@@ -16,16 +16,28 @@
 
     <div class="mt-4">
         {{ form_start(form) }}
-            <div class="form-group">
-                {{ form_label(form.contenu, 'Votre réponse', {'label_attr': {'class': 'font-weight-bold'}}) }}
-                {{ form_widget(form.contenu, {'attr': {'class': 'form-control'}}) }}
-            </div>
-            <div class="form-group">
-                {{ form_label(form.createdAt, 'Date de la réponse') }}
-                {{ form_widget(form.createdAt, {'attr': {'class': 'form-control'}}) }}
-            </div>
-            <button type="submit" class="btn btn-success mt-3">Envoyer la réponse</button>
-        {{ form_end(form) }}
+    <div class="form-group">
+        {{ form_label(form.contenu, 'Votre réponse', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        {{ form_widget(form.contenu, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <!-- 🆕 Select manuel -->
+    <div class="form-group mt-3">
+        <label for="statut" class="font-weight-bold">Statut de la réclamation</label>
+        <select id="statut" name="statut" class="form-control">
+            <option value="en_cours">En cours</option>
+            <option value="Terminer">Terminer</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.createdAt, 'Date de la réponse') }}
+        {{ form_widget(form.createdAt, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Envoyer la réponse</button>
+{{ form_end(form) }}
+
     </div>
 </div>
 {% endblock %}
