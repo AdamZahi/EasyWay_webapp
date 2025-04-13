@@ -3,11 +3,39 @@
 {% block title %}Mes Offres{% endblock %}
 
 {% block body %}
-<div class="container-fluid" style="width: 100%; margin: 0 auto;">
-    <!-- Header Section -->
-    <div class="border" style="background-color: #DDDEC6; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); margin-bottom: 30px;">
+<!-- Navbar Start -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">    
+    <a href="#" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <h2 class="mb-2 text-white">EasyWay</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a href="#" class="nav-item nav-link">Acceuil</a>
+            <a href="#" class="nav-item nav-link active">Événements</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
+                <div class="dropdown-menu fade-up m-0">
+                    <a href="#" class="dropdown-item">Co-voiturage</a>
+                    <a href="#" class="dropdown-item">Transport public</a>
+                    <a href="#" class="dropdown-item">Véhicules</a>
+                    <a href="#" class="dropdown-item">Réclamation</a>
+                </div>
+            </div>
+            <a href="#" class="nav-item nav-link">Contact</a>
+        </div>
+        <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="fa fa-headphones text-primary me-3"></i>+216 77 777 777</h4>
+    </div>
+</nav>
+<!-- Navbar End -->
+
+<div class="container-fluid" style="width: 100%; margin: 0 ;">
+    
+    <!-- <div class="border" style="background-color: #DDDEC6; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); margin-bottom: 30px;">
         <div class="d-flex justify-content-between align-items-center p-4">
-            <!-- Navigation Buttons -->
+            
             <div class="d-flex">
                 <button class="btn" style="font-size: 16px; font-weight: bold; background-color: #DDDEC6; color: #A11010; border: none; margin-right: 15px; transition: all 0.3s;">
                     Accueil
@@ -19,41 +47,56 @@
                     Communauté
                 </button>
             </div>
-            <!-- Logo -->
+            
             <div class="d-flex justify-content-start align-items-center">
                 <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo" style="height: 60px; width: auto;">
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Sidebar and Main Content Layout -->
     <div class="d-flex">
         <!-- Sidebar -->
-        <div class="col-md-3" style="width: 250px; background-color: #DDDEC6; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); padding: 20px;">
-            <h3 style="text-align: center; font-size: 20px; font-weight: bold; color: #A11010;">EasyWay</h3>
+        <div class="col-md-3" style="width: 250px; background-color: transparent; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); padding: 20px;">
+            <h3 style="text-align: center; padding-top: 20px; font-size: 20px; font-weight: bold; color: #A11010;">Service de covoiturage</h3>
 
             <div class="p-3">
-                <div class="d-flex align-items-center">
-                    <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
-                    <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
-                </div>
-                <div class="d-flex align-items-center mt-3">
-                    <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
-                    <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
-                </div>
-                <div class="d-flex align-items-center mt-3" style="background-color: #F4EFE2;">
-                    <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
-                    <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
-                </div>
+                <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3">
+                        <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
+                    </div>
+                </a>
+
+                <a href="{{ path('app_covoiturage_mes_offres') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Mes offres</label>
+                    </div>
+                </a>
             </div>
         </div>
 
         <!-- Main Content (Posts List) -->
         <div class="col-md-9" style="padding: 20px;">
             <div class="scroll-container" style="width: 100%; overflow-y: auto;">
-                <div class="post-list" style="padding: 10px; background-color: #F4EFE2;">
+                <div class="post-list" style="padding: 10px; background-color: #f4efe230;">
                     {% for post in posts %}
-                        <div class="post-item" style="background-color: #F4EFE2; padding: 15px; border: 1px solid #ccc; border-radius: 10px; margin-bottom: 10px;">
+                        <div class="post-item" style="background-color: #f4efe202; padding: 15px; border: 1px solid #ccc; border-radius: 10px; margin-bottom: 10px;">
                             <h4 style="text-align: center; font-size: 18px; font-weight: bold;">Offre Covoiturage</h4>
 
                             <div class="post-details">
@@ -93,6 +136,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             
 
                             

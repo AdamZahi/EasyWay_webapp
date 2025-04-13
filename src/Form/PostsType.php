@@ -30,6 +30,7 @@ class PostsType extends AbstractType
         $builder
             ->add('ville_depart', ChoiceType::class, [
                 'label' => 'Ville de départ',
+                'required' => false,
                 'choices' => array_combine(self::TUNISIAN_CITIES, self::TUNISIAN_CITIES),
                 'attr' => ['class' => 'form-control']
             ])
@@ -47,12 +48,13 @@ class PostsType extends AbstractType
                     'min' => (new \DateTime())->format('Y-m-d') // Prevent past dates
                 ],
                 'empty_data' => null, // Explicitly handle empty data
-                'required' => true
+                'required' => false
             ])
           
            // src/Form/PostsType.php
 ->add('message', TextareaType::class, [
     'label' => 'Détails du trajet',
+    
     'empty_data' => '', // Ensure empty submits convert to empty string
     'attr' => [
         'class' => 'form-control',
