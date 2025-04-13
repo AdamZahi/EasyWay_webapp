@@ -66,10 +66,7 @@ class Reclamation
     private ?Categorie $Category_Id = null;
 
 
-    #[ORM\Column(type: 'string', length: 255)]
-    #[ORM\JoinColumn(nullable:'false')]
-    private $user;
-
+   
     // 🔹 GETTERS & SETTERS
 
 
@@ -87,17 +84,7 @@ class Reclamation
     }
 
 
-    public function getUser(): ?string
-{
-    return $this->user;
-}
-
-public function setUser(string $user): self
-{
-    $this->user = $user;
-    return $this;
-}
- 
+  
 
 
     public function getEmail(): string
