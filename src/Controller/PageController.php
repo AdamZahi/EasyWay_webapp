@@ -14,21 +14,8 @@ final class PageController extends AbstractController
     #[Route('/', name: 'app_page')]
     public function index(): Response
     {
-        $reclamation = new Reclamation();
-        $user = $this->getUser();
-        
-        if ($user instanceof \App\Entity\User) {
-            $reclamation->setUser($user);
-            $reclamation->setEmail($user->getEmail()); // si tu veux le dupliquer dans l'entité
-        }
-        
-        
-        
-        // Create the form
-        $form = $this->createForm(ReclamationType::class, $reclamation);
-
         return $this->render('front-office/index.html.twig', [
-            'form' => $form->createView(),
+            'controller_name' => 'PageController',
         ]);
     }
 
