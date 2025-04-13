@@ -85,6 +85,7 @@
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $reclamation->setDateCreation(new \DateTime());
+                $reclamation->setUser('tayssirbennejma@gmail.com');
                 $this->entityManager->persist($reclamation);
                 $this->entityManager->flush();
         
@@ -146,25 +147,30 @@
 
 
 
-
 #[Route('/list', name: 'admin_reclamations')]
-public function listReclamations(ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
+public function listReclamations(Request $request, ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
 {
-    $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
-    
+    $selectedStatut = $request->query->get('statut');
+
+    // Récupérer les réclamations selon le filtre de statut
+    if ($selectedStatut) {
+        $reclamations = $reclamationRepository->findBy(['statut' => $selectedStatut]);
+    } else {
+        $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
+    }
+
     // Récupérer les réclamations ayant des réponses
     $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
-    
+
     // Récupérer les ID des réclamations ayant des réponses
     $reclamationsWithReponsesIds = array_map(function($reponse) {
         return $reponse->getReclamation()->getId();
     }, $reclamationsWithReponses);
-    dump($reclamationsWithReponsesIds);
-
 
     return $this->render('back-office/reclamation/listreclamation.html.twig', [
         'reclamations' => $reclamations,
-        'reclamationsWithReponsesIds' => $reclamationsWithReponsesIds, // Passer les IDs des réclamations avec réponses
+        'reclamationsWithReponsesIds' => $reclamationsWithReponsesIds,
+        'selected_statut' => $selectedStatut, // 🔥 Ajout de cette variable pour Twig
     ]);
 }
 
@@ -190,7 +196,7 @@ public function listReclamationsApi(): JsonResponse
     return new JsonResponse($data, Response::HTTP_OK);
 }
 
-
+/*
         #[Route('/edit/{id}', name: 'reclamation_edit')]
         public function edit(Reclamation $reclamation, Request $request, EntityManagerInterface $entityManager): Response
         {
@@ -244,7 +250,7 @@ public function listReclamationsApi(): JsonResponse
             ]);
         }
 
-        
+       */ 
 
 
         #[Route('/delete/{id}', name:'reclamation_delete', methods:["POST"])]
@@ -290,57 +296,59 @@ public function deleteReclamationJson($id, EntityManagerInterface $entityManager
 
 
         
-        #[Route('/admin/reclamation/{id}/repondre', name:'admin_repondre_reclamation')]
-        public function repondre(int $id, Request $request, EntityManagerInterface $em, ReclamationRepository $reclamationRepository, MailerInterface $mailer): Response
-        {
-            // Récupérer la réclamation
-            $reclamation = $reclamationRepository->find($id);
-        
-            if (!$reclamation) {
-                throw $this->createNotFoundException('Réclamation non trouvée');
-            }
-        
-            // Créer une nouvelle réponse
-            $reponse = new Reponse();
-            $form = $this->createForm(ReponseType::class, $reponse);
-            $form->handleRequest($request);
-        
-            if ($form->isSubmitted() && $form->isValid()) {
-                // Lier la réponse à la réclamation
-                $reponse->setReclamation($reclamation);
-                $reponse->setCreatedAt(new \DateTime());
-        
-                // Sauvegarder la réponse
-                $em->persist($reponse);
-                $em->flush();
-                $to = $reclamation->getEmail();
-        
-                // ✉ Envoi de l'email après l'ajout de la réponse
-                $email = (new Email())
-                ->from('tayssirbennejma@gmail.com')
-                ->to('tayssirbennejma@gmail.com')
-                ->subject('Test email')
-                ->text('Ceci est un test d\'envoi.');
-        
-                // Envoi de l'email
-                try {
-                    $mailer->send($email);
-                    $this->addFlash('success', 'Réponse envoyée par email avec succès.');
-                } catch (\Exception $e) {
-                    // Si une erreur se produit lors de l'envoi de l'email
-                    $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
-                }
-        
-                // Ajouter un message flash et rediriger
-                $this->addFlash('success', 'Réponse envoyée avec succès.');
-                return $this->redirectToRoute('admin_reclamations');
-            }
-        
-            return $this->render('back-office/reclamation/repondre.html.twig', [
-                'reclamation' => $reclamation,
-                'form' => $form->createView(),
-            ]);
+#[Route('/admin/reclamation/{id}/repondre', name:'admin_repondre_reclamation')]
+public function repondre(int $id, Request $request, EntityManagerInterface $em, ReclamationRepository $reclamationRepository, MailerInterface $mailer): Response
+{
+    $reclamation = $reclamationRepository->find($id);
+
+    if (!$reclamation) {
+        throw $this->createNotFoundException('Réclamation non trouvée');
+    }
+
+    $reponse = new Reponse();
+    $form = $this->createForm(ReponseType::class, $reponse);
+    $form->handleRequest($request);
+
+    // 🎯 Gérer le statut manuellement depuis le request
+    $statut = $request->request->get('statut');
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $reponse->setReclamation($reclamation);
+        $reponse->setCreatedAt(new \DateTime());
+
+        // ✅ Appliquer le statut à la réclamation
+        if (in_array($statut, ['en_cours', 'Terminer'])) {
+            $reclamation->setStatut($statut);
         }
+
+        $em->persist($reponse);
+        $em->persist($reclamation);
+        $em->flush();
+
+        // Envoi email
+        $email = (new Email())
+            ->from('tayssirbennejma@gmail.com')
+            ->to($reclamation->getEmail())
+            ->subject('Réponse à votre réclamation')
+            ->text('Votre réclamation a été traitée. Merci pour votre patience.');
+
+        try {
+            $mailer->send($email);
+            $this->addFlash('success', 'Réponse envoyée par email avec succès.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+        }
+
+        $this->addFlash('success', 'Réponse envoyée avec succès.');
+        return $this->redirectToRoute('admin_reclamations');
+    }
+
+    return $this->render('back-office/reclamation/repondre.html.twig', [
+        'reclamation' => $reclamation,
+        'form' => $form->createView(),
+    ]);
+}
+
         
 
 
