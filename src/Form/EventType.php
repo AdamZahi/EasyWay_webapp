@@ -3,9 +3,6 @@
 namespace App\Form;
 
 use App\Entity\Event;
-use App\Entity\Ligne;
-use App\Enum\EventStatus;
-use App\Enum\TypeEvent;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -21,9 +18,9 @@ class EventType extends AbstractType
         $builder
             ->add('type', ChoiceType::class, [
                 'choices' => [
-                    'Retard' => 'RETARD',
-                    'Greve' => 'GREVE',
-                    'Incident' => 'INCIDENT',
+                    'Retard' => 'Retard',
+                    'Greve' => 'Greve',
+                    'Incident' => 'Incident',
                 ],
                 'placeholder' => 'Sélectionnez un type',
                 'required' => false,
@@ -33,9 +30,9 @@ class EventType extends AbstractType
             ])
             ->add('status', ChoiceType::class, [
                 'choices' => [
-                    'En cours' => 'EN_COUR',
-                    'Résolu' => 'RESOLU',
-                    'Annulé' => 'ANNULE',
+                    'En cours' => 'En cours',
+                    'Résolu' => 'Résolu',
+                    'Annulé' => 'Annulé',
                 ],
                 'placeholder' => 'Sélectionnez un statut',
                 'required' => false,
