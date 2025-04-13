@@ -1,0 +1,17 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Modifier Ligne
+{% endblock %}
+
+{% block main_content %}
+<br><br><br><br><br><br>
+	<div class="container mt-4">
+		<h1>Modifier ligne  #{{ ligne.id }}</h1>
+
+		{{ form_start(form) }}
+		{{ form_widget(form) }}
+		<button type="submit" class="btn btn-primary">Update</button>
+		<a href="{{ path('ligne_list') }}" class="btn btn-secondary">Cancel</a>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}
