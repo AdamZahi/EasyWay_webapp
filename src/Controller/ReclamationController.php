@@ -85,7 +85,7 @@
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $reclamation->setDateCreation(new \DateTime());
-                $reclamation->setUser('tayssirbennejma@gmail.com');
+               
                 $this->entityManager->persist($reclamation);
                 $this->entityManager->flush();
         
