@@ -90,6 +90,8 @@
             </div>
         </div>
 {# Affichage des messages flash dans le bloc body #}
+
+<div class="container-fluid" style="width: 100%; margin: 0 auto;">
 {% for message in app.flashes('error') %}
     <div class="alert alert-danger">
         {{ message }}
@@ -101,8 +103,8 @@
         {{ message }}
     </div>
 {% endfor %}
-<div class="container-fluid" style="width: 100%; margin: 0 auto;">
     <div class="d-flex">
+
         <!-- Main Content (Posts List) -->
         <div class="col-md-9" style="padding: 20px; width: 100%;">
             <!-- Search Bar -->
