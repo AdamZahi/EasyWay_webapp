@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Entity\Reclamation;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -21,8 +21,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: "id_user", type: "integer")]
     private ?int $id_user = null;
     
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reclamation::class)]
-    private Collection $reclamations;
     
 
 
@@ -88,10 +86,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Admin::class, cascade: ['persist', 'remove'])]
     private ?Admin $admin = null;
 
+    /**
+     * @var Collection<int, Reclamation>
+     */
+    #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_user')]
+    private Collection $reclamations;
+
     public function __construct()
     {
         $this->photo_profil = 'default_profile.png';
         $this->reclamations = new ArrayCollection();
+       
     }
 
     public function getIdUser(): ?int
@@ -242,29 +247,35 @@ public function setAdmin(?Admin $admin): static
         return $this;
     }
 
+    /**
+     * @return Collection<int, Reclamation>
+     */
     public function getReclamations(): Collection
-{
-    return $this->reclamations;
-}
-
-public function addReclamation(Reclamation $reclamation): static
-{
-    if (!$this->reclamations->contains($reclamation)) {
-        $this->reclamations[] = $reclamation;
-        $reclamation->setUser($this);
+    {
+        return $this->reclamations;
     }
 
-    return $this;
-}
-
-public function removeReclamation(Reclamation $reclamation): static
-{
-    if ($this->reclamations->removeElement($reclamation)) {
-        if ($reclamation->getUser() === $this) {
-            $reclamation->setUser(null);
+    public function addReclamation(Reclamation $reclamation): static
+    {
+        if (!$this->reclamations->contains($reclamation)) {
+            $this->reclamations->add($reclamation);
+            $reclamation->setUser($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeReclamation(Reclamation $reclamation): static
+    {
+        if ($this->reclamations->removeElement($reclamation)) {
+            // set the owning side to null (unless already changed)
+            if ($reclamation->getUser() === $this) {
+                $reclamation->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+ 
 }
