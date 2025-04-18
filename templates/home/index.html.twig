@@ -16,32 +16,24 @@
             <div class="card h-100">
                 <div class="card-body text-center">
                     <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
-                    <h3 class="my-3">Covoiturage</h3>
-                    <p>Partagez vos trajets et économisez sur vos déplacements.</p>
-                    <a href="#" class="btn btn-primary">En savoir plus</a>
+                    <h3 class="my-3">Se connecter</h3>
+                    <p>Vous avez deja un compte? Vous pouvez acceder au votre compte ici.</p>
+                    <a href="{{ path('app_login') }} " class="btn btn-primary">Login</a>
                 </div>
             </div>
         </div>
+
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 <div class="card-body text-center">
-                    <i class="bi bi-bus-front text-primary" style="font-size: 3rem;"></i>
-                    <h3 class="my-3">Transport public</h3>
-                    <p>Accédez facilement aux informations sur les transports publics.</p>
-                    <a href="#" class="btn btn-primary">En savoir plus</a>
+                    <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                    <h3 class="my-3">S'inscrire</h3>
+                    <p>Vous pouvez s'inscrire et nous rejoindre sur Easy Way</p>
+                    <a href="{{ path('app_register') }}" class="btn btn-primary">Register</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <i class="bi bi-car-front text-primary" style="font-size: 3rem;"></i>
-                    <h3 class="my-3">Véhicules</h3>
-                    <p>Découvrez notre flotte de véhicules adaptés à tous vos besoins.</p>
-                    <a href="#" class="btn btn-primary">En savoir plus</a>
-                </div>
-            </div>
-        </div>
+        
     </div>
 </div>
 {% endblock %} 

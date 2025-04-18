@@ -1,0 +1,134 @@
+{% extends 'front-office/front.html.twig' %}
+{% block stylesheets %}
+    <style>
+        .btn-lightblue {
+            background-color: #5bcaef; /* Bleu clair */
+            color: #000; /* Texte noir */
+            border: none;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-lightblue:hover {
+            background-color: #1eafe8; /* Bleu clair plus foncé au hover */
+            color: #000;
+        }
+    </style>
+{% endblock %}
+{% block body %}
+<!-- Navbar Start -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">    
+    <a href="#" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <h2 class="mb-2 text-white">EasyWay</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a href="#" class="nav-item nav-link">Acceuil</a>
+            <a href="#" class="nav-item nav-link active">Événements</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
+                <div class="dropdown-menu fade-up m-0">
+                    <a href="#" class="dropdown-item">Co-voiturage</a>
+                    <a href="#" class="dropdown-item">Transport public</a>
+                    <a href="#" class="dropdown-item">Véhicules</a>
+                    <a href="#" class="dropdown-item">Réclamation</a>
+                </div>
+            </div>
+            <a href="#" class="nav-item nav-link">Contact</a>
+        </div>
+        <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="fa fa-headphones text-primary me-3"></i>+216 77 777 777</h4>
+    </div>
+</nav>
+<!-- Navbar End -->
+
+<div class="container-fluid" style="width: 100%; margin: 0 ;">
+    
+    <!-- <div class="border" style="background-color: #DDDEC6; border-radius: 10px; box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); margin-bottom: 30px;">
+        <div class="d-flex justify-content-between align-items-center p-4">
+            
+            <div class="d-flex">
+                <button class="btn" style="font-size: 16px; font-weight: bold; background-color: #DDDEC6; color: #A11010; border: none; margin-right: 15px; transition: all 0.3s;">
+                    Accueil
+                </button>
+                <button class="btn" style="font-size: 16px; font-weight: bold; background-color: #DDDEC6; color: #A11010; border: none; margin-right: 15px; transition: all 0.3s;">
+                    Notre Solution
+                </button>
+                <button class="btn" style="font-size: 16px; font-weight: bold; background-color: #DDDEC6; color: #A11010; border: none; transition: all 0.3s;">
+                    Communauté
+                </button>
+            </div>
+            
+            <div class="d-flex justify-content-start align-items-center">
+                <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo" style="height: 60px; width: auto;">
+            </div>
+        </div>
+    </div> -->
+
+    <!-- Sidebar and Main Content Layout -->
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="col-md-3" style="width: 250px; background-color: transparent; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); padding: 20px;">
+            <h3 style="text-align: center; padding-top: 20px; font-size: 20px; font-weight: bold; color: #A11010;">Service de covoiturage</h3>
+
+            <div class="p-3">
+                <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3">
+                        <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
+                    </div>
+                </a>
+
+                <a href="{{ path('app_covoiturage_mes_offres') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Mes offres</label>
+                    </div>
+                </a>
+            </div>
+        </div>
+<main style="margin-top: 30px;">
+    <h1 class="text-center mb-4 fw-bold">Bienvenue sur EasyWay Covoiturage</h1>
+    
+    <div class="text-center mb-4">
+        <img  src="{{ asset('img/carpool.png') }}" alt="Illustration covoiturage" class="img-fluid" style="max-height: 200px;">
+    </div>
+    
+    <p class="text-center mb-4 lead">
+        Facilitez vos déplacements à Tunis en choisissant l'option qui vous convient le mieux.
+    </p>
+    
+    <h2 class="text-center mb-3 fw-bold">Que souhaitez-vous faire ?</h2>
+    
+    <div class="d-flex justify-content-center gap-4 mb-4 flex-wrap">
+        <a href="{{ path('app_covoiturage_poster') }}" class="btn-lightblue">
+            <i class="fas fa-car me-2"></i>Publier un trajet
+        </a>
+        <a href="{{ path('app_covoiturage_rechercher') }}" class="btn-lightblue">
+            <i class="fas fa-search me-2"></i>Rechercher un trajet
+        </a>
+    </div>
+    
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle me-2"></i> Notre système de covoiturage vous permet de partager vos trajets et économiser sur vos déplacements.
+    </div>
+</main>
+{% endblock %}
