@@ -23,7 +23,8 @@
     use App\Repository\ReponseRepository;
     use Symfony\Bundle\SecurityBundle\Security;
     
-   
+    use App\Entity\User;  
+
 
 
 
@@ -77,62 +78,42 @@
         }
         
 
-
         #[Route('/add-reclamation', name: 'app_add_reclamation')]
-        public function addReclamation(Request $request, MailerInterface $mailer, Security $security): Response
+        public function addReclamation(Request $request, MailerInterface $mailer, Security $security, EntityManagerInterface $entityManager): Response
         {
-            // Création de l'objet réclamation
+            $user = $security->getUser();
+            if (!$user) {
+                throw new \Exception('Utilisateur non connecté');
+            }
+        
             $reclamation = new Reclamation();
-            
-            // Création du formulaire lié à la réclamation
+            $reclamation->setUser($user); // ✅ AVANT de créer le formulaire
+            $reclamation->setDateCreation(new \DateTimeImmutable());
+        
             $form = $this->createForm(ReclamationType::class, $reclamation);
             $form->handleRequest($request);
         
-            // Vérifier si le formulaire est soumis et valide
             if ($form->isSubmitted() && $form->isValid()) {
-                
-                // Récupérer l'utilisateur connecté
-                $user = $security->getUser();
-                if (!$user) {
-                    throw new \Exception('Aucun utilisateur connecté.');
-                }
+                dd($reclamation->getUser());
+                $entityManager->persist($reclamation);
+                $entityManager->flush();
         
-                // Associer l'utilisateur à la réclamation
-                $reclamation->setUser($user);  // Liens avec l'utilisateur connecté
-                $reclamation->setDateCreation(new \DateTime());  // Ajouter la date de création
-        
-                // Persist et flush de l'entité Reclamation
-                $this->entityManager->persist($reclamation);
-                $this->entityManager->flush();
-        
-                // Envoi de l'email de confirmation
-                try {
-                    $this->sendEmail(
-                        $mailer,
-                        $reclamation->getEmail(),
-                        'Confirmation de votre réclamation',
-                        'Votre réclamation a été reçue avec succès. Nous vous répondrons bientôt.'
-                    );
-                    $this->addFlash('success', 'Réclamation ajoutée et email envoyé.');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Réclamation ajoutée, mais erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
-                }
-        
-                // Rediriger vers la page des réclamations
                 return $this->redirectToRoute('app_reclamation');
             }
         
-            // Rendu du formulaire
             return $this->render('front-office/reclamation/index.html.twig', [
                 'form' => $form->createView(),
             ]);
         }
         
         
+        
+        
+        
 
 ////
         
-        #[Route('/api/reclamation', name: 'api_add_reclamation', methods: ['POST'])]
+    /*    #[Route('/api/reclamation', name: 'api_add_reclamation', methods: ['POST'])]
         public function addReclamationJson(Request $request, EntityManagerInterface $entityManager): JsonResponse
         {
             $data = json_decode($request->getContent(), true);
@@ -154,7 +135,7 @@
             $entityManager->flush();
         
             return new JsonResponse(['message' => 'Réclamation ajoutée avec succès'], 201);
-        }
+        }*/
 
         /*{
   "email": "test@example.com",
