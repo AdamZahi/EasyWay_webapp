@@ -145,31 +145,36 @@
 */
 
 
-
-#[Route('/list', name: 'admin_reclamations')]
-public function listReclamations(Request $request, ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
-{
+#[Route('/list', name: 'admin_reclamations', methods: ['GET'])]
+public function listReclamations(
+    Request $request,
+    ReclamationRepository $reclamationRepository,
+    ReponseRepository $reponseRepository
+): Response {
     $selectedStatut = $request->query->get('statut');
+    $query = $request->query->get('q');
 
-    // Récupérer les réclamations selon le filtre de statut
-    if ($selectedStatut) {
-        $reclamations = $reclamationRepository->findBy(['statut' => $selectedStatut]);
-    } else {
-        $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
+    $qb = $reclamationRepository->createQueryBuilder('r');
+
+    if ($query) {
+        $qb->where('r.email LIKE :query OR r.sujet LIKE :query OR r.description LIKE :query OR r.statut LIKE :query')
+           ->setParameter('query', '%' . $query . '%');
     }
 
-    // Récupérer les réclamations ayant des réponses
-    $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
+    if ($selectedStatut) {
+        $qb->andWhere('r.statut = :statut')
+           ->setParameter('statut', $selectedStatut);
+    }
 
-    // Récupérer les ID des réclamations ayant des réponses
-    $reclamationsWithReponsesIds = array_map(function($reponse) {
-        return $reponse->getReclamation()->getId();
-    }, $reclamationsWithReponses);
+    $reclamations = $qb->getQuery()->getResult();
+
+    $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
+    $reclamationsWithReponsesIds = array_map(fn($r) => $r->getReclamation()->getId(), $reclamationsWithReponses);
 
     return $this->render('back-office/reclamation/listreclamation.html.twig', [
         'reclamations' => $reclamations,
         'reclamationsWithReponsesIds' => $reclamationsWithReponsesIds,
-        'selected_statut' => $selectedStatut, // 🔥 Ajout de cette variable pour Twig
+        'selected_statut' => $selectedStatut,
     ]);
 }
 
@@ -353,7 +358,7 @@ public function repondre(int $id, Request $request, EntityManagerInterface $em, 
 
 
 
-        #[Route('/admin/reclamation/search', name: 'admin_search_reclamation', methods: ['GET'])]
+#[Route('/admin/reclamation/search', name: 'admin_search_reclamation', methods: ['GET'])]
 public function search(Request $request, ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
 {
     $query = $request->query->get('q'); // Récupérer la recherche

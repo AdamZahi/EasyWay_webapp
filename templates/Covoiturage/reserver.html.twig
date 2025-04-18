@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Confirmer Réservation{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="card" style="background-color: white; border-radius: 13px; max-width: 937px; margin: 0 auto;">
+        <div class="card-header bg-danger text-white">
+            <h2>Vérifiez votre identité</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center mb-4">
+                        <img src="{{ asset('img/LOGOEASY.png') }}" style="height: 77px; width: 87px; margin-right: 15px;">
+                        <div>
+                            <h3 style="color: #c40000; font-weight: bold;">{{ post.villeDepart }}</h3>
+                            <span style="color: #c40000; font-weight: bold; font-size: 24px;">Vers</span>
+                            <h3 style="color: #c40000; font-weight: bold;">{{ post.villeArrivee }}</h3>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        <div class="form-group">
+                            <label for="email" style="font-weight: bold;">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="card_id" style="font-weight: bold;">Numéro de carte</label>
+                            <input type="text" class="form-control" id="card_id" name="card_id" required>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="places" style="font-weight: bold;">Nombre de places</label>
+                            <input type="number" class="form-control" id="places" name="places" 
+                                   min="1" max="{{ post.nombreDePlaces }}" value="1">
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="montant" style="font-weight: bold;">Montant</label>
+                            <input type="text" class="form-control" id="montant" name="montant" 
+                                   value="{{ post.prix }} €" readonly>
+                        </div>
+
+                        <input type="hidden" name="_token" value="{{ csrf_token('reserve' ~ post.getIdPost() ) }}">
+                        
+                        <button type="submit" class="btn btn-danger mt-3" style="background-color: #AA1010;">
+                            Valider
+                        </button>
+                    </form>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mt-4">
+                        <h5>Accédez à un transport abordable et fiable</h5>
+                        <p>Avec notre application, vous pouvez voyager à travers la Tunisie à des prix imbattables.</p>
+                    </div>
+                    <img src="{{asset('img/car.png') }}" style="height: 195px; width: 333px; margin-top: 20px;">
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ path('app_covoiturage_rechercher') }}" class="text-primary mr-3">Retour</a>
+                <a href="#" class="text-primary mr-3">Consulter reservations</a>
+                <a href="#" class="text-primary">facebook</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

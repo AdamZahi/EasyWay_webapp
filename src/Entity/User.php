@@ -264,18 +264,4 @@ public function setAdmin(?Admin $admin): static
 
         return $this;
     }
-
-    public function removeReclamation(Reclamation $reclamation): static
-    {
-        if ($this->reclamations->removeElement($reclamation)) {
-            // set the owning side to null (unless already changed)
-            if ($reclamation->getUser() === $this) {
-                $reclamation->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
- 
 }

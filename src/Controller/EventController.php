@@ -31,10 +31,26 @@ class EventController extends AbstractController
         ]);
     }
 
+    #[Route('/front', name: 'app_event_front', methods: ['GET'])]
+    public function frontList(EventRepository $eventRepository): Response
+    {
+        $events = $eventRepository->findBy(
+            ['status' => 'En cours'], 
+            ['dateDebut' => 'ASC']    
+        );
+
+        return $this->render('event/front-events.html.twig', [
+            'events' => $events,
+        ]);
+    }
+
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $event = new Event();
+        $event->setStatus('En cours');
+        $event->setDateDebut(new \DateTime());
+        
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
@@ -49,6 +65,13 @@ class EventController extends AbstractController
         return $this->render('event/new.html.twig', [
             'event' => $event,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/front/{id}', name:'app_event_front_show', methods: ['GET'])]
+    public function frontShow(Event $event): Response{
+        return $this->render('event/front-show.html.twig', [
+            'event' => $event,
         ]);
     }
 
