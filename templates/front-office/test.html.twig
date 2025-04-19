@@ -162,15 +162,16 @@
     {% endif %}
     </div>
 
-    <div class="mb-3">
-        {{ form_label(form.dateCreation) }}
-        {{ form_widget(form.dateCreation, {'attr': {'class': 'form-control'}}) }}
-        {% if form_errors(form.dateCreation) %}
-        <div class="form-error">
-        {{ form_errors(form.dateCreation) }}
-    </div>
-    {% endif %}
-    </div>
+   <label for="{{ form.dateCreation.vars.id }}">Date de création</label>
+<input
+    type="text"
+    id="{{ form.dateCreation.vars.id }}"
+    class="form-control"
+    value="{{ reclamation.dateCreation|date('Y-m-d H:i') }}"
+    readonly
+>
+
+
 
    
 

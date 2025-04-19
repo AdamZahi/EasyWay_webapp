@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 
 
@@ -44,11 +45,20 @@ class ReclamationType extends AbstractType
                 'attr' => ['class' => 'form-control']
             ])
             // ReclamationType.php
-            ->add('dateCreation', DateType::class, [
+           /* ->add('dateCreation', DateTimeType::class, [
                 'widget' => 'single_text',
-                'html5' => true,
-                'attr' => ['class' => 'form-control', 'id' => 'datepicker']  // Ajout de l'id
+                'input' => 'datetime_immutable',
+                'label' => 'Date de création',
+                'mapped' => false, // <- SUPER IMPORTANT pour ne pas qu’il écrase la valeur de l’entité
+                'required' => false,
+                'attr' => [
+                    'readonly' => true,
+                    'class' => 'form-control'
+                ],
             ])
+            */
+            
+            
             ;
     }
 

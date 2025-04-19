@@ -88,7 +88,7 @@
         
             $reclamation = new Reclamation();
             $reclamation->setUser($user); // ✅ AVANT de créer le formulaire
-            $reclamation->setDateCreation(new \DateTimeImmutable());
+            $reclamation->setDateCreation(new \DateTimeImmutable()); 
         
             $form = $this->createForm(ReclamationType::class, $reclamation);
             $form->handleRequest($request);
@@ -96,13 +96,16 @@
             if ($form->isSubmitted() && $form->isValid()) {
                 dd($reclamation->getUser());
                 $entityManager->persist($reclamation);
+                dd($reclamation->getDateCreation());
                 $entityManager->flush();
         
                 return $this->redirectToRoute('app_reclamation');
             }
         
+            dump($reclamation);
             return $this->render('front-office/reclamation/index.html.twig', [
                 'form' => $form->createView(),
+                'reclamation' => $reclamation,
             ]);
         }
         
