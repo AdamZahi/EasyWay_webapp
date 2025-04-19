@@ -1,0 +1,36 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Vérification du code{% endblock %}
+
+{% block body %}
+<div class="container" style="min-height: 100vh; background-color: #ffffff; padding: 40px 0;">
+    <div class="card mx-auto shadow p-5" style="max-width: 750px;">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="{{ asset('img/earth.jpg') }}" class="img-fluid" alt="Earth Image">
+            </div>
+            <div class="col-md-6">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="mb-3" style="max-height: 60px;">
+                <p class="mb-1 text-muted"><a href="{{ path('app_login') }}">← Revenir pour se connecter</a></p>
+                <h3 class="mb-3" style="font-family: Arial Black;">Vérifier votre code</h3>
+                <p class="text-secondary">Un code d'authentification a été envoyé à votre email.</p>
+
+                {% for flashMessage in app.flashes('success') %}
+                    <div class="alert alert-success">{{ flashMessage }}</div>
+                {% endfor %}
+                {% for flashMessage in app.flashes('danger') %}
+                    <div class="alert alert-danger">{{ flashMessage }}</div>
+                {% endfor %}
+
+                <form method="post" action="{{ path('check_code') }}">
+                    <div class="form-group mb-3">
+                        <input type="text" name="code" class="form-control" placeholder="Entrer votre code" required>
+                    </div>
+                    <p>Vous n'avez reçu aucun code ? <a href="{{ path('reset_password') }}" class="text-danger">Renvoyer</a></p>
+                    <button type="submit" class="btn w-100 text-white" <a href="{{ path('app_reset_password') }}" style="background-color: #ec0707;">Vérifier</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
