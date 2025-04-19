@@ -1,0 +1,54 @@
+{% extends 'front-office/front.html.twig' %}
+
+{% block title %}Mot de passe oublié{% endblock %}
+
+{% block body %}
+<div class="container" style="background-color: #B7D973; min-height: 100vh; padding: 40px 0;">
+    <div class="card mx-auto p-4 shadow" style="max-width: 800px; background-color: #ffffff;">
+        <div class="d-flex justify-content-between mb-3">
+            <div class="circle" style="width: 28px; height: 28px; background-color: #d1d1d1; border-radius: 50%; border: 1px solid lightgray;"></div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-1 back-login" style="font-size: 12px;"><a href="{{ path('app_login') }}">&lt; Revenir pour se connecter</a></p>
+                <h3 class="mb-2" style="font-family: 'Arial Rounded MT Bold';">Mot de passe oublié ?</h3>
+                <p style="font-size: 13px; color: #7c7c7c;">Ne vous inquiétez pas, cela arrive ! Entrez votre email ci-dessous pour recevoir un code de réinitialisation.</p>
+
+                {% for flashMessage in app.flashes('success') %}
+                    <div class="alert alert-success">{{ flashMessage }}</div>
+                {% endfor %}
+
+                <form method="post" action="{{ path('reset_password_send_code') }}">
+                    <div class="form-group mb-3">
+                        <label for="email">Adresse email</label>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="ex: exemple@email.com" required>
+                    </div>
+                    <button href="{{ path('verify_code') }}" type="submit" class="btn w-100 mt-2 py-2 text-white" style="background-color: #CF321A; font-size: 17px;">
+                        Envoyer code
+                    </button>
+                </form>
+
+                <div class="d-flex align-items-center my-4">
+                    <hr class="flex-grow-1">
+                    <span class="px-2" style="font-size: 13px;">ou Se connecter avec</span>
+                    <hr class="flex-grow-1">
+                </div>
+
+                <div class="d-flex justify-content-center mb-3">
+                    <img src="{{ asset('img/facebook.png') }}" alt="Facebook" class="mx-2" style="width: 36px;">
+                    <img src="{{ asset('img/google.png') }}" alt="Google" class="mx-2" style="width: 36px;">
+                    <img src="{{ asset('img/apple.png') }}" alt="Apple" class="mx-2" style="width: 36px;">
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <img src="{{ asset('img/earth.jpg') }}" alt="Illustration Terre" class="img-fluid" style="max-width: 300px; margin-top: 30px;">
+            </div>
+        </div>
+        <div class="d-flex justify-content-end mt-4">
+            <span class="me-3">Aide</span>
+            <span class="me-3">Confidentialité</span>
+            <span>Termes</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
