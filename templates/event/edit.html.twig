@@ -598,6 +598,10 @@
                         </div>
                     {% endfor %}
 
+                    <div id="formAlert" class="alert alert-danger d-none" role="alert">
+                        Veuillez remplir tous les champs obligatoires ou corriger les erreurs du formulaire.
+                    </div>
+
                     {{ form_start(form, {'attr': {'id': 'eventForm', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
                         <div class="form-group">
                             {{ form_label(form.type, 'Event Type', {'label_attr': {'class': 'form-label'}}) }}
@@ -628,7 +632,11 @@
                             {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
                             {{ form_errors(form.dateFin) }}
                         </div>
-
+                        <div class="form-group">
+                        {{ form_label(form.ligneAffectee, 'Affected Line', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.ligneAffectee, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.ligneAffectee) }}
+                    </div>
                         <div class="btn-group d-flex justify-content-between">
                             <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Back to list
@@ -641,5 +649,44 @@
                 </div>
             </div>
         </div>
+    <script>
+    document.getElementById('eventForm').addEventListener('submit', function(event) {
+        let valid = true;
+
+        // Clear previous validation styles
+        document.querySelectorAll('#eventForm .form-control').forEach(function(field) {
+            field.classList.remove('is-invalid');
+        });
+
+        // Required fields to validate (adjust IDs/names if needed)
+        const requiredFields = [
+            'form_type',
+            'form_status',
+            'form_description',
+            'form_dateDebut',
+            'form_dateFin',
+            'form_ligneAffectee'
+        ];
+
+        requiredFields.forEach(function(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field && field.value.trim() === '') {
+                field.classList.add('is-invalid');
+                valid = false;
+            }
+        });
+
+        // If not valid, show alert and prevent submission
+        const alertBox = document.getElementById('formAlert');
+        if (!valid) {
+            event.preventDefault();
+            alertBox.classList.remove('d-none');
+            alertBox.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            alertBox.classList.add('d-none');
+        }
+    });
+    </script>
+
     </div>
 {% endblock %} 
