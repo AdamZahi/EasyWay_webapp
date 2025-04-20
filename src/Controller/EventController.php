@@ -3,7 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\EventComment;
+use App\Entity\User;
 use App\Form\EventType;
+use App\Form\EventCommentType;
+use App\Repository\EventCommentRepository;
 use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -47,8 +51,11 @@ class EventController extends AbstractController
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        // For testing with static user ID 1
+        $currentUser = $entityManager->getRepository(User::class)->find(10);
         $event = new Event();
         $event->setStatus('En cours');
+        $event->setId_createur($currentUser) ;
         $event->setDateDebut(new \DateTime());
         
         $form = $this->createForm(EventType::class, $event);
@@ -113,4 +120,34 @@ class EventController extends AbstractController
 
         return $this->redirectToRoute('app_event_index');
     }
+
+    #[Route('/{id}/comments', name: 'event_comment')]
+public function comment(Request $request, Event $event, EventCommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
+{
+    // For testing with static user ID 1
+    $currentUser = $entityManager->getRepository(User::class)->find(1);
+    $comment = new EventComment();
+    $form = $this->createForm(EventCommentType::class, $comment);
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        $comment->setEvent($event);
+        $comment->setUser($currentUser); // Set the current user
+        $comment->setCreatedAt(new \DateTime());
+
+        $entityManager->persist($comment);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Commentaire ajouté avec succès.');
+        return $this->redirectToRoute('event_comment', ['id' => $event->getId()]);
+    }
+
+    $comments = $commentRepository->findBy(['event' => $event], ['createdAt' => 'DESC']);
+
+    return $this->render('event/eventComment.html.twig', [
+        'event' => $event,
+        'comments' => $comments,
+        'form' => $form->createView(),
+    ]);
+}
 } 
