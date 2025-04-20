@@ -52,8 +52,8 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <th>Ligne</th>
                         <th>Type</th>
-                        <th>Status</th>
                         <th>Description</th>
                         <th>Date debut</th>
                         <th>Date fin</th>
@@ -63,8 +63,8 @@
                 <tbody>
                 {% for event in events %}
                     <tr>
+                        <td> {{ event.ligneAffectee.depart }} - {{ event.ligneAffectee.arret }}</td>
                         <td>{{ event.type }}</td>
-                        <td>{{ event.status }}</td>
                         <td>{{ event.description }}</td>
                         <td>{{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</td>
                         <td>{{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</td>
