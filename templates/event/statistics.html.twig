@@ -1,0 +1,82 @@
+{% extends 'back-office/pages/back-office.html.twig' %}
+
+{% block body %}
+    <h1>Statistiques des Événements</h1>
+    <p>Total événements : {{ totalEvents }}</p>
+
+    <canvas id="statusChart"></canvas>
+    <canvas id="typeChart"></canvas>
+    <canvas id="evolutionChart"></canvas>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const statusCount = {{ statusCount|json_encode|raw }};
+    const typeCount = {{ typeCount|json_encode|raw }};
+    const evolutionEvents = {{ evolutionEvents|json_encode|raw }};
+
+    // Chart 1: Statut
+    const statusChart = new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(statusCount),
+            datasets: [{
+                data: Object.values(statusCount),
+                backgroundColor: ['#FF5733', '#FFC107', '#28A745'],
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Répartition des Événements par Statut' }
+            }
+        }
+    });
+
+    // Chart 2: Type
+    const typeChart = new Chart(document.getElementById('typeChart'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(typeCount),
+            datasets: [{
+                label: 'Types d\'événements',
+                data: Object.values(typeCount),
+                backgroundColor: '#007BFF'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Chart 3: Evolution
+    const evolutionChart = new Chart(document.getElementById('evolutionChart'), {
+        type: 'line',
+        data: {
+            labels: Object.keys(evolutionEvents),
+            datasets: [{
+                label: 'Événements par jour',
+                data: Object.values(evolutionEvents),
+                borderColor: '#28A745',
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true },
+                x: {
+                    title: { display: true, text: 'Jour' }
+                }
+            }
+        }
+    });
+</script>
+
+
+{% endblock %}
