@@ -6,14 +6,19 @@ use App\Entity\Event;
 use App\Entity\EventComment;
 use App\Entity\User;
 use App\Form\EventType;
+use App\Form\EventFilterType;
 use App\Form\EventCommentType;
 use App\Repository\EventCommentRepository;
+use App\Repository\LigneRepository;
 use App\Repository\EventRepository;
+use App\Repository\ReservationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 #[Route('/event')]
 class EventController extends AbstractController
@@ -49,15 +54,19 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        MailerInterface $mailer,
+        ReservationRepository $reservationRepository
+    ): Response {
         // For testing with static user ID 1
         $currentUser = $entityManager->getRepository(User::class)->find(10);
         $event = new Event();
         $event->setStatus('En cours');
-        $event->setId_createur($currentUser) ;
+        $event->setId_createur($currentUser);
         $event->setDateDebut(new \DateTime());
-        
+
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
@@ -65,7 +74,42 @@ class EventController extends AbstractController
             $entityManager->persist($event);
             $entityManager->flush();
 
-            $this->addFlash('success', 'L\'événement a été créé avec succès.');
+            // Fetch users who made reservations in the ligneAffectee
+            $reservations = $reservationRepository->findBy(['depart' => $event->getLigneAffectee()->getDepart(), 'arret' => $event->getLigneAffectee()->getArret()]);
+            foreach ($reservations as $reservation) {
+                $user = $reservation->getUser();
+                if ($user && $user->getEmail()) {
+                    // Send email to the user
+                    // $email = (new Email())
+                    //     ->from('no-reply@demomailtrap.co')
+                    //     ->to($user->getEmail())
+                    //     ->subject('Nouvel événement sur votre ligne')
+                    //     ->text('Un nouvel événement a été ajouté sur votre ligne.
+                    //         Départ: ' . $event->getLigneAffectee()->getDepart() . '
+                    //         Arrêt: ' . $event->getLigneAffectee()->getArret() . '
+                    //         Description: ' . $event->getDescription()
+                    //         . 'Merci de consulter l\'application pour plus de détails.');
+                    // $mailer->send($email);
+                    // Envoi de l'email de confirmation
+                try {
+                    $this->sendEmail(
+                        $mailer,
+                        $user->getEmail(),
+                        'Nouvel événement sur votre ligne',
+                        'Un nouvel événement a été ajouté sur votre ligne.
+                                Départ: ' . $event->getLigneAffectee()->getDepart() . '
+                                Arrêt: ' . $event->getLigneAffectee()->getArret() . '
+                                Description: ' . $event->getDescription()
+                            . 'Merci de consulter l\'application pour plus de détails.'
+                    );
+                    $this->addFlash('success', 'Email envoyé avec succès à ' . $user->getEmail());
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Error : ' . $e->getMessage());
+                }
+                }
+            }
+
+            $this->addFlash('success', 'L\'événement a été crée avec succès et les utilisateurs concernés ont été notifiés.');
             return $this->redirectToRoute('app_event_index');
         }
 
@@ -122,32 +166,79 @@ class EventController extends AbstractController
     }
 
     #[Route('/{id}/comments', name: 'event_comment')]
-public function comment(Request $request, Event $event, EventCommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
-{
-    // For testing with static user ID 1
-    $currentUser = $entityManager->getRepository(User::class)->find(1);
-    $comment = new EventComment();
-    $form = $this->createForm(EventCommentType::class, $comment);
-    $form->handleRequest($request);
+    public function comment(Request $request, Event $event, EventCommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
+    {
+        // For testing with static user ID 1
+        $currentUser = $entityManager->getRepository(User::class)->find(1);
+        $comment = new EventComment();
+        $form = $this->createForm(EventCommentType::class, $comment);
+        $form->handleRequest($request);
 
-    if ($form->isSubmitted() && $form->isValid()) {
-        $comment->setEvent($event);
-        $comment->setUser($currentUser); // Set the current user
-        $comment->setCreatedAt(new \DateTime());
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment->setEvent($event);
+            $comment->setUser($currentUser); // Set the current user
+            $comment->setCreatedAt(new \DateTime());
 
-        $entityManager->persist($comment);
-        $entityManager->flush();
+            $entityManager->persist($comment);
+            $entityManager->flush();
 
-        $this->addFlash('success', 'Commentaire ajouté avec succès.');
-        return $this->redirectToRoute('event_comment', ['id' => $event->getId()]);
+            $this->addFlash('success', 'Commentaire ajouté avec succès.');
+            return $this->redirectToRoute('event_comment', ['id' => $event->getId()]);
+        }
+
+        $comments = $commentRepository->findBy(['event' => $event], ['createdAt' => 'DESC']);
+
+        return $this->render('event/eventComment.html.twig', [
+            'event' => $event,
+            'comments' => $comments,
+            'form' => $form->createView(),
+        ]);
     }
 
-    $comments = $commentRepository->findBy(['event' => $event], ['createdAt' => 'DESC']);
+    #[Route('/ev/statistics', name: 'app_admin_statistics')]
+    public function statistiquesEvenements(EventRepository $eventRepo): Response{
+    $events = $eventRepo->findAll();
+    $totalEvents = count($events);
+    $statusCount = [];
+    $typeCount = [];
+    $evolutionEvents = [];
 
-    return $this->render('event/eventComment.html.twig', [
-        'event' => $event,
-        'comments' => $comments,
-        'form' => $form->createView(),
+    foreach ($events as $event) {
+        $status = $event->getStatus();
+        $type = $event->getType();
+        $date = $event->getDateDebut()->format('Y-m-d');
+        if (!isset($statusCount[$status])) {
+            $statusCount[$status] = 0;
+        }
+        $statusCount[$status]++;
+        if (!isset($typeCount[$type])) {
+            $typeCount[$type] = 0;
+        }
+        $typeCount[$type]++;
+        if (!isset($evolutionEvents[$date])) {
+            $evolutionEvents[$date] = 0;
+        }
+        $evolutionEvents[$date]++;
+    }
+
+    ksort($evolutionEvents);
+
+    return $this->render('event/statistics.html.twig', [
+        'totalEvents' => $totalEvents,
+        'statusCount' => $statusCount,
+        'typeCount' => $typeCount,
+        'evolutionEvents' => $evolutionEvents
     ]);
 }
-} 
+
+    public function sendEmail(MailerInterface $mailer, $toEmail, $subject, $body)
+    {
+        $email = (new Email())
+            ->from('zahi.adem10@gmail.com')
+            ->to($toEmail)
+            ->subject($subject)
+            ->text($body);
+
+        $mailer->send($email);
+    }
+}
