@@ -45,6 +45,7 @@
                         <p><strong>Description:</strong> {{ event.description }}</p>
                     </div>
                     <div class="col-md-6">
+                        <p><strong>Ligne affectee:</strong> {{ event.ligneAffectee.depart }} - {{ event.ligneAffectee.arret }}</p>
                         <p><strong>Date Debut:</strong> {{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</p>
                         <p><strong>Date Fin:</strong> {{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</p>
                     </div>
