@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class StationController extends AbstractController
 {
-    #[Route('/station/add', name: 'station_add')]
+    #[Route('/dashboard/station/add', name: 'station_add')]
 public function add(Request $request, EntityManagerInterface $entityManager): Response
 {
     $station = new Station();
@@ -30,6 +30,16 @@ public function add(Request $request, EntityManagerInterface $entityManager): Re
 
     return $this->render('/station/add.html.twig', [
         'form' => $form->createView(),
+    ]);
+}
+
+#[Route('/dashboard/station/list', name: 'station_list_admin')]
+public function list_admin(EntityManagerInterface $entityManager): Response
+{
+    $stations = $entityManager->getRepository(Station::class)->findAll();
+
+    return $this->render('/station/list_station.html.twig', [
+        'stations' => $stations
     ]);
 }
 

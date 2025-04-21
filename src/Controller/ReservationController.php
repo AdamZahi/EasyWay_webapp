@@ -25,7 +25,7 @@ public function add(Request $request, EntityManagerInterface $entityManager): Re
         $entityManager->persist($reservation);
         $entityManager->flush();
 
-        return $this->redirectToRoute('reservation_list');
+        return $this->redirectToRoute('paiement_add');
     }
 
     return $this->render('reservation/add.html.twig', [
