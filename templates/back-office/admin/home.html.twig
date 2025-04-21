@@ -1,0 +1,26 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %}BIENVENUE ADMINISTRATEUR !{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="display-4 fw-bold text-center mb-5">BIENVENUE ADMINISTRATEUR !</h1>
+
+    <div class="row align-items-center">
+        <div class="col-md-6 text-center">
+            <img
+                src="{{ asset('img/map.jpg') }}"
+                alt="Tunisia Map"
+                class="img-fluid rounded shadow"
+                style="max-width: 100%; height: auto; max-height: 400px;"
+            />
+        </div>
+        <div class="col-md-6 text-center">
+            <h3 class="fw-semibold">
+                Planifiez vos déplacements <span class="text-primary">facilement</span> <br>
+                à travers <span class="text-success">la Tunisie</span> 🇹🇳
+            </h3>
+        </div>
+    </div>
+</div>
+{% endblock %}
