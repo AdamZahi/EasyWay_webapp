@@ -78,37 +78,44 @@
         }
         
 
+       
         #[Route('/add-reclamation', name: 'app_add_reclamation')]
-        public function addReclamation(Request $request, MailerInterface $mailer, Security $security, EntityManagerInterface $entityManager): Response
+        public function addReclamation(Request $request, MailerInterface $mailer, Security $security): Response
         {
-            $user = $security->getUser();
-            if (!$user) {
-                throw new \Exception('Utilisateur non connecté');
-            }
-        
+            // Création de l'objet réclamation
             $reclamation = new Reclamation();
-            $reclamation->setUser($user); // ✅ AVANT de créer le formulaire
-            $reclamation->setDateCreation(new \DateTimeImmutable()); 
-        
+            
+            // Création du formulaire lié à la réclamation
             $form = $this->createForm(ReclamationType::class, $reclamation);
             $form->handleRequest($request);
         
+            // Vérifier si le formulaire est soumis et valide
             if ($form->isSubmitted() && $form->isValid()) {
-                dd($reclamation->getUser());
-                $entityManager->persist($reclamation);
-                dd($reclamation->getDateCreation());
-                $entityManager->flush();
+                
+                // Récupérer l'utilisateur connecté
+                $user = $security->getUser();
+                if (!$user) {
+                    throw new \Exception('Aucun utilisateur connecté.');
+                }
         
+                // Associer l'utilisateur à la réclamation
+                $reclamation->setUser($user);  // Liens avec l'utilisateur connecté
+                $reclamation->setDateCreation(new \DateTime());  // Ajouter la date de création
+        
+                // Persist et flush de l'entité Reclamation
+                $this->entityManager->persist($reclamation);
+                $this->entityManager->flush();
+        
+                // Rediriger vers la page des réclamations
                 return $this->redirectToRoute('app_reclamation');
             }
         
-            dump($reclamation);
+            // Rendu du formulaire
             return $this->render('front-office/reclamation/index.html.twig', [
                 'form' => $form->createView(),
-                'reclamation' => $reclamation,
+                
             ]);
         }
-        
         
         
         
@@ -168,8 +175,9 @@ public function listReclamations(
         $qb->andWhere('r.statut = :statut')
            ->setParameter('statut', $selectedStatut);
     }
-
+    $qb->orderBy('r.dateCreation', 'DESC');
     $reclamations = $qb->getQuery()->getResult();
+
 
     $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
     $reclamationsWithReponsesIds = array_map(fn($r) => $r->getReclamation()->getId(), $reclamationsWithReponses);

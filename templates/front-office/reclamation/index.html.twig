@@ -109,7 +109,9 @@
         </div>
 
         <div class="text-center mt-3">
-            <button type="submit" class="btn btn-primary px-4">Submit</button>
+            <button type="submit" class="btn btn-primary px-4">Ajouter</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ path('chatbot') }}'">💬 Vous pouvez questionner le AI</button>
+
         </div>
         
         {{ form_end(form) }}

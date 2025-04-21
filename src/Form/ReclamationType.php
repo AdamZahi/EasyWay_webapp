@@ -45,20 +45,12 @@ class ReclamationType extends AbstractType
                 'attr' => ['class' => 'form-control']
             ])
             // ReclamationType.php
-           /* ->add('dateCreation', DateTimeType::class, [
+            ->add('dateCreation', DateType::class, [
                 'widget' => 'single_text',
-                'input' => 'datetime_immutable',
-                'label' => 'Date de création',
-                'mapped' => false, // <- SUPER IMPORTANT pour ne pas qu’il écrase la valeur de l’entité
-                'required' => false,
-                'attr' => [
-                    'readonly' => true,
-                    'class' => 'form-control'
-                ],
+                'html5' => true,
+                'attr' => ['class' => 'form-control', 'id' => 'datepicker']  // Ajout de l'id
             ])
-            */
-            
-            
+
             ;
     }
 
