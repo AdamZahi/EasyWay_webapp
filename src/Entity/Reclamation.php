@@ -56,8 +56,10 @@ class Reclamation
     private string $statut;
 
 
-    #[ORM\Column(type: "datetime_immutable")]
-    private \DateTimeImmutable $dateCreation;
+    #[ORM\Column(type: "datetime")]
+    #[Assert\NotNull(message: "La date de création est requise.")]
+    #[Assert\LessThanOrEqual("today", message: "La date de création ne peut pas être dans le futur.")]
+    private \DateTimeInterface $dateCreation;
 
 
     #[ORM\ManyToOne(inversedBy: 'reclamations')]
@@ -142,18 +144,17 @@ class Reclamation
     }
 
 
-    public function getDateCreation(): \DateTimeImmutable
+   public function getDateCreation(): \DateTimeInterface
     {
         return $this->dateCreation;
     }
 
 
-    public function setDateCreation(\DateTimeImmutable $dateCreation): self
+    public function setDateCreation(\DateTimeInterface $dateCreation): self
     {
         $this->dateCreation = $dateCreation;
         return $this;
     }
-
 
     public function getCategoryId(): ?Categorie
     {
