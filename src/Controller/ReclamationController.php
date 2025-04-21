@@ -21,14 +21,17 @@
     use Symfony\Component\Mime\Email;
     use Symfony\Component\HttpFoundation\JsonResponse;
     use App\Repository\ReponseRepository;
+    use Symfony\Bundle\SecurityBundle\Security;
+    
+    use App\Entity\User;  
 
-   
 
 
 
     final class ReclamationController extends AbstractController
     {
-        private $entityManager;
+        
+        private EntityManagerInterface $entityManager;
 
         // Inject the EntityManagerInterface into the controller
         public function __construct(EntityManagerInterface $entityManager)
@@ -75,46 +78,52 @@
         }
         
 
-
+       
         #[Route('/add-reclamation', name: 'app_add_reclamation')]
-        public function addReclamation(Request $request, MailerInterface $mailer): Response
+        public function addReclamation(Request $request, MailerInterface $mailer, Security $security): Response
         {
+            // Création de l'objet réclamation
             $reclamation = new Reclamation();
+            
+            // Création du formulaire lié à la réclamation
             $form = $this->createForm(ReclamationType::class, $reclamation);
-        
             $form->handleRequest($request);
+        
+            // Vérifier si le formulaire est soumis et valide
             if ($form->isSubmitted() && $form->isValid()) {
-                $reclamation->setDateCreation(new \DateTime());
-               
+                
+                // Récupérer l'utilisateur connecté
+                $user = $security->getUser();
+                if (!$user) {
+                    throw new \Exception('Aucun utilisateur connecté.');
+                }
+        
+                // Associer l'utilisateur à la réclamation
+                $reclamation->setUser($user);  // Liens avec l'utilisateur connecté
+                $reclamation->setDateCreation(new \DateTime());  // Ajouter la date de création
+        
+                // Persist et flush de l'entité Reclamation
                 $this->entityManager->persist($reclamation);
                 $this->entityManager->flush();
         
-                // 📧 Envoi de l'email après l'ajout de la réclamation
-                try {
-                    $this->sendEmail(
-                        $mailer,
-                        $reclamation->getEmail(),
-                        'Confirmation de votre réclamation',
-                        'Votre réclamation a été reçue avec succès. Nous vous répondrons bientôt.'
-                    );
-        
-                    $this->addFlash('success', 'Réclamation ajoutée et email envoyé.');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Réclamation ajoutée, mais erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
-                }
-        
+                // Rediriger vers la page des réclamations
                 return $this->redirectToRoute('app_reclamation');
             }
         
+            // Rendu du formulaire
             return $this->render('front-office/reclamation/index.html.twig', [
                 'form' => $form->createView(),
+                
             ]);
         }
+        
+        
+        
         
 
 ////
         
-        #[Route('/api/reclamation', name: 'api_add_reclamation', methods: ['POST'])]
+    /*    #[Route('/api/reclamation', name: 'api_add_reclamation', methods: ['POST'])]
         public function addReclamationJson(Request $request, EntityManagerInterface $entityManager): JsonResponse
         {
             $data = json_decode($request->getContent(), true);
@@ -136,7 +145,7 @@
             $entityManager->flush();
         
             return new JsonResponse(['message' => 'Réclamation ajoutée avec succès'], 201);
-        }
+        }*/
 
         /*{
   "email": "test@example.com",
@@ -146,31 +155,37 @@
 */
 
 
-
-#[Route('/list', name: 'admin_reclamations')]
-public function listReclamations(Request $request, ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
-{
+#[Route('/list', name: 'admin_reclamations', methods: ['GET'])]
+public function listReclamations(
+    Request $request,
+    ReclamationRepository $reclamationRepository,
+    ReponseRepository $reponseRepository
+): Response {
     $selectedStatut = $request->query->get('statut');
+    $query = $request->query->get('q');
 
-    // Récupérer les réclamations selon le filtre de statut
-    if ($selectedStatut) {
-        $reclamations = $reclamationRepository->findBy(['statut' => $selectedStatut]);
-    } else {
-        $reclamations = $this->entityManager->getRepository(Reclamation::class)->findAll();
+    $qb = $reclamationRepository->createQueryBuilder('r');
+
+    if ($query) {
+        $qb->where('r.email LIKE :query OR r.sujet LIKE :query OR r.description LIKE :query OR r.statut LIKE :query')
+           ->setParameter('query', '%' . $query . '%');
     }
 
-    // Récupérer les réclamations ayant des réponses
-    $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
+    if ($selectedStatut) {
+        $qb->andWhere('r.statut = :statut')
+           ->setParameter('statut', $selectedStatut);
+    }
+    $qb->orderBy('r.dateCreation', 'DESC');
+    $reclamations = $qb->getQuery()->getResult();
 
-    // Récupérer les ID des réclamations ayant des réponses
-    $reclamationsWithReponsesIds = array_map(function($reponse) {
-        return $reponse->getReclamation()->getId();
-    }, $reclamationsWithReponses);
+
+    $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
+    $reclamationsWithReponsesIds = array_map(fn($r) => $r->getReclamation()->getId(), $reclamationsWithReponses);
 
     return $this->render('back-office/reclamation/listreclamation.html.twig', [
         'reclamations' => $reclamations,
         'reclamationsWithReponsesIds' => $reclamationsWithReponsesIds,
-        'selected_statut' => $selectedStatut, // 🔥 Ajout de cette variable pour Twig
+        'selected_statut' => $selectedStatut,
     ]);
 }
 
@@ -354,7 +369,7 @@ public function repondre(int $id, Request $request, EntityManagerInterface $em, 
 
 
 
-        #[Route('/admin/reclamation/search', name: 'admin_search_reclamation', methods: ['GET'])]
+#[Route('/admin/reclamation/search', name: 'admin_search_reclamation', methods: ['GET'])]
 public function search(Request $request, ReclamationRepository $reclamationRepository, ReponseRepository $reponseRepository): Response
 {
     $query = $request->query->get('q'); // Récupérer la recherche

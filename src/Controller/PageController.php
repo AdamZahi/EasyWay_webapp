@@ -3,24 +3,22 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\ReclamationType;
 use App\Entity\Reclamation;
+
 final class PageController extends AbstractController
 {
-    #[Route('/', name: 'app_page')]
+    #[Route('/index', name: 'app_page')]
     public function index(): Response
     {
-        $reclamation = new Reclamation();
-        
-        // Create the form
-        $form = $this->createForm(ReclamationType::class, $reclamation);
-       
         return $this->render('front-office/index.html.twig', [
-            'form' => $form->createView(),
+            'controller_name' => 'PageController',
         ]);
     }
+
     #[Route('/admin', name: 'admin_page')]
     public function adminIndex(): Response
     {
@@ -28,6 +26,7 @@ final class PageController extends AbstractController
             'controller_name' => 'PageController',
         ]);
     }
+
     #[Route('/dashboard', name: 'back_office')]
     public function backOfficeV1(): Response
     {
@@ -45,5 +44,4 @@ final class PageController extends AbstractController
     {
         return $this->render('back-office/pages/back-office3.html.twig');
     }
-
 }

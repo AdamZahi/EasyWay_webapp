@@ -7,6 +7,7 @@ use App\Entity\Reponse;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\User;
 
 
 #[ORM\Entity]
@@ -66,7 +67,12 @@ class Reclamation
     private ?Categorie $Category_Id = null;
 
 
-   
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
+    private ?User $user = null;
+
+
     // 🔹 GETTERS & SETTERS
 
 
@@ -84,8 +90,7 @@ class Reclamation
     }
 
 
-  
-
+    
 
     public function getEmail(): string
     {
@@ -139,7 +144,7 @@ class Reclamation
     }
 
 
-    public function getDateCreation(): \DateTimeInterface
+   public function getDateCreation(): \DateTimeInterface
     {
         return $this->dateCreation;
     }
@@ -150,7 +155,6 @@ class Reclamation
         $this->dateCreation = $dateCreation;
         return $this;
     }
-
 
     public function getCategoryId(): ?Categorie
     {
@@ -188,6 +192,17 @@ public function removeReponse(Reponse $reponse): self
             $reponse->setReclamation(null);
         }
     }
+    return $this;
+}
+
+public function getUser(): ?User
+{
+    return $this->user;
+}
+
+public function setUser(?User $user): self
+{
+    $this->user = $user;
     return $this;
 }
 
