@@ -1,9 +1,14 @@
 <?php
-// src/Controller/CovoiturageController.php
+
 namespace App\Controller;
-use App\Entity\User;
+use App\Entity\Payment;
 use App\Entity\Posts;
+use App\Entity\User;
+use App\Repository\PostsRepository;
+use App\Service\EmailService;
+use App\Service\StripePaymentService;
 use App\Form\PostsType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Entity\Commentaire;
 use App\Service\BadWordFilter; 
 use Doctrine\ORM\EntityManagerInterface;
@@ -67,11 +72,9 @@ class CovoiturageController extends AbstractController
         }
                 } else {
                     try {
-                        // Replace this with your actual user retrieval logic
-                        // For example, if you're using security:
-                        // $user = $this->getUser();
+                      
                         $user = $entityManager->getReference('App\Entity\User', 1); // or 18
-                        $post->setUser($user); // Changed from setIdUser to setUser
+                        $post->setUser($user); 
                 
                         $entityManager->persist($post);
                         $entityManager->flush();
@@ -96,6 +99,7 @@ class CovoiturageController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+    
 
     #[Route('/covoiturage/rechercher', name: 'app_covoiturage_rechercher')]
     public function rechercher(Request $request, EntityManagerInterface $entityManager): Response
@@ -163,20 +167,105 @@ class CovoiturageController extends AbstractController
         $this->addFlash('success', 'Commentaire ajouté avec succès!');
         return $this->redirectToRoute('app_covoiturage_rechercher');
     }
-    #[Route('/covoiturage/reserver/{id_post}', name: 'app_covoiturage_reserver')]
-    public function reserver(int $id_post, EntityManagerInterface $entityManager): Response
+    #[Route('/covoiturage/reserver/{id_post}', name: 'app_covoiturage_reserver', methods: ['GET'])]
+    public function reserver(Posts $post): Response
     {
-        // Get the post from database
-        $post = $entityManager->getRepository(Posts::class)->find($id_post);
-        
-        if (!$post) {
-            throw $this->createNotFoundException('Post not found');
-        }
-        
         return $this->render('covoiturage/reserver.html.twig', [
             'post' => $post,
+            'stripe_public_key' => $this->getParameter('stripe_public_key'),
         ]);
     }
+    #[Route('/payment/{id_post}', name: 'app_process_payment', methods: ['POST'])]
+public function processPayment(
+    Posts $post,
+    Request $request,
+    StripePaymentService $stripePayment,
+    EmailService $emailService,
+    EntityManagerInterface $entityManager
+): Response {
+    $email = $request->request->get('email');
+    $paymentMethodId = $request->request->get('payment_method_id');
+    $places = (int) $request->request->get('places', 1);
+    
+    // Validate inputs
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $this->addFlash('error', 'Invalid email address.');
+        return $this->render('covoiturage/reserver.html.twig', [
+            'post' => $post,
+            'stripe_public_key' => $this->getParameter('stripe_public_key'),
+        ]);
+    }
+
+    if ($places > $post->getNombreDePlaces()) {
+        $this->addFlash('error', 'Not enough available places.');
+        return $this->render('covoiturage/reserver.html.twig', [
+            'post' => $post,
+            'stripe_public_key' => $this->getParameter('stripe_public_key'),
+        ]);
+    }
+
+    $amount = $post->getPrix() * $places;
+
+    try {
+        // Create payment intent
+        $paymentIntent = $stripePayment->createPaymentIntent($amount);
+        
+        // Confirm payment
+        $confirmedIntent = $stripePayment->confirmPayment($paymentIntent->id, $paymentMethodId);
+        
+        // Check payment status
+        if ($confirmedIntent->status !== 'succeeded') {
+            throw new \Exception('Payment did not complete successfully.');
+        }
+
+        // Save payment to database
+        $payment = new Payment();
+        $payment->setTransactionId($paymentIntent->id);
+        $payment->setAmount($amount);
+        $payment->setEmail($email);
+        $entityManager->persist($payment);
+        
+        // Update available places
+        $post->setNombreDePlaces($post->getNombreDePlaces() - $places);
+        $entityManager->flush();
+
+        // Send confirmation email
+        $emailSent = $emailService->sendPaymentConfirmation(
+            $email,
+            $amount,
+            $places,
+            $post->getVilleDepart(),
+            $post->getVilleArrivee()
+        );
+
+        if ($emailSent) {
+            $this->addFlash('success', 'Payment successful and confirmation email sent!');
+        } else {
+            $this->addFlash('warning', 'Payment successful but email not sent.');
+        }
+
+        // Render the page again with a success message
+        return $this->render('covoiturage/reserver.html.twig', [
+            'post' => $post,
+            'stripe_public_key' => $this->getParameter('stripe_public_key'),
+        ]);
+        
+    } catch (\Exception $e) {
+        $this->addFlash('error', 'Payment error: ' . $e->getMessage());
+        return $this->render('covoiturage/reserver.html.twig', [
+            'post' => $post,
+            'stripe_public_key' => $this->getParameter('stripe_public_key'),
+        ]);
+    }
+}
+
+    
+    #[Route('/payment/success', name: 'app_payment_success')]
+    public function paymentSuccess(): Response
+    {
+        return $this->render('payment/reserver.html.twig');
+    }
+
     #[Route('/covoiturage/mes-offres', name: 'app_covoiturage_mes_offres')]
     public function mesOffres(EntityManagerInterface $entityManager): Response
     {
@@ -381,5 +470,29 @@ private function getTunisianCities(): array
     return $cities;
 }
 
-    
+#[Route('/stripe/webhook', name: 'stripe_webhook')]
+public function handleWebhook(Request $request, EntityManagerInterface $em): Response
+{
+    $payload = $request->getContent();
+    $sig_header = $request->headers->get('stripe-signature');
+    $endpoint_secret = $this->getParameter('stripe_webhook_secret');
+
+    try {
+        $event = \Stripe\Webhook::constructEvent(
+            $payload, $sig_header, $endpoint_secret
+        );
+    } catch (\Exception $e) {
+        return new Response('Invalid signature', 400);
+    }
+
+    switch ($event->type) {
+        case 'payment_intent.succeeded':
+            $paymentIntent = $event->data->object;
+            // Handle successful payment
+            break;
+        // Add other event types as needed
+    }
+
+    return new Response('Success', 200);
+}
 }

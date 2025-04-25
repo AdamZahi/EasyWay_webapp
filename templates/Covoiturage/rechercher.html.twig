@@ -90,17 +90,25 @@
             </div>
         </div>
 {# Affichage des messages flash dans le bloc body #}
-{% for message in app.flashes('error') %}
-    <div class="alert alert-danger">
-        {{ message }}
-    </div>
-{% endfor %}
+<div class="flash-messages-container" style="position: fixed; top: 80px; left: 0; right: 0; z-index: 1000; width: 100%; padding: 0 20px;">
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" style="max-width: 1200px; margin: 0 auto; font-size: 16px; font-weight: bold; text-align: center;">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="position: absolute; right: 20px;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
 
-{% for message in app.flashes('success') %}
-    <div class="alert alert-success">
-        {{ message }}
-    </div>
-{% endfor %}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" style="max-width: 1200px; margin: 0 auto; font-size: 16px; font-weight: bold; text-align: center;">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="position: absolute; right: 20px;">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endfor %}
+</div>
 <div class="container-fluid" style="width: 100%; margin: 0 auto;">
     <div class="d-flex">
         <!-- Main Content (Posts List) -->
@@ -136,7 +144,7 @@
                                 <p><strong>Lieu d'arrivée:</strong> {{ post.villeArrivee }}</p>
                                 <p><strong>Date:</strong> {{ post.date ? post.date|date('Y-m-d') : 'Non spécifiée' }}</p>
                                 <p><strong>Nombre de places:</strong> {{ post.nombreDePlaces }}</p>
-                                <p><strong>Prix:</strong> {{ post.prix ? post.prix : 'Non spécifié' }} €</p>
+                                <p><strong>Prix:</strong> {{ post.prix ? post.prix : 'Non spécifié' }} DT</p>
                             </div>
 
                             <!-- Reservation Button -->

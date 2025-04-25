@@ -9,6 +9,15 @@
             <h2>Vérifiez votre identité</h2>
         </div>
         <div class="card-body">
+          {% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'warning' ? 'warning' : 'success') }} mt-3">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+            
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-4">
@@ -20,16 +29,12 @@
                         </div>
                     </div>
 
-                    <form method="post">
+                    <form method="post" action="{{ path('app_process_payment', { 'id_post': post.idPost }) }}">
                         <div class="form-group">
                             <label for="email" style="font-weight: bold;">Email</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
 
-                        <div class="form-group mt-3">
-                            <label for="card_id" style="font-weight: bold;">Numéro de carte</label>
-                            <input type="text" class="form-control" id="card_id" name="card_id" required>
-                        </div>
 
                         <div class="form-group mt-3">
                             <label for="places" style="font-weight: bold;">Nombre de places</label>
@@ -40,10 +45,13 @@
                         <div class="form-group mt-3">
                             <label for="montant" style="font-weight: bold;">Montant</label>
                             <input type="text" class="form-control" id="montant" name="montant" 
-                                   value="{{ post.prix }} €" readonly>
+                                   value="{{ post.prix }} DT" readonly>
                         </div>
 
                         <input type="hidden" name="_token" value="{{ csrf_token('reserve' ~ post.getIdPost() ) }}">
+                        
+                        <div id="card-element" class="form-control mb-3"></div>
+                        <div id="card-errors" role="alert" class="text-danger mb-3"></div>
                         
                         <button type="submit" class="btn btn-danger mt-3" style="background-color: #AA1010;">
                             Valider
@@ -63,9 +71,46 @@
             <div class="mt-4">
                 <a href="{{ path('app_covoiturage_rechercher') }}" class="text-primary mr-3">Retour</a>
                 <a href="#" class="text-primary mr-3">Consulter reservations</a>
-                <a href="#" class="text-primary">facebook</a>
+                <a href="#" class="text-primary">Facebook</a>
             </div>
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+    
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const {error, paymentMethod} = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+        });
+        
+        if (error) {
+            document.getElementById('card-errors').textContent = error.message;
+        } else {
+            // Show loading state
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+            
+            // Add payment method ID to form and submit
+            const hiddenInput = document.createElement('input');
+            hiddenInput.setAttribute('type', 'hidden');
+            hiddenInput.setAttribute('name', 'payment_method_id');
+            hiddenInput.setAttribute('value', paymentMethod.id);
+            form.appendChild(hiddenInput);
+            
+            // Submit form
+            form.submit();
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,333 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container-fluid mt-3">
+    <!-- En-tête avec titre et description -->
+    <div class="dashboard-header text-center mb-5 p-4 bg-light rounded-3">
+        <h1 class="display-5 fw-bold text-primary">
+            <i class="bi bi-speedometer2 me-2"></i>Tableau de bord des trajets
+        </h1>
+        <p class="lead text-muted">
+            Visualisation des statistiques clés et tendances des trajets partagés
+        </p>
+    </div>
+
+    <!-- Info Boxes Row - Version améliorée -->
+    <div class="row mb-4 g-4">
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box shadow-lg rounded-3 bg-gradient-primary text-white">
+                <span class="info-box-icon">
+                    <i class="bi bi-geo-alt-fill fs-1"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Total des trajets</span>
+                    <span class="info-box-number display-6">{{ totalPosts }}</span>
+                    <small class="d-block">Tous trajets confondus</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box shadow-lg rounded-3 bg-gradient-success text-white">
+                <span class="info-box-icon">
+                    <i class="bi bi-people-fill fs-1"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Places moyennes</span>
+                    <span class="info-box-number display-6">{{ avgSeats|number_format(1) }}</span>
+                    <small class="d-block">Par trajet</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box shadow-lg rounded-3 bg-gradient-warning text-white">
+                <span class="info-box-icon">
+                    <i class="bi bi-cash-coin fs-1"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Prix moyen</span>
+                    <span class="info-box-number display-6">{{ avgPrice|number_format(2) }} TND</span>
+                    <small class="d-block">Par trajet</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-md-3">
+            <div class="info-box shadow-lg rounded-3 bg-gradient-info text-white">
+                <span class="info-box-icon">
+                    <i class="bi bi-chat-left-text-fill fs-1"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">Commentaires</span>
+                    <span class="info-box-number display-6">{{ totalComments }}</span>
+                    <small class="d-block">Total des interactions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Graphiques -->
+    <div class="row mt-4 g-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white rounded-top">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calendar-event me-2"></i>Activité mensuelle des trajets
+                    </h5>
+                    <p class="small mb-0">Évolution du nombre de trajets créés par mois</p>
+                </div>
+                <div class="card-body">
+                    <canvas id="postsActivityChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-success text-white rounded-top">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-pie-chart-fill me-2"></i>Répartition par ville
+                    </h5>
+                    <p class="small mb-0">Top 5 des villes de départ les plus populaires</p>
+                </div>
+                <div class="card-body">
+                    <canvas id="postsDistributionChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Statistiques -->
+    <div class="row mt-4 g-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-white rounded-top">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-tags-fill me-2"></i>Répartition par prix
+                    </h5>
+                    <p class="small mb-0">Distribution des trajets par fourchette de prix</p>
+                </div>
+                <div class="card-body">
+                    {% set priceGroups = [
+                        {name: 'Moins de 10DT', value: priceUnder10, color: 'bg-success'},
+                        {name: '10DT - 20DT', value: price10to20, color: 'bg-info'},
+                        {name: '20DT - 50DT', value: price20to50, color: 'bg-warning'},
+                        {name: 'Plus de 50DT', value: priceOver50, color: 'bg-danger'}
+                    ] %}
+                    
+                    {% for group in priceGroups %}
+                    <div class="progress-group mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>{{ group.name }}</span>
+                            <span><b>{{ group.value }}</b>/{{ totalPosts }} ({{ ((group.value/totalPosts)*100)|round }}%)</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar {{ group.color }} progress-bar-striped" 
+                                 style="width: {{ (group.value/totalPosts)*100 }}%"
+                                 role="progressbar">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white rounded-top">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-people-fill me-2"></i>Disponibilité des places
+                    </h5>
+                    <p class="small mb-0">Répartition des trajets par nombre de places offertes</p>
+                </div>
+                <div class="card-body">
+                    {% set seatsGroups = [
+                        {name: '1 place', value: seats1, color: 'bg-primary'},
+                        {name: '2 places', value: seats2, color: 'bg-info'},
+                        {name: '3-4 places', value: seats3to4, color: 'bg-success'},
+                        {name: '5+ places', value: seats5plus, color: 'bg-purple'}
+                    ] %}
+                    
+                    {% for group in seatsGroups %}
+                    <div class="progress-group mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>{{ group.name }}</span>
+                            <span><b>{{ group.value }}</b>/{{ totalPosts }} ({{ ((group.value/totalPosts)*100)|round }}%)</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                            <div class="progress-bar {{ group.color }} progress-bar-striped" 
+                                 style="width: {{ (group.value/totalPosts)*100 }}%"
+                                 role="progressbar">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau des derniers trajets -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-purple text-white rounded-top">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Derniers trajets ajoutés
+                    </h5>
+                    <p class="small mb-0">Les 10 trajets les plus récemment publiés</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Départ</th>
+                                    <th>Arrivée</th>
+                                    <th>Date</th>
+                                    <th>Places</th>
+                                    <th>Prix</th>
+                                    <th>Commentaires</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for post in recentPosts %}
+                                <tr>
+                                    <td class="fw-bold">{{ post.idPost }}</td>
+                                    <td>{{ post.villeDepart }}</td>
+                                    <td>{{ post.villeArrivee }}</td>
+                                    <td>{{ post.date|date('d/m/Y') }}</td>
+                                    <td><span class="badge bg-primary">{{ post.nombreDePlaces }}</span></td>
+                                    <td><span class="badge bg-success">{{ post.prix }} TND</span></td>
+                                    <td><span class="badge bg-info">{{ post.commentaires|length }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Graphique d'activité mensuelle
+    new Chart(document.getElementById('postsActivityChart'), {
+        type: 'line',
+        data: {
+            labels: {{ monthlyLabels|raw }},
+            datasets: [{
+                label: 'Trajets créés',
+                data: {{ monthlyData|raw }},
+                backgroundColor: 'rgba(61, 101, 161, 0.1)',
+                borderColor: '#0d6efd',
+                borderWidth: 3,
+                tension: 0.3,
+                fill: true,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#0d6efd',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#0d6efd'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Graphique de répartition
+    new Chart(document.getElementById('postsDistributionChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ topCitiesLabels|raw }},
+            datasets: [{
+                data: {{ topCitiesData|raw }},
+                backgroundColor: [
+                    '#0d6efd', '#198754', '#ffc107', '#fd7e14', '#6f42c1'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 20
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+<style>
+    /* Styles personnalisés */
+    .bg-gradient-primary { background: linear-gradient(135deg, #0d6efd 0%, #3b8bfd 100%); }
+    .bg-gradient-success { background: linear-gradient(135deg, #198754 0%, #3bb56d 100%); }
+    .bg-gradient-warning { background: linear-gradient(135deg, #ffc107 0%, #ffd54f 100%); }
+    .bg-gradient-info { background: linear-gradient(135deg, #0dcaf0 0%, #4dd4f7 100%); }
+    .bg-purple { background-color: #6f42c1; }
+    .bg-gradient-purple { background: linear-gradient(135deg, #6f42c1 0%, #9c6ef0 100%); }
+    
+    .info-box {
+        padding: 1rem;
+        transition: all 0.3s;
+    }
+    .info-box:hover {
+        transform: translateY(-5px);
+    }
+    .info-box-icon {
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        margin-right: 1rem;
+    }
+    .progress-bar-striped {
+        background-image: linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.15) 25%,
+            transparent 25%,
+            transparent 50%,
+            rgba(255, 255, 255, 0.15) 50%,
+            rgba(255, 255, 255, 0.15) 75%,
+            transparent 75%,
+            transparent
+        );
+        background-size: 1rem 1rem;
+    }
+</style>
+{% endblock %}
