@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Modifier le Train</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ asset('css/adminlte.css') }}"/>
+  <style>
+    .form-container {
+      max-width: 800px;
+      margin: 50px auto;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+  {% if errors is defined %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for error in errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+    <form method="POST" action="{{ path('edit_train', { 'id': train.vehicule.id }) }}">
+      <div class="card card-success card-outline mb-4">
+        <div class="card-header">
+          <div class="card-title">Modifier le Train</div>
+        </div>
+        <div class="card-body">
+
+          <!-- Immatriculation -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Immatriculation</span>
+            <input type="text" class="form-control" name="immatriculation" value="{{ train.vehicule.immatriculation }}">
+          </div>
+
+          <!-- Capacité -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Capacité</span>
+            <input type="number" class="form-control" name="capacite" value="{{ train.vehicule.capacite }}" min="0">
+          </div>
+
+          <!-- État -->
+          <div class="input-group mb-3">
+            <label class="input-group-text">État</label>
+            <select class="form-select" name="etat" required>
+              <option value="EN_SERVICE" {% if train.vehicule.etat == 'EN_SERVICE' %}selected{% endif %}>En service</option>
+              <option value="HORS_SERVICE" {% if train.vehicule.etat == 'HORS_SERVICE' %}selected{% endif %}>Hors service</option>
+              <option value="EN_MAINTENANCE" {% if train.vehicule.etat == 'EN_MAINTENANCE' %}selected{% endif %}>En maintenance</option>
+            </select>
+          </div>
+
+          <!-- Longueur réseau -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Longueur réseau (km)</span>
+            <input type="number" step="0.1" class="form-control" name="longueurReseau" value="{{ train.longueurReseau }}">
+          </div>
+
+          <!-- Nombre de wagons -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Nombre de wagons</span>
+            <input type="number" class="form-control" name="nombreWagons" value="{{ train.nombreWagons }}" min="1">
+          </div>
+
+          <!-- Nombre de lignes -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Nombre de lignes</span>
+            <input type="number" class="form-control" name="nombreLignes" value="{{ train.nombreLignes }}" min="1">
+          </div>
+
+          <!-- Vitesse maximale -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Vitesse maximale</span>
+            <input type="number" class="form-control" name="vitesseMaximale" value="{{ train.vitesseMaximale }}">
+          </div>
+
+          <!-- Propriétaire -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Propriétaire</span>
+            <input type="text" class="form-control" name="proprietaire" value="{{ train.proprietaire }}">
+          </div>
+
+          <!-- Départ -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Départ</span>
+            <input type="text" class="form-control" name="depart" value="{{ depart }}">
+          </div>
+
+          <!-- Arrêt -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Arrêt</span>
+            <input type="text" class="form-control" name="arret" value="{{ arret }}">
+          </div>
+
+          <!-- Nom Conducteur -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Nom Conducteur</span>
+            <input type="text" class="form-control" name="nomConducteur" value="{{ conducteur ? conducteur.nom : '' }}">
+          </div>
+
+          <!-- Prénom Conducteur -->
+          <div class="input-group mb-3">
+            <span class="input-group-text">Prénom Conducteur</span>
+            <input type="text" class="form-control" name="prenomConducteur" value="{{ conducteur ? conducteur.prenom : '' }}">
+          </div>
+
+        </div>
+        <div class="card-footer text-end">
+          <button type="submit" class="btn btn-success">Modifier le Train</button>
+          <a href="/admin/train" class="btn btn-secondary me-2">Annuler</a>
+        </div>
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

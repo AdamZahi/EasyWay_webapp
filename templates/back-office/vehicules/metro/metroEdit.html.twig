@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Modifier un Métro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ asset('css/adminlte.css') }}"/>
+  <style>
+    .form-container {
+      max-width: 800px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container my-5 form-container">
+  {% if errors is defined %}
+    <div class="alert alert-danger">
+      <ul>
+        {% for error in errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form method="POST" action="{{ path('edit_metro', { 'id': metro.id.id }) }}">
+    <div class="card card-success card-outline mb-4">
+      <div class="card-header">
+        <div class="card-title">Modifier un Métro</div>
+      </div>
+      <div class="card-body">
+
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text">Immatriculation</span>
+          <input type="text" class="form-control" name="immatriculation" value="{{ metro.id.immatriculation }}" >
+        </div>
+
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text">Capacité</span>
+          <input type="number" class="form-control" name="capacite" value="{{ metro.id.capacite }}" min="0" >
+        </div>
+
+       
+        <div class="input-group mb-3">
+          <label class="input-group-text">État</label>
+          <select class="form-select" name="etat" required>
+            <option value="EN_SERVICE" {% if metro.id.etat == 'EN_SERVICE' %}selected{% endif %}>En service</option>
+            <option value="HORS_SERVICE" {% if metro.id.etat == 'HORS_SERVICE' %}selected{% endif %}>Hors service</option>
+            <option value="EN_MAINTENANCE" {% if metro.id.etat == 'EN_MAINTENANCE' %}selected{% endif %}>En maintenance</option>
+          </select>
+        </div>
+
+       
+        <div class="input-group mb-3">
+          <span class="input-group-text">Départ</span>
+          <input type="text" class="form-control" name="depart" value="{{ depart }}" >
+        </div>
+
+       
+        <div class="input-group mb-3">
+          <span class="input-group-text">Arrivée</span>
+          <input type="text" class="form-control" name="arret" value="{{ arret }}" >
+        </div>
+
+       
+        <div class="input-group mb-3">
+          <span class="input-group-text">Nom Conducteur</span>
+          <input type="text" class="form-control" name="nomConducteur" value="{{ conducteur ? conducteur.nom : '' }}" >
+        </div>
+
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text">Prénom Conducteur</span>
+          <input type="text" class="form-control" name="prenomConducteur" value="{{ conducteur ? conducteur.prenom : '' }}" >
+        </div>
+
+       
+        <div class="input-group mb-3">
+          <span class="input-group-text">Nombre de rames</span>
+          <input type="number" class="form-control" name="nombreRames" value="{{ metro.nombreRames }}" min="1" >
+        </div>
+
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text">Nombre de lignes</span>
+          <input type="number" class="form-control" name="nombreLignes" value="{{ metro.nombreLignes }}" min="1" >
+        </div>
+
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text">Longueur réseau (km)</span>
+          <input type="number" step="0.1" min="0" class="form-control" name="longueurReseau" value="{{ metro.longueurReseau }}" >
+        </div>
+
+        
+        <div class="input-group mb-3">
+          <span class="input-group-text">Propriétaire</span>
+          <input type="text" class="form-control" name="proprietaire" value="{{ metro.proprietaire }}" >
+        </div>
+
+      </div>
+      <div class="card-footer text-end">
+        <button type="submit" class="btn btn-success">Modifier le Métro</button>
+        <a href="/admin/metro" class="btn btn-secondary me-2">Annuler</a>
+      </div>
+    </div>
+  </form>
+</div>
+
+</body>
+</html>

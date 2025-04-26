@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Ajouter un Métro</title>
+    <link rel="stylesheet" href="{{ asset('css/adminlte.css') }}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+      .form-container {
+        max-width: 800px; 
+        margin: 0 auto;
+      }
+      .input-group-text {
+        min-width: 150px; 
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5 form-container">
+    
+          {% if errors is defined and errors|length > 0 %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          {% for label, messages in app.flashes %}
+            {% for message in messages %}
+              <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endfor %}
+      <form method="POST" action="{{ path('create_metro') }}">
+        <div class="card card-primary card-outline mb-4">
+          <div class="card-header">
+            <div class="card-title">Ajouter un Métro</div>
+          </div>
+          <div class="card-body">
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Immatriculation</span>
+              <input type="text" class="form-control" name="immatriculation" >
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Capacité</span>
+              <input type="number" class="form-control" name="capacite" min="0" >
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <label class="input-group-text">État</label>
+              <select class="form-select" name="etat" >
+                <option value="EN_SERVICE">En service</option>
+                <option value="HORS_SERVICE">Hors service</option>
+                <option value="EN_MAINTENANCE">En maintenance</option>
+              </select>
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Départ</span>
+              <input type="text" class="form-control" name="depart" >
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Arrivée</span>
+              <input type="text" class="form-control" name="arret">
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Nom Conducteur</span>
+              <input type="text" class="form-control" name="nomConducteur" >
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Prénom Conducteur</span>
+              <input type="text" class="form-control" name="prenomConducteur">
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Longueur du réseau (km)</span>
+              <input type="number" step="0.01" class="form-control" name="longueurReseau" >
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Nombre de lignes</span>
+              <input type="number" class="form-control" name="nombreLignes" min="1" >
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Nombre de rames</span>
+              <input type="number" class="form-control" name="nombreRames" min="1">
+            </div>
+
+            
+            <div class="input-group mb-3">
+              <span class="input-group-text">Propriétaire</span>
+              <input type="text" class="form-control" name="proprietaire" >
+            </div>
+
+          </div>
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Ajouter le Métro</button>
+            <a href="/admin/metro" class="btn btn-secondary me-2">Annuler</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

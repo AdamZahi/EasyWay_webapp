@@ -1,0 +1,336 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+{% block title %}Liste des trains{% endblock %}
+
+{% block content %}
+<div class="content-wrapper p-3">
+    <div class="container-fluid">
+        <div class="row">
+            {% for train in trains %}
+            <div class="col-md-4 mb-4">
+                <div class="card card-info h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Train {{ train.vehicule.immatriculation ?? 'N/A' }}</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-lte-toggle="card-collapse">
+                                <i data-lte-icon="expand" class="bi bi-plus-lg"></i>
+                                <i data-lte-icon="collapse" class="bi bi-dash-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="train-details">
+                            <div class="detail-item">
+                                <i class="bi bi-rulers"></i>
+                                <span><strong>Longueur du réseau:</strong> {{ train.longueurReseau }} km</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-list-ol"></i>
+                                <span><strong>Nombre de lignes:</strong> {{ train.nombreLignes }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-train-front"></i>
+                                <span><strong>Nombre de wagons:</strong> {{ train.nombreWagons }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-speedometer2"></i>
+                                <span><strong>Vitesse maximale:</strong> {{ train.vitesseMaximale }} km/h</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-person-workspace"></i>
+                                <span><strong>Propriétaire:</strong> {{ train.proprietaire }}</span>
+                            </div>
+                            <hr>
+                            {% if train.vehicule %}
+                            <div class="detail-item">
+                                <i class="bi bi-tools"></i>
+                                <span><strong>État:</strong> {{ train.vehicule.etat }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-people-fill"></i>
+                                <span><strong>Capacité:</strong> {{ train.vehicule.capacite }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-card-text"></i>
+                                <span><strong>Immatriculation:</strong> {{ train.vehicule.immatriculation }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if train.trajet %}
+                            <hr>
+                            <div class="detail-item">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                <span data-depart><strong>Départ:</strong> {{ train.trajet.depart }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-flag-fill"></i>
+                                <span data-arret><strong>Arrêt:</strong> {{ train.trajet.arret }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ path('edit_train', {'id': train.vehicule.id}) }}" class="action-btn edit-btn">
+                            <i class="bi bi-pencil-square"></i> Modifier
+                        </a>
+                        <form method="post" action="{{ path('delete_train', {'id': train.vehicule.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce train?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ train.vehicule.id) }}">
+                            <button type="submit" class="action-btn delete-btn">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </form>
+                        {% if train.trajet %}
+                        <button type="button" class="action-btn route-btn" 
+                                data-depart="{{ train.trajet.depart }}" 
+                                data-arret="{{ train.trajet.arret }}">
+                            <i class="bi bi-map"></i> Trajet
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12">
+                <div class="alert alert-warning text-center py-4">
+                    <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                    <h4 class="mt-3">Aucun train trouvé</h4>
+                    <p class="mb-0">Cliquez sur le bouton "Ajouter" pour commencer</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center my-4">
+            <a href="{{ path('create_train') }}" class="btn btn-success d-inline-flex align-items-center px-4 py-2">
+                <i class="bi bi-plus-circle me-2"></i> Ajouter un train
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour la carte -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mapModalLabel">Trajet du train</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="map" style="height: 70vh;"></div>
+                <div id="loading" class="text-center p-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-2">Calcul du trajet en cours...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+{{ parent() }}
+<!-- Leaflet CSS & JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Leaflet Routing Machine -->
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Gestion des boutons de trajet
+    document.querySelectorAll('.route-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const depart = this.dataset.depart;
+            const arret = this.dataset.arret;
+            
+            // Afficher le modal
+            const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+            modal.show();
+            
+            // Initialiser la carte après que le modal est visible
+            document.getElementById('mapModal').addEventListener('shown.bs.modal', function() {
+                initRouteMap(depart, arret);
+            }, {once: true});
+        });
+    });
+
+    // Fonction pour géocoder une adresse
+    async function geocodeAddress(address) {
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=tn&limit=1`);
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                return {
+                    lat: parseFloat(data[0].lat),
+                    lng: parseFloat(data[0].lon),
+                    displayName: data[0].display_name
+                };
+            }
+            return null;
+        } catch (error) {
+            console.error("Erreur de géocodage:", error);
+            return null;
+        }
+    }
+
+    // Fonction pour initialiser la carte avec l'itinéraire
+    async function initRouteMap(depart, arret) {
+        const mapContainer = document.getElementById('map');
+        const loadingElement = document.getElementById('loading');
+        
+        // Réinitialiser la carte
+        if (mapContainer._leaflet_map) {
+            mapContainer._leaflet_map.remove();
+        }
+
+        // Afficher le loader
+        loadingElement.style.display = 'block';
+        mapContainer.style.display = 'none';
+
+        // Création de la carte
+        const map = L.map('map').setView([36.8, 10.1], 6); // Vue plus large pour les trains
+        
+        // Couche de tuiles OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        try {
+            // Géocodage du point de départ
+            loadingElement.querySelector('p').textContent = "Recherche de la gare de départ...";
+            const pointDepart = await geocodeAddress(depart + " gare tunisie");
+            if (!pointDepart) {
+                throw new Error("Gare de départ non trouvée: " + depart);
+            }
+
+            // Géocodage du point d'arrivée
+            loadingElement.querySelector('p').textContent = "Recherche de la gare d'arrivée...";
+            const pointArret = await geocodeAddress(arret + " gare tunisie");
+            if (!pointArret) {
+                throw new Error("Gare d'arrivée non trouvée: " + arret);
+            }
+
+            // Ajout des marqueurs avec icônes de train
+            L.marker([pointDepart.lat, pointDepart.lng], {
+                icon: L.divIcon({
+                    className: 'depart-icon',
+                    html: '<i class="bi bi-train-front text-success fs-5"></i>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map)
+              .bindPopup(`<b>Départ:</b> ${pointDepart.displayName}`)
+              .openPopup();
+
+            L.marker([pointArret.lat, pointArret.lng], {
+                icon: L.divIcon({
+                    className: 'arrivee-icon',
+                    html: '<i class="bi bi-train-front text-danger fs-5"></i>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map)
+              .bindPopup(`<b>Arrivée:</b> ${pointArret.displayName}`)
+              .openPopup();
+
+            // Tracé de l'itinéraire ferroviaire
+            L.Routing.control({
+                waypoints: [
+                    L.latLng(pointDepart.lat, pointDepart.lng),
+                    L.latLng(pointArret.lat, pointArret.lng)
+                ],
+                routeWhileDragging: false,
+                show: false,
+                lineOptions: {
+                    styles: [{color: '#ff6600', weight: 5, opacity: 0.7}] // Orange pour les voies ferrées
+                },
+                createMarker: () => null
+            }).addTo(map);
+
+            // Ajustement de la vue
+            map.fitBounds([
+                [pointDepart.lat, pointDepart.lng],
+                [pointArret.lat, pointArret.lng]
+            ], {padding: [100, 100]}); // Plus large pour voir le trajet complet
+
+            // Cacher le loader et afficher la carte
+            loadingElement.style.display = 'none';
+            mapContainer.style.display = 'block';
+
+        } catch (error) {
+            loadingElement.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    ${error.message}
+                </div>
+            `;
+            console.error(error);
+        }
+    }
+});
+</script>
+
+<style>
+    #map {
+        width: 100%;
+        border-radius: 8px;
+    }
+    .leaflet-routing-container {
+        display: none;
+    }
+    .depart-icon, .arrivee-icon {
+        background: transparent;
+        border: none;
+    }
+    /* Styles existants */
+    .route-btn {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border: none;
+        color: white;
+    }
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        padding: 12px;
+        background: rgba(0,0,0,0.03);
+        border-top: 1px solid rgba(0,0,0,0.125);
+    }
+    .action-btn {
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .edit-btn {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border: none;
+        color: white;
+    }
+    .delete-btn {
+        background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+        border: none;
+        color: white;
+    }
+    .detail-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 8px;
+    }
+    .detail-item i {
+        width: 20px;
+        text-align: center;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ajouter un Train</title>
+    <link rel="stylesheet" href="{{ asset('css/adminlte.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+      .form-container {
+        max-width: 800px; /* Largeur maximale du formulaire */
+        margin: 0 auto; /* Centrer le formulaire */
+      }
+      .input-group-text {
+        min-width: 150px; /* Largeur minimum des labels */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5 form-container">
+    {# 🔔 Bloc d'affichage des erreurs et flashs #}
+          {% if errors is defined and errors|length > 0 %}
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                {% for error in errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+      <form method="POST" action="{{ path('create_train') }}">
+        <div class="card card-primary card-outline mb-4">
+          <div class="card-header">
+            <div class="card-title">Ajouter un Train</div>
+          </div>
+          <div class="card-body">
+            <!-- Immatriculation -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Immatriculation</span>
+              <input type="text" class="form-control" name="immatriculation" >
+            </div>
+
+            <!-- Capacité -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Capacité</span>
+              <input type="number" class="form-control" name="capacite" min="0" >
+            </div>
+
+            <!-- État -->
+            <div class="input-group mb-3">
+              <label class="input-group-text">État</label>
+              <select class="form-select" name="etat" >
+                <option value="EN_SERVICE">En service</option>
+                <option value="HORS_SERVICE">Hors service</option>
+                <option value="EN_MAINTENANCE">En maintenance</option>
+              </select>
+            </div>
+
+            <!-- Lieu de départ -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Départ</span>
+              <input type="text" class="form-control" name="depart" >
+            </div>
+
+            <!-- Lieu d'arrivée -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Arrivée</span>
+              <input type="text" class="form-control" name="arret" >
+            </div>
+
+            <!-- Nom Conducteur -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Nom Conducteur</span>
+              <input type="text" class="form-control" name="nomConducteur" >
+            </div>
+
+            <!-- Prénom Conducteur -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Prénom Conducteur</span>
+              <input type="text" class="form-control" name="prenomConducteur" >
+            </div>
+
+            <!-- Longueur du réseau -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Longueur du réseau (km)</span>
+              <input type="number" class="form-control" name="longueurReseau" min="0" step="0.1" >
+            </div>
+
+            <!-- Nombre de lignes -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Nombre de lignes</span>
+              <input type="number" class="form-control" name="nombreLignes" min="1" >
+            </div>
+
+            <!-- Nombre de wagons -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Nombre de wagons</span>
+              <input type="number" class="form-control" name="nombreWagons" min="1" >
+            </div>
+
+            <!-- Vitesse maximale -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Vitesse maximale (km/h)</span>
+              <input type="number" class="form-control" name="vitesseMaximale" min="0" step="0.1" >
+            </div>
+
+            <!-- Propriétaire -->
+            <div class="input-group mb-3">
+              <span class="input-group-text">Propriétaire</span>
+              <input type="text" class="form-control" name="proprietaire" >
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Ajouter le Train</button>
+            <a href="/admin/train" class="btn btn-secondary me-2">Annuler</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

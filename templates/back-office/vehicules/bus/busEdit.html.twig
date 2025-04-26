@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>AdminLTE 4 | Modifier un Bus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{{ asset('css/adminlte.css') }}"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  </head>
+  <body class="bg-light">
+
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+
+          {% if errors is defined %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+
+          <form method="POST" action="{{ path('edit_bus', { 'id': bus.vehicule.id }) }}">
+            <div class="card card-success card-outline shadow-sm">
+              <div class="card-header">
+                <h4 class="card-title mb-0">Modifier un Bus</h4>
+              </div>
+              <div class="card-body">
+
+                <!-- Immatriculation -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Immatriculation</span>
+                  <input type="text" class="form-control" name="immatriculation" value="{{ bus.vehicule.immatriculation }}" >
+                </div>
+
+                <!-- Capacité -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Capacité</span>
+                  <input type="number" class="form-control" name="capacite" value="{{ bus.vehicule.capacite }}" min="0" >
+                </div>
+
+                <!-- État -->
+                <div class="input-group mb-3">
+                  <label class="input-group-text">État</label>
+                  <select class="form-select" name="etat" required>
+                    <option value="EN_SERVICE" {% if bus.vehicule.etat == 'EN_SERVICE' %}selected{% endif %}>En service</option>
+                    <option value="HORS_SERVICE" {% if bus.vehicule.etat == 'HORS_SERVICE' %}selected{% endif %}>Hors service</option>
+                    <option value="EN_MAINTENANCE" {% if bus.vehicule.etat == 'EN_MAINTENANCE' %}selected{% endif %}>En maintenance</option>
+                  </select>
+                </div>
+
+                <!-- Lieu de départ -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Départ</span>
+                  <input type="text" class="form-control" name="depart" value="{{ depart }}" >
+                </div>
+
+                <!-- Lieu d'arrivée -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Arrivée</span>
+                  <input type="text" class="form-control" name="arret" value="{{ arret }}">
+                </div>
+
+                <!-- Nom Conducteur -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Nom Conducteur</span>
+                  <input type="text" class="form-control" name="nomConducteur" value="{{ conducteur ? conducteur.nom : '' }}">
+                </div>
+
+                <!-- Prénom Conducteur -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Prénom Conducteur</span>
+                  <input type="text" class="form-control" name="prenomConducteur" value="{{ conducteur ? conducteur.prenom : '' }}">
+                </div>
+
+                <!-- Nombre de portes -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Nombre de portes</span>
+                  <input type="number" class="form-control" name="nombrePortes" value="{{ bus.nombrePortes }}" min="1" >
+                </div>
+
+                <!-- Type de service -->
+                <div class="input-group mb-3">
+                  <label class="input-group-text">Type de service</label>
+                  <select class="form-select" name="typeService" required>
+                    <option value="URBAIN" {% if bus.typeService == 'URBAIN' %}selected{% endif %}>Urbain</option>
+                    <option value="INTERURBAIN" {% if bus.typeService == 'INTERURBAIN' %}selected{% endif %}>Interurbain</option>
+                  </select>
+                </div>
+
+                <!-- Nombre de places -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Nombre de places</span>
+                  <input type="number" class="form-control" name="nombreDePlaces" value="{{ bus.nombreDePlaces }}" min="1" >
+                </div>
+
+                <!-- Compagnie -->
+                <div class="input-group mb-3">
+                  <span class="input-group-text">Compagnie</span>
+                  <input type="text" class="form-control" name="compagnie" value="{{ bus.compagnie }}" >
+                </div>
+
+                <!-- Climatisation -->
+                <div class="input-group mb-3">
+                  <label class="input-group-text">Climatisation</label>
+                  <select class="form-select" name="climatisation" required>
+                    <option value="1" {% if bus.climatisation %}selected{% endif %}>Oui</option>
+                    <option value="0" {% if not bus.climatisation %}selected{% endif %}>Non</option>
+                  </select>
+                </div>
+
+              </div>
+              <div class="card-footer text-end">
+                <button type="submit" class="btn btn-success">Modifier le Bus</button>
+                <a href="/admin/bus" class="btn btn-secondary me-2">Annuler</a>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
