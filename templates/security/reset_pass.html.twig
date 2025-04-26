@@ -12,19 +12,23 @@
             <div class="col-md-6">
                 <p class="mb-1 back-login" style="font-size: 12px;"><a href="{{ path('app_login') }}">&lt; Revenir pour se connecter</a></p>
                 <h3 class="mb-2" style="font-family: 'Arial Rounded MT Bold';">Mot de passe oublié ?</h3>
-                <p style="font-size: 13px; color: #7c7c7c;">Ne vous inquiétez pas, cela arrive ! Entrez votre email ci-dessous pour recevoir un code de réinitialisation.</p>
+                <p style="font-size: 13px; color: #7c7c7c;">Ne vous inquiétez pas, cela arrive ! Entrez votre email ci-dessous pour recevoir un lien de réinitialisation.</p>
 
                 {% for flashMessage in app.flashes('success') %}
                     <div class="alert alert-success">{{ flashMessage }}</div>
                 {% endfor %}
 
-                <form method="post" action="{{ path('reset_password_send_code') }}">
+                {% for flashMessage in app.flashes('error') %}
+                    <div class="alert alert-danger">{{ flashMessage }}</div>
+                {% endfor %}
+
+                <form method="post" action="{{ path('app_request_reset') }}">
                     <div class="form-group mb-3">
                         <label for="email">Adresse email</label>
                         <input type="email" name="email" id="email" class="form-control" placeholder="ex: exemple@email.com" required>
                     </div>
-                    <button href="{{ path('verify_code') }}" type="submit" class="btn w-100 mt-2 py-2 text-white" style="background-color: #CF321A; font-size: 17px;">
-                        Envoyer code
+                    <button type="submit" class="btn w-100 mt-2 py-2 text-white" style="background-color: #CF321A; font-size: 17px;">
+                        Envoyer Code
                     </button>
                 </form>
 
