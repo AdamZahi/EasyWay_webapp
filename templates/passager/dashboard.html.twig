@@ -4,10 +4,10 @@
 
 {% block body %}
 
-
 <!-- Navbar Start -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
-    <a href="index.html" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+    <a href="{{ path('passager_dashboard') }}" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" style="width: 60px; height: 60px; border-radius: 50%; margin-right: 10px;">
         <h2 class="mb-2 text-white">EasyWay</h2>
     </a>
     <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -15,24 +15,27 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ms-auto p-4 p-lg-0">
-            <a href="index.html" class="nav-item nav-link active">Acceuil</a>
-            <a href="about.html" class="nav-item nav-link">A propos</a>
-            <a href="service.html" class="nav-item nav-link">Notre équipe</a>
+            <a href="{{ path('passager_dashboard') }}" class="nav-item nav-link active">Acceuil</a>
+            <a href="#" class="nav-item nav-link">Co-voiturage</a>
+            <a href="#" class="nav-item nav-link">Réclamation</a>
+            <a href="#" class="nav-item nav-link">Véhicules</a>
+            <a href="#" class="nav-item nav-link">Evénements</a>
+              <!-- Profil Dropdown -->
             <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
-                <div class="dropdown-menu fade-up m-0">
-                    <a href="price.html" class="dropdown-item">Co-voiturage</a>
-                    <a href="feature.html" class="dropdown-item">Transport public</a>
-                    <a href="quote.html" class="dropdown-item">Véhicules</a>
-                    <a href="team.html" class="dropdown-item">Réclamation</a>
-                </div>
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-user me-2"></i>Profil
+                </a>
+                <ul class="dropdown-menu fade-up m-0" style="z-index: 1050;">
+                    <li><a href="{{ path('edit_profile') }}" class="dropdown-item">Consulter mon profil</a></li>
+                    <li><a href="{{ path('app_logout') }}" class="dropdown-item">Se déconnecter</a></li>
+                </ul>
             </div>
-            <a href="contact.html" class="nav-item nav-link">Contact</a>
+            <a href="#" class="nav-item nav-link">Contact</a>
         </div>
-        <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="fa fa-headphones text-primary me-3"></i>+216 77 777 777</h4>
     </div>
 </nav>
 <!-- Navbar End -->
+
 
 
 <div class="container">
@@ -40,15 +43,15 @@
     <p>Welcome to the passenger dashboard.</p>
     
     <div class="row mt-4">
-        <div class="col-md-4">
+        <div class="col-md-4 ">
             <div class="card">
                 <div class="card-header">
-                    My Bookings
+                    Mes réservations
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Manage Bookings</h5>
-                    <p class="card-text">View and manage your upcoming and past bookings.</p>
-                    <a href="{{ path('reservation_add') }}" class="btn btn-primary">Go to Bookings</a>
+                    <h5 class="card-title">Besoin de Réservation ?</h5>
+                    <p class="card-text">Consultez et gérez vos réservations à venir et passées .</p>
+                    <a href="{{ path('reservation_add') }}" class="btn btn-primary">Accéder aux réservations</a>
                 </div>
             </div>
         </div>
@@ -56,12 +59,12 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    Find a Ride
+                    Rechercher un trajet
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Search Rides</h5>
-                    <p class="card-text">Search for available rides.</p>
-                    <a href="{{ path('app_covoiturage') }}" class="btn btn-primary">Find a Ride</a>
+                    <h5 class="card-title">Rechercher un trajet </h5>
+                    <p class="card-text">Recherchez les trajets disponibles</p>
+                    <a href="{{ path('app_covoiturage') }}" class="btn btn-primary">Trouver un trajet </a>
                 </div>
             </div>
         </div>
@@ -69,27 +72,31 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    Payments
+                    Paiement
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">My Payments</h5>
-                    <p class="card-text">View your payment history and manage payment methods.</p>
-                    <a href="#" class="btn btn-primary">Go to Payments</a>
+                    <h5 class="card-title">Mes paiements</h5>
+                    <p class="card-text">Consultez l'historique de vos paiements et gérez vos méthodes de paiement.</p>
+                    <a href="#" class="btn btn-primary">Accéder aux paiements</a>
+                </div>
+            </div>
+        </div>
+<!-- Espace vertical -->
+<div class="w-100 my-3"></div>
+         <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    Réclamation
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Vous souhaitez faire une réclamation ?</h5>
+                    <p class="card-text">Nous sommes là pour vous aider. Cliquez ci-dessous pour accéder au formulaire de réclamation .</p>
+                    <a href="{{ path('app_reclamation') }}" class="btn btn-primary">Go to Payments</a>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-    <div class="card">
-        <div class="card-header">
-            Réclamation
-        </div>
-        <div class="card-body">
-            <h5 class="card-title">Réclamation</h5>
-            <p class="card-text">View your payment history and manage payment methods.</p>
-            <a href="{{ path('app_reclamation') }}" class="btn btn-primary">Go to Réclamation</a>
-        </div>
-    </div>
+    
 </div>
 
 
