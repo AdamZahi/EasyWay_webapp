@@ -215,10 +215,11 @@ public function setAdmin(?Admin $admin): static
     }
 
     public function setPhotoProfil(?string $photo_profil): static
-    {
-        $this->photo_profil = $photo_profil ?? 'default_profile.png';
-        return $this;
-    }
+{
+    $this->photo_profil = $photo_profil ?? 'default_profile.png';
+    return $this;
+}
+
 
     public function getPassager(): ?Passager
     {
