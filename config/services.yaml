@@ -6,6 +6,7 @@
 parameters:
     profile_picture_directory: '%kernel.project_dir%/public/uploads'
 
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
 
 services:
     App\Security\GoogleAuthenticator:
