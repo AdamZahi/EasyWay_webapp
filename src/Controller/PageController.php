@@ -11,7 +11,7 @@ use App\Entity\Reclamation;
 
 final class PageController extends AbstractController
 {
-    #[Route('/', name: 'app_page')]
+    #[Route('/index', name: 'app_page')]
     public function index(): Response
     {
         return $this->render('front-office/index.html.twig', [

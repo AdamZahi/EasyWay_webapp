@@ -1,0 +1,98 @@
+{# templates/covoiturage/choix.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}EasyWay - Covoiturage{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-color: #A11010;
+            --secondary-color: #DDDEC6;
+            --background-color: #F4EFE2;
+            --success-color: #008955;
+        }
+        .main-header {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .sidebar {
+            background-color: var(--secondary-color);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .main-content {
+            background-color: var(--secondary-color);
+            border: 10px solid var(--primary-color);
+            border-radius: 10px;
+        }
+        .nav-link-custom {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        .btn-publish {
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 10px;
+        }
+        .btn-reserve {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row">
+        <div class="col-12 p-3 d-flex align-items-center main-header">
+            <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" class="img-fluid" style="max-height: 50px;">
+            <div class="ms-auto">
+                <a href="{{ path('app_page') }}" class="btn btn-link nav-link-custom">Accueil</a>
+                <a href="#" class="btn btn-link nav-link-custom">Notre Solution</a>
+                <a href="#" class="btn btn-link nav-link-custom">Communauté</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <!-- Sidebar -->
+        <div class="col-md-3 p-4 sidebar">
+            <h4 class="text-center mb-4 fw-bold" style="color: var(--primary-color);">EasyWay</h4>
+      <div class="p-3">
+                <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3">
+                        <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
+                    </div>
+                </a>
+            
+                <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
+                    <div class="d-flex align-items-center mt-3" style="background-color: #F4EFE2;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
+                    </div>
+                </a>
+            </div>
+            
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="p-4 h-100 main-content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
