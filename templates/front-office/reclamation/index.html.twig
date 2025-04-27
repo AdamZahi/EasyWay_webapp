@@ -132,4 +132,16 @@
             });
         });
     </script>
+
+
+    {% if showAlert %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (confirm("Réclamation ajoutée.\nVoulez-vous voir les réponses liées à cette réclamation ?")) {
+                window.location.href = "{{ path('admin_voir_reponses', {'id': reclamationId}) }}";
+            }
+        });
+    </script>
+{% endif %}
+
 {% endblock %}
