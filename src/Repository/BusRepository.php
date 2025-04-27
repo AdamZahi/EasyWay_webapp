@@ -36,4 +36,35 @@ public function findTrajetByDepartAndArrivee($depart, $arrivee)
         ->getQuery()
         ->getOneOrNullResult();
 }
+public function createSearchQueryBuilder(array $criteria): \Doctrine\ORM\Query
+{
+    $qb = $this->createQueryBuilder('b')
+        ->join('b.vehicule', 'v')  // Jointure Bus -> Vehicule
+        ->addSelect('v');  // Including vehicule data
+
+    // Immatriculation filter
+    if (!empty($criteria['immatriculation'])) {
+        $qb->andWhere('v.immatriculation LIKE :immatriculation')
+            ->setParameter('immatriculation', '%' . $criteria['immatriculation'] . '%');
+    }
+
+    
+
+    // Capacite filter (greater than or equal)
+    if (!empty($criteria['capacite'])) {
+        $qb->andWhere('v.capacite >= :capacite')
+            ->setParameter('capacite', $criteria['capacite']);
+    }
+
+    // Etat filter
+    if (!empty($criteria['etat'])) {
+        $qb->andWhere('v.etat = :etat')
+            ->setParameter('etat', $criteria['etat']);
+    }
+
+    
+
+    return $qb->getQuery();
+}
+
 }

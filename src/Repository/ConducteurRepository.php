@@ -40,4 +40,17 @@ class ConducteurRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+public function findIdsByNomPrenom(string $search): array
+{
+    $qb = $this->createQueryBuilder('c')
+        ->select('c.id')
+        ->where('c.nom LIKE :search')
+        ->orWhere('c.prenom LIKE :search')
+        ->setParameter('search', '%' . $search . '%');
+
+    $results = $qb->getQuery()->getArrayResult();
+    
+    // Just extract the IDs into a flat array
+    return array_map(fn($row) => $row['id'], $results);
+}
 }

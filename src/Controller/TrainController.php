@@ -114,7 +114,7 @@ public function index(
    
     foreach ($trains as $train) {
         $vehicule = $train->getVehicule(); 
-        $conducteur = $conducteurRepository->find($vehicule->getId_conducteur());
+        $conducteur = $conducteurRepository->find($vehicule->getIdConducteur());
         $trajet = $trajetRepository->find($vehicule->getIdLigne());
     
         $train->conducteur = $conducteur;
@@ -132,24 +132,25 @@ public function edit(
     EntityManagerInterface $em,
     TrainRepository $trainRepo,
     ConducteurRepository $conducteurRepo,
-    LigneRepository $trajetRepo
+    LigneRepository $trajetRepo,
+    SmsService $smsService
 ): Response {
-    
     $train = $trainRepo->find($id);
 
     if (!$train) {
         return new Response("Train non trouvé", 404);
     }
 
-    
     $vehicule = $train->getVehicule();
-    $conducteur = $conducteurRepo->find($vehicule->getId_conducteur());
+    $conducteur = $conducteurRepo->find($vehicule->getIdConducteur());
     $trajet = $trajetRepo->find($vehicule->getIdLigne());
+
+    // Sauvegarder l'état avant modification
+    $oldEtat = $vehicule->getEtat();
 
     if ($request->isMethod('POST')) {
         $errors = [];
 
-        
         $immatriculation = $request->request->get('immatriculation');
         $capacite = $request->request->get('capacite');
         $etat = $request->request->get('etat');
@@ -163,7 +164,6 @@ public function edit(
         $vitesseMaximale = $request->request->get('vitesseMaximale');
         $proprietaire = $request->request->get('proprietaire');
 
-        
         if (empty($immatriculation)) $errors[] = "L'immatriculation est requise.";
         if (!is_numeric($capacite) || $capacite <= 0) $errors[] = "La capacité doit être un nombre positif.";
         if (!in_array($etat, ['EN_SERVICE', 'HORS_SERVICE', 'EN_MAINTENANCE'])) $errors[] = "État invalide.";
@@ -187,16 +187,16 @@ public function edit(
             ]);
         }
 
-        
+        // Mise à jour du véhicule
         $vehicule->setImmatriculation($immatriculation);
         $vehicule->setCapacite($capacite);
         $vehicule->setEtat($etat);
 
-        
+        // Mise à jour du trajet
         $trajet = $trajetRepo->findOneBy(['depart' => $depart, 'arret' => $arret]);
 
         if (!$trajet) {
-            $trajet = new Trajet();
+            $trajet = new \App\Entity\Trajet();
             $trajet->setDepart($depart);
             $trajet->setArret($arret);
             $em->persist($trajet);
@@ -205,20 +205,20 @@ public function edit(
 
         $vehicule->setIdTrajet($trajet->getId());
 
-        
+        // Mise à jour du conducteur
         $conducteur = $conducteurRepo->findOneBy(['nom' => $nomConducteur, 'prenom' => $prenomConducteur]);
 
         if (!$conducteur) {
-            $conducteur = new Conducteur();
+            $conducteur = new \App\Entity\Conducteur();
             $conducteur->setNom($nomConducteur);
             $conducteur->setPrenom($prenomConducteur);
             $em->persist($conducteur);
             $em->flush();
         }
 
-        $vehicule->setId_conducteur($conducteur->getId_conducteur());
+        $vehicule->setId_conducteur($conducteur->getIdConducteur());
 
-        
+        // Mise à jour du train
         $train->setLongueurReseau($longueurReseau);
         $train->setNombreLignes($nombreLignes);
         $train->setNombreWagons($nombreWagons);
@@ -226,6 +226,21 @@ public function edit(
         $train->setProprietaire($proprietaire);
 
         $em->flush();
+
+        // Envoi du SMS si l'état a changé
+        if ($oldEtat !== $etat) {
+            $phoneNumber = $conducteur->getTelephone();
+            if (!empty($phoneNumber)) {
+                if (strpos($phoneNumber, '+216') !== 0) {
+                    $phoneNumber = '+216' . ltrim($phoneNumber, '0');
+                }
+
+                $message = "Bonjour {$conducteur->getPrenom()} {$conducteur->getNom()}, "
+                         . "votre train ({$vehicule->getImmatriculation()}) est maintenant en état : $etat.";
+
+                $smsService->sendSms($phoneNumber, $message);
+            }
+        }
 
         return $this->redirectToRoute('admin_train');
     }
@@ -237,6 +252,7 @@ public function edit(
         'conducteur' => $conducteur,
     ]);
 }
+
 
 
     #[Route('/train/delete/{id}', name: 'delete_train', methods: ['POST'])]

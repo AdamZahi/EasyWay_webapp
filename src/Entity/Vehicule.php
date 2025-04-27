@@ -5,8 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-
-class Vehicule 
+class Vehicule
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -31,16 +30,15 @@ class Vehicule
     #[ORM\Column(type: "integer")]
     private int $idLigne;
 
- 
     // Getters & Setters
     public function getId(): int
     {
         return $this->id;
     }
 
-    public function setId(int $value): void
+    public function setId(int $id): void
     {
-        $this->id = $value;
+        $this->id = $id;
     }
 
     public function getImmatriculation(): string
@@ -48,9 +46,9 @@ class Vehicule
         return $this->immatriculation;
     }
 
-    public function setImmatriculation(string $value): void
+    public function setImmatriculation(string $immatriculation): void
     {
-        $this->immatriculation = $value;
+        $this->immatriculation = $immatriculation;
     }
 
     public function getCapacite(): int
@@ -58,9 +56,9 @@ class Vehicule
         return $this->capacite;
     }
 
-    public function setCapacite(int $value): void
+    public function setCapacite(int $capacite): void
     {
-        $this->capacite = $value;
+        $this->capacite = $capacite;
     }
 
     public function getEtat(): string
@@ -68,9 +66,9 @@ class Vehicule
         return $this->etat;
     }
 
-    public function setEtat(string $value): void
+    public function setEtat(string $etat): void
     {
-        $this->etat = $value;
+        $this->etat = $etat;
     }
 
     public function getTypeVehicule(): string
@@ -78,19 +76,19 @@ class Vehicule
         return $this->typeVehicule;
     }
 
-    public function setTypeVehicule(string $value): void
+    public function setTypeVehicule(string $typeVehicule): void
     {
-        $this->typeVehicule = $value;
+        $this->typeVehicule = $typeVehicule;
     }
 
-    public function getId_conducteur(): int
+    public function getIdConducteur(): int
     {
         return $this->id_conducteur;
     }
 
-    public function setId_conducteur(int $value): void
+    public function setIdConducteur(int $id_conducteur): void
     {
-        $this->id_conducteur = $value;
+        $this->id_conducteur = $id_conducteur;
     }
 
     public function getIdLigne(): int
@@ -98,9 +96,8 @@ class Vehicule
         return $this->idLigne;
     }
 
-    public function setIdLigne(int $value): void
+    public function setIdLigne(int $idLigne): void
     {
-        $this->idLigne = $value;
+        $this->idLigne = $idLigne;
     }
-    
 }

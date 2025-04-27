@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Knp\Component\Pager\PaginatorInterface;
+use App\Service\SmsService;
 
 
 class BusController extends AbstractController
@@ -113,13 +115,14 @@ public function create(
     public function index(
         BusRepository $busRepository,
         ConducteurRepository $conducteurRepository,
-        LigneRepository $trajetRepository
+        LigneRepository $trajetRepository,
+        PaginatorInterface $paginator
     ): Response {
         $buses = $busRepository->findAll();
     
         foreach ($buses as $bus) {
             $vehicule = $bus->getVehicule(); // C’est l’objet Vehicule
-            $conducteur = $conducteurRepository->find($vehicule->getId_conducteur());
+            $conducteur = $conducteurRepository->find($vehicule->getIdConducteur());
             $trajet = $trajetRepository->find($vehicule->getIdLigne());
     
             // On attache les objets manuellement
@@ -135,112 +138,119 @@ public function create(
     
 
     #[Route('/bus/edit/{id}', name: 'edit_bus')]
-public function edit(
-    int $id,
-    Request $request,
-    EntityManagerInterface $em,
-    BusRepository $busRepo,
-    ConducteurRepository $conducteurRepo,
-    LigneRepository $trajetRepo
-): Response {
-    $bus = $busRepo->find($id);
-
-    if (!$bus) {
-        return new Response("Bus non trouvé", 404);
-    }
-
-    $vehicule = $bus->getVehicule();
-    $conducteur = $conducteurRepo->find($vehicule->getId_conducteur());
-    $trajet = $trajetRepo->find($vehicule->getIdLigne());
-
-    if ($request->isMethod('POST')) {
-        
-        $immatriculation = trim($request->request->get('immatriculation'));
-        $capacite = (int) $request->request->get('capacite');
-        $etat = $request->request->get('etat');
-        $depart = trim($request->request->get('depart'));
-        $arret = trim($request->request->get('arret'));
-        $nomConducteur = trim($request->request->get('nomConducteur'));
-        $prenomConducteur = trim($request->request->get('prenomConducteur'));
-        $nombrePortes = (int) $request->request->get('nombrePortes');
-        $typeService = $request->request->get('typeService');
-        $nombreDePlaces = (int) $request->request->get('nombreDePlaces');
-        $compagnie = trim($request->request->get('compagnie'));
-        $climatisation = $request->request->get('climatisation');
-
-        
-        $errors = [];
-
-        if (empty($immatriculation)) $errors[] = "L'immatriculation est requise.";
-        if ($capacite <= 0) $errors[] = "La capacité doit être supérieure à zéro.";
-        if (!in_array($etat, ['EN_SERVICE', 'HORS_SERVICE', 'EN_MAINTENANCE'])) $errors[] = "État invalide.";
-        if (empty($depart)) $errors[] = "Le lieu de départ est requis.";
-        if (empty($arret)) $errors[] = "Le lieu d'arrivée est requis.";
-        if (empty($nomConducteur)) $errors[] = "Le nom du conducteur est requis.";
-        if (empty($prenomConducteur)) $errors[] = "Le prénom du conducteur est requis.";
-        if ($nombrePortes <= 0) $errors[] = "Le nombre de portes doit être supérieur à zéro.";
-        if (!in_array($typeService, ['URBAIN', 'INTERURBAIN'])) $errors[] = "Type de service invalide.";
-        if ($nombreDePlaces <= 0) $errors[] = "Le nombre de places doit être supérieur à zéro.";
-        if (empty($compagnie)) $errors[] = "La compagnie est requise.";
-        if (!in_array($climatisation, ['0', '1'])) $errors[] = "Valeur de climatisation invalide.";
-
-        
-        if (!empty($errors)) {
-            return $this->render('back-office/vehicules/bus/busEdit.html.twig', [
-                'bus' => $bus,
-                'depart' => $depart,
-                'arret' => $arret,
-                'conducteur' => $conducteur,
-                'errors' => $errors,
-            ]);
+    public function edit(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em,
+        BusRepository $busRepo,
+        ConducteurRepository $conducteurRepo,
+        LigneRepository $trajetRepo,
+        SmsService $smsService // Injecte ton service SMS ici
+    ): Response {
+        $bus = $busRepo->find($id);
+    
+        if (!$bus) {
+            return new Response("Bus non trouvé", 404);
         }
-
-        
-        $vehicule->setImmatriculation($immatriculation);
-        $vehicule->setCapacite($capacite);
-        $vehicule->setEtat($etat);
-
-        
-        $trajet = $trajetRepo->findOneBy(['depart' => $depart, 'arret' => $arret]);
-        if (!$trajet) {
-            $trajet = new Trajet();
-            $trajet->setDepart($depart);
-            $trajet->setArret($arret);
-            $em->persist($trajet);
+    
+        $vehicule = $bus->getVehicule();
+        $conducteur = $conducteurRepo->find($vehicule->getIdConducteur());
+        $trajet = $trajetRepo->find($vehicule->getIdLigne());
+    
+        if ($request->isMethod('POST')) {
+            $immatriculation = trim($request->request->get('immatriculation'));
+            $capacite = (int) $request->request->get('capacite');
+            $etat = $request->request->get('etat');
+            $depart = trim($request->request->get('depart'));
+            $arret = trim($request->request->get('arret'));
+            $nomConducteur = trim($request->request->get('nomConducteur'));
+            $prenomConducteur = trim($request->request->get('prenomConducteur'));
+            $nombrePortes = (int) $request->request->get('nombrePortes');
+            $typeService = $request->request->get('typeService');
+            $nombreDePlaces = (int) $request->request->get('nombreDePlaces');
+            $compagnie = trim($request->request->get('compagnie'));
+            $climatisation = $request->request->get('climatisation');
+    
+            $errors = [];
+    
+            if (empty($immatriculation)) $errors[] = "L'immatriculation est requise.";
+            if ($capacite <= 0) $errors[] = "La capacité doit être supérieure à zéro.";
+            if (!in_array($etat, ['EN_SERVICE', 'HORS_SERVICE', 'EN_MAINTENANCE'])) $errors[] = "État invalide.";
+            if (empty($depart)) $errors[] = "Le lieu de départ est requis.";
+            if (empty($arret)) $errors[] = "Le lieu d'arrivée est requis.";
+            if (empty($nomConducteur)) $errors[] = "Le nom du conducteur est requis.";
+            if (empty($prenomConducteur)) $errors[] = "Le prénom du conducteur est requis.";
+            if ($nombrePortes <= 0) $errors[] = "Le nombre de portes doit être supérieur à zéro.";
+            if (!in_array($typeService, ['URBAIN', 'INTERURBAIN'])) $errors[] = "Type de service invalide.";
+            if ($nombreDePlaces <= 0) $errors[] = "Le nombre de places doit être supérieur à zéro.";
+            if (empty($compagnie)) $errors[] = "La compagnie est requise.";
+            if (!in_array($climatisation, ['0', '1'])) $errors[] = "Valeur de climatisation invalide.";
+    
+            if (!empty($errors)) {
+                return $this->render('back-office/vehicules/bus/busEdit.html.twig', [
+                    'bus' => $bus,
+                    'depart' => $depart,
+                    'arret' => $arret,
+                    'conducteur' => $conducteur,
+                    'errors' => $errors,
+                ]);
+            }
+    
+            // Sauvegarder l'ancien état
+            $oldEtat = $vehicule->getEtat();
+    
+            $vehicule->setImmatriculation($immatriculation);
+            $vehicule->setCapacite($capacite);
+            $vehicule->setEtat($etat);
+    
+            $trajet = $trajetRepo->findOneBy(['depart' => $depart, 'arret' => $arret]);
+            if (!$trajet) {
+                $trajet = new Trajet();
+                $trajet->setDepart($depart);
+                $trajet->setArret($arret);
+                $em->persist($trajet);
+                $em->flush();
+            }
+            $vehicule->setIdLigne($trajet->getId());
+    
+            $conducteur = $conducteurRepo->findOneBy(['nom' => $nomConducteur, 'prenom' => $prenomConducteur]);
+            if (!$conducteur) {
+                $conducteur = new Conducteur();
+                $conducteur->setNom($nomConducteur);
+                $conducteur->setPrenom($prenomConducteur);
+                $em->persist($conducteur);
+                $em->flush();
+            }
+            $vehicule->setIdConducteur($conducteur->getIdConducteur());
+    
+            $bus->setNombrePortes($nombrePortes);
+            $bus->setTypeService($typeService);
+            $bus->setNombreDePlaces($nombreDePlaces);
+            $bus->setCompagnie($compagnie);
+            $bus->setClimatisation((bool)$climatisation);
+    
             $em->flush();
+    
+            // Envoi du SMS si l'état a changé
+            if ($oldEtat !== $etat) {
+                $numeroConducteur = $conducteur->getTelephonne(); // supposons que Conducteur a une méthode getTelephone()
+                if ($numeroConducteur) {
+                    $message = "Bonjour " . $conducteur->getPrenom() . ", l'état de votre véhicule (" . $vehicule->getImmatriculation() . ") est maintenant : " . str_replace('_', ' ', $etat) . ".";
+                    $smsService->sendSms($numeroConducteur, $message);
+                }
+            }
+    
+            return $this->redirectToRoute('admin_bus');
         }
-        $vehicule->setIdLigne($trajet->getId());
-
-        
-        $conducteur = $conducteurRepo->findOneBy(['nom' => $nomConducteur, 'prenom' => $prenomConducteur]);
-        if (!$conducteur) {
-            $conducteur = new Conducteur();
-            $conducteur->setNom($nomConducteur);
-            $conducteur->setPrenom($prenomConducteur);
-            $em->persist($conducteur);
-            $em->flush();
-        }
-        $vehicule->setId_conducteur($conducteur->getIdConducteur());
-
-        
-        $bus->setNombrePortes($nombrePortes);
-        $bus->setTypeService($typeService);
-        $bus->setNombreDePlaces($nombreDePlaces);
-        $bus->setCompagnie($compagnie);
-        $bus->setClimatisation((bool)$climatisation);
-
-        $em->flush();
-
-        return $this->redirectToRoute('admin_bus');
+    
+        return $this->render('back-office/vehicules/bus/busEdit.html.twig', [
+            'bus' => $bus,
+            'depart' => $trajet ? $trajet->getDepart() : '',
+            'arret' => $trajet ? $trajet->getArret() : '',
+            'conducteur' => $conducteur,
+        ]);
     }
-
-    return $this->render('back-office/vehicules/bus/busEdit.html.twig', [
-        'bus' => $bus,
-        'depart' => $trajet ? $trajet->getDepart() : '',
-        'arret' => $trajet ? $trajet->getArret() : '',
-        'conducteur' => $conducteur,
-    ]);
-}
+    
 
     #[Route('/bus/delete/{id}', name: 'delete_bus', methods: ['POST'])]
 public function delete(
