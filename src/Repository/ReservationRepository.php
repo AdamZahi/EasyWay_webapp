@@ -35,4 +35,16 @@ class ReservationRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getOneOrNullResult()['id'] ?? null;
     }
+
+    public function findReservationsByDepartAndArret(string $depart, string $arret): array
+{
+    return $this->createQueryBuilder('r')
+        ->where('r.depart = :depart')
+        ->andWhere('r.arret = :arret')
+        ->setParameter('depart', $depart)
+        ->setParameter('arret', $arret)
+        ->getQuery()
+        ->getResult();
+}
+
 }
