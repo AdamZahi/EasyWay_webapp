@@ -163,14 +163,21 @@
     </div>
 
    <div class="mb-3">
-        {{ form_label(form.dateCreation) }}
-        {{ form_widget(form.dateCreation, {'attr': {'class': 'form-control'}}) }}
-        {% if form_errors(form.dateCreation) %}
+    {{ form_label(form.dateCreation) }}
+    {{ form_widget(form.dateCreation, {
+        'attr': {
+            'class': 'form-control',
+            'readonly': true,
+            'value': form.dateCreation.vars.value ? form.dateCreation.vars.value.format('Y-m-d\TH:i') : '' 
+        }
+    }) }}
+    {% if form_errors(form.dateCreation) %}
         <div class="form-error">
-        {{ form_errors(form.dateCreation) }}
-    </div>
+            {{ form_errors(form.dateCreation) }}
+        </div>
     {% endif %}
-    </div>
+</div>
+
 
 
 
@@ -180,10 +187,14 @@
 </div>
 
 
+
 {{ form_end(form) }}
 
     </div>
 </div>
+
+
+
     <!-- Footer Start -->
     <div class="container-fluid bg-dark text-light footer pt-5 wow fadeIn" data-wow-delay="0.1s" style="margin-top: 6rem;">
         <div class="container py-5">
@@ -265,6 +276,8 @@
             });
         });
     </script>
+
+    
 
     <script src="{{ asset('lib/wow/wow.min.js') }}"></script>
     <script src="{{ asset('lib/easing/easing.min.js') }}"></script>

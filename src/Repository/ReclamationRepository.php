@@ -46,15 +46,40 @@ class ReclamationRepository extends ServiceEntityRepository
         ->getResult();
 }
 
-public function findReclamationsWithReponses(): array
+public function findByEmail(string $email): array
 {
     return $this->createQueryBuilder('r')
-        ->select('r.id')
-        ->innerJoin('r.reponses', 'rep')
-        ->groupBy('r.id')
+        ->join('r.user', 'u')
+        ->where('u.email = :email')
+        ->setParameter('email', $email)
         ->getQuery()
         ->getResult();
 }
+
+
+public function findReclamationsByUserEmail(string $email): array
+{
+    return $this->createQueryBuilder('r')
+        ->join('r.user', 'u')
+        ->where('u.email = :email')
+        ->setParameter('email', $email)
+        ->getQuery()
+        ->getResult();
+}
+
+
+
+public function findReclamationsWithReponses(): array
+{
+    return $this->createQueryBuilder('r')
+        ->innerJoin('r.reponses', 'rep')  // Inner join pour récupérer uniquement les réclamations avec des réponses
+        ->addSelect('rep')               // Sélectionner aussi les réponses pour un accès direct
+        ->getQuery()
+        ->getResult();
+}
+
+
+
 
 
 }

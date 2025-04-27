@@ -31,9 +31,16 @@
     </div>
 
     <div class="form-group">
-        {{ form_label(form.createdAt, 'Date de la réponse') }}
-        {{ form_widget(form.createdAt, {'attr': {'class': 'form-control'}}) }}
-    </div>
+    {{ form_label(form.createdAt, 'Date de la réponse') }}
+    {{ form_widget(form.createdAt, {
+        'attr': {
+            'class': 'form-control',
+            'readonly': true,
+            'value': form.createdAt.vars.value
+        }
+    }) }}
+</div>
+
 
     <button type="submit" class="btn btn-success mt-3">Envoyer la réponse</button>
 {{ form_end(form) }}

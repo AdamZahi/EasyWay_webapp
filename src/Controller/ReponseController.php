@@ -13,6 +13,7 @@ use App\Entity\Reponse;
 use App\Entity\Reclamation;
 use App\Form\ReponseType;
 use App\Repository\ReponseRepository;
+use App\Repository\ReclamationRepository;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Psr\Log\LoggerInterface;
@@ -142,6 +143,27 @@ public function supprimerReponse(Reponse $reponse, EntityManagerInterface $entit
 
     return $this->redirectToRoute('admin_voir_reponses', ['id' => $reponse->getReclamation()->getId()]);
 }
+
+/*
+#[Route('/reponses-par-email/{email}', name: 'voir_reponses_par_email')]
+public function voirReponsesParEmail(string $email, ReclamationRepository $reclamationRepository): Response
+{
+    // Récupérer toutes les réclamations associées à cet email
+    $reclamations = $reclamationRepository->findByEmail($email);
+
+    $reponses = [];
+    foreach ($reclamations as $reclamation) {
+        foreach ($reclamation->getReponses() as $reponse) {
+            $reponses[] = $reponse;
+        }
+    }
+
+    return $this->render('front-office/reclamation/reponses_par_email.html.twig', [
+        'email' => $email,
+        'reponses' => $reponses,
+    ]);
+}*/
+
 
 
 }
