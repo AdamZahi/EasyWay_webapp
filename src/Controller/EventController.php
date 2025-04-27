@@ -3,8 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Event;
+use App\Entity\EventComment;
+use App\Entity\User;
 use App\Form\EventType;
+use App\Form\EventFilterType;
+use App\Form\EventCommentType;
+use App\Repository\EventCommentRepository;
+use Twilio\Rest\Client;
+
 use App\Repository\EventRepository;
+use App\Repository\ReservationRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,26 +54,56 @@ class EventController extends AbstractController
     }
 
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
+    public function new(
+        Request $request,
+        EntityManagerInterface $em,
+        ReservationRepository $reservationRepository,
+        UserRepository $userRepository,
+        Client $twilio
+    ): Response {
+        $currentUser = $this->getUser(); 
         $event = new Event();
-        $event->setStatus('En cours');
+        $event->setStatus('En cours'); 
         $event->setDateDebut(new \DateTime());
-        
+        $event->setId_createur($currentUser);
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($event);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'L\'événement a été créé avec succès.');
+            $em->persist($event);
+            $em->flush();
+    
+            $depart = $event->getLigneAffectee()->getDepart();
+            $arret = $event->getLigneAffectee()->getArret();
+    
+            $reservations = $reservationRepository->findReservationsByDepartAndArret($depart, $arret);
+            $notifiedPhones = [];
+    
+            foreach ($reservations as $reservation) {
+                $user = $reservation->getUser();
+                $phone =$user->getTelephonne(); 
+    
+                if ($phone && !in_array($phone, $notifiedPhones)) {
+                    $notifiedPhones[] = $phone;
+                    
+                    $twilio->messages->create(
+                        $phone,
+                        [
+                            'from' => $_ENV['TWILIO_FROM'],
+                            'body' => "🚨 Un nouvel événement a été ajouté sur votre ligne $depart → $arret.\n
+                            Merci de consulter votre compte pour plus de détails."
+                        ]
+                    );
+                    
+                }
+            }
+    
+            $this->addFlash('success', 'Événement crée et SMS envoyé !');
             return $this->redirectToRoute('app_event_index');
         }
-
+    
         return $this->render('event/new.html.twig', [
-            'event' => $event,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -113,4 +152,71 @@ class EventController extends AbstractController
 
         return $this->redirectToRoute('app_event_index');
     }
-} 
+
+    #[Route('/{id}/comments', name: 'event_comment')]
+    public function comment(Request $request, Event $event, EventCommentRepository $commentRepository, EntityManagerInterface $entityManager): Response
+    {
+        // For testing with static user ID 1
+        $currentUser = $entityManager->getRepository(User::class)->find(1);
+        $comment = new EventComment();
+        $form = $this->createForm(EventCommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment->setEvent($event);
+            $comment->setUser($currentUser); // Set the current user
+            $comment->setCreatedAt(new \DateTime());
+
+            $entityManager->persist($comment);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Commentaire ajouté avec succès.');
+            return $this->redirectToRoute('event_comment', ['id' => $event->getId()]);
+        }
+
+        $comments = $commentRepository->findBy(['event' => $event], ['createdAt' => 'DESC']);
+
+        return $this->render('event/eventComment.html.twig', [
+            'event' => $event,
+            'comments' => $comments,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/ev/statistics', name: 'app_admin_statistics')]
+    public function statistiquesEvenements(EventRepository $eventRepo): Response{
+    $events = $eventRepo->findAll();
+    $totalEvents = count($events);
+    $statusCount = [];
+    $typeCount = [];
+    $evolutionEvents = [];
+
+    foreach ($events as $event) {
+        $status = $event->getStatus();
+        $type = $event->getType();
+        $date = $event->getDateDebut()->format('Y-m-d');
+        if (!isset($statusCount[$status])) {
+            $statusCount[$status] = 0;
+        }
+        $statusCount[$status]++;
+        if (!isset($typeCount[$type])) {
+            $typeCount[$type] = 0;
+        }
+        $typeCount[$type]++;
+        if (!isset($evolutionEvents[$date])) {
+            $evolutionEvents[$date] = 0;
+        }
+        $evolutionEvents[$date]++;
+    }
+
+    ksort($evolutionEvents);
+
+    return $this->render('event/statistics.html.twig', [
+        'totalEvents' => $totalEvents,
+        'statusCount' => $statusCount,
+        'typeCount' => $typeCount,
+        'evolutionEvents' => $evolutionEvents
+    ]);
+}
+
+}

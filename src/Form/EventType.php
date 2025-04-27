@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Event;
+use App\Entity\Ligne;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -23,7 +24,7 @@ class EventType extends AbstractType
                     'Incident' => 'Incident',
                 ],
                 'placeholder' => 'Sélectionnez un type',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                 ],
@@ -35,13 +36,13 @@ class EventType extends AbstractType
                     'Annulé' => 'Annulé',
                 ],
                 'placeholder' => 'Sélectionnez un statut',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                 ],
             ])
             ->add('description', TextareaType::class, [
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'rows' => 4,
@@ -50,19 +51,31 @@ class EventType extends AbstractType
             ])
             ->add('dateDebut', DateTimeType::class, [
                 'widget' => 'single_text',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                 ],
             ])
             ->add('dateFin', DateTimeType::class, [
                 'widget' => 'single_text',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                 ],
             ])
-        ;
+
+            ->add('ligneAffectee', EntityType::class, [
+                'class' => Ligne::class,
+                'choice_label' => function (Ligne $ligne) {
+                    return $ligne->getDepart() . ' - ' . $ligne->getArret();
+                },
+                'placeholder' => 'Sélectionnez une ligne affectée',
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-control',
+                ],
+            ]);
+            
     }
 
     public function configureOptions(OptionsResolver $resolver): void
