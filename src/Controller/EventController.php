@@ -9,16 +9,16 @@ use App\Form\EventType;
 use App\Form\EventFilterType;
 use App\Form\EventCommentType;
 use App\Repository\EventCommentRepository;
-use App\Repository\LigneRepository;
+use Twilio\Rest\Client;
+
 use App\Repository\EventRepository;
 use App\Repository\ReservationRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 
 #[Route('/event')]
 class EventController extends AbstractController
@@ -56,66 +56,54 @@ class EventController extends AbstractController
     #[Route('/new', name: 'app_event_new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $entityManager,
-        MailerInterface $mailer,
-        ReservationRepository $reservationRepository
+        EntityManagerInterface $em,
+        ReservationRepository $reservationRepository,
+        UserRepository $userRepository,
+        Client $twilio
     ): Response {
-        // For testing with static user ID 1
-        $currentUser = $entityManager->getRepository(User::class)->find(10);
+        $currentUser = $this->getUser(); 
         $event = new Event();
-        $event->setStatus('En cours');
-        $event->setId_createur($currentUser);
+        $event->setStatus('En cours'); 
         $event->setDateDebut(new \DateTime());
-
+        $event->setId_createur($currentUser);
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($event);
-            $entityManager->flush();
-
-            // Fetch users who made reservations in the ligneAffectee
-            $reservations = $reservationRepository->findBy(['depart' => $event->getLigneAffectee()->getDepart(), 'arret' => $event->getLigneAffectee()->getArret()]);
+            $em->persist($event);
+            $em->flush();
+    
+            $depart = $event->getLigneAffectee()->getDepart();
+            $arret = $event->getLigneAffectee()->getArret();
+    
+            $reservations = $reservationRepository->findReservationsByDepartAndArret($depart, $arret);
+            $notifiedPhones = [];
+    
             foreach ($reservations as $reservation) {
                 $user = $reservation->getUser();
-                if ($user && $user->getEmail()) {
-                    // Send email to the user
-                    // $email = (new Email())
-                    //     ->from('no-reply@demomailtrap.co')
-                    //     ->to($user->getEmail())
-                    //     ->subject('Nouvel événement sur votre ligne')
-                    //     ->text('Un nouvel événement a été ajouté sur votre ligne.
-                    //         Départ: ' . $event->getLigneAffectee()->getDepart() . '
-                    //         Arrêt: ' . $event->getLigneAffectee()->getArret() . '
-                    //         Description: ' . $event->getDescription()
-                    //         . 'Merci de consulter l\'application pour plus de détails.');
-                    // $mailer->send($email);
-                    // Envoi de l'email de confirmation
-                try {
-                    $this->sendEmail(
-                        $mailer,
-                        $user->getEmail(),
-                        'Nouvel événement sur votre ligne',
-                        'Un nouvel événement a été ajouté sur votre ligne.
-                                Départ: ' . $event->getLigneAffectee()->getDepart() . '
-                                Arrêt: ' . $event->getLigneAffectee()->getArret() . '
-                                Description: ' . $event->getDescription()
-                            . 'Merci de consulter l\'application pour plus de détails.'
+                $phone =$user->getTelephonne(); 
+    
+                if ($phone && !in_array($phone, $notifiedPhones)) {
+                    $notifiedPhones[] = $phone;
+                    
+                    $twilio->messages->create(
+                        $phone,
+                        [
+                            'from' => $_ENV['TWILIO_FROM'],
+                            'body' => "🚨 Un nouvel événement a été ajouté sur votre ligne $depart → $arret.\n
+                            Merci de consulter votre compte pour plus de détails."
+                        ]
                     );
-                    $this->addFlash('success', 'Email envoyé avec succès à ' . $user->getEmail());
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Error : ' . $e->getMessage());
-                }
+                    
                 }
             }
-
-            $this->addFlash('success', 'L\'événement a été crée avec succès et les utilisateurs concernés ont été notifiés.');
+    
+            $this->addFlash('success', 'Événement crée et SMS envoyé !');
             return $this->redirectToRoute('app_event_index');
         }
-
+    
         return $this->render('event/new.html.twig', [
-            'event' => $event,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -231,14 +219,4 @@ class EventController extends AbstractController
     ]);
 }
 
-    public function sendEmail(MailerInterface $mailer, $toEmail, $subject, $body)
-    {
-        $email = (new Email())
-            ->from('zahi.adem10@gmail.com')
-            ->to($toEmail)
-            ->subject($subject)
-            ->text($body);
-
-        $mailer->send($email);
-    }
 }
