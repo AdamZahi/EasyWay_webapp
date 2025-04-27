@@ -14,6 +14,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Service\SmsService;
+use Knp\Component\Pager\PaginatorInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+
 
 class MetroController extends AbstractController
 {
@@ -99,26 +102,43 @@ class MetroController extends AbstractController
 
     
 
+
     #[Route('/admin/metro', name: 'admin_metro')]
 public function index(
     MetroRepository $metroRepository,
     ConducteurRepository $conducteurRepository,
-    LigneRepository $trajetRepository
+    LigneRepository $trajetRepository,
+    PaginatorInterface $paginator,
+    Request $request
 ): Response {
-    $metros = $metroRepository->findAll();
+    // Requête de base sans jointures
+    $query = $metroRepository->createQueryBuilder('m')
+        ->getQuery();
 
-    foreach ($metros as $metro) {
-        $vehicule = $metro->getId(); 
-        $conducteur = $conducteurRepository->find($vehicule->getIdConducteur());
-        $trajet = $trajetRepository->find($vehicule->getIdLigne());
+    // Configuration spéciale pour la pagination
+    $pagination = $paginator->paginate(
+        $query,
+        $request->query->getInt('page', 1),
+        2,
+        [
+            'wrap-queries' => true,
+            'distinct' => false
+        ]
+    );
 
-        
-        $metro->conducteur = $conducteur;
-        $metro->trajet = $trajet;
+    
+
+    // Hydratation manuelle des relations
+    foreach ($pagination as $metro) {
+        $vehicule = $metro->getId(); // Accès au véhicule via la relation existante
+        if ($vehicule) {
+            $metro->conducteur = $conducteurRepository->find($vehicule->getIdConducteur());
+            $metro->trajet = $trajetRepository->find($vehicule->getIdLigne());
+        }
     }
 
     return $this->render('back-office/vehicules/metro/metroCards.html.twig', [
-        'metros' => $metros,
+        'pagination' => $pagination,
     ]);
 }
 

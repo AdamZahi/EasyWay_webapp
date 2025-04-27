@@ -16,6 +16,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use App\Service\SmsService;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+
 
 
 class BusController extends AbstractController
@@ -79,7 +81,7 @@ public function create(
             $vehicule->setCapacite($capacite);
             $vehicule->setEtat($etat);
             $vehicule->setTypeVehicule('BUS');
-            $vehicule->setId_conducteur($conducteur->getIdConducteur());
+            $vehicule->setIdConducteur($conducteur->getIdConducteur());
             $vehicule->setIdLigne($trajet->getId());
 
             $em->persist($vehicule);
@@ -116,26 +118,46 @@ public function create(
         BusRepository $busRepository,
         ConducteurRepository $conducteurRepository,
         LigneRepository $trajetRepository,
-        PaginatorInterface $paginator
+        PaginatorInterface $paginator,
+        Request $request
     ): Response {
-        $buses = $busRepository->findAll();
-    
-        foreach ($buses as $bus) {
-            $vehicule = $bus->getVehicule(); // C’est l’objet Vehicule
+        // Create the query builder for fetching bus data with left joins
+        $query = $busRepository->createQueryBuilder('b')
+            ->leftJoin('b.vehicule', 'v')
+            ->addSelect('v')
+            ->getQuery();
+
+        // Doctrine Paginator
+        $paginatorInstance = new Paginator($query, true); // true enables output walkers
+
+        // Count the total number of results
+        $totalCount = count($paginatorInstance);
+
+        // Paginate results (using KNP pagination)
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1), // Default to page 1 if no page parameter
+            3, // Number of items per page
+            ['distinct' => false] // Use distinct if necessary
+        );
+
+        // Manually resolve conducteur and trajet for each bus in the pagination
+        foreach ($pagination as $bus) {
+            $vehicule = $bus->getVehicule();
             $conducteur = $conducteurRepository->find($vehicule->getIdConducteur());
             $trajet = $trajetRepository->find($vehicule->getIdLigne());
-    
-            // On attache les objets manuellement
+
             $bus->conducteur = $conducteur;
             $bus->trajet = $trajet;
         }
-    
+
+        // Render the view with pagination data
         return $this->render('back-office/vehicules/bus/busCards.html.twig', [
-            'buses' => $buses,
+            'paginations' => $pagination,
         ]);
     }
 
-    
+
 
     #[Route('/bus/edit/{id}', name: 'edit_bus')]
     public function edit(

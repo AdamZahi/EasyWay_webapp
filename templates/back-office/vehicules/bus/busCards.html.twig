@@ -6,96 +6,176 @@
 <div class="content-wrapper p-3">
     <div class="container-fluid">
         <div class="container mt-4">
-                <div class="row">
-                    {% for bus in buses %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card card-success h-100">
-                                <div class="card-header d-flex justify-content-between align-items-center">
-                                    <h3 class="card-title mb-0">Bus {{ bus.vehicule.immatriculation }}</h3>
-                                    <div class="card-tools">
-                                        {% if bus.trajet %}
-                                            <button type="button" class="action-btn stations-btn" 
-                                                    data-depart="{{ bus.trajet.depart }}" 
-                                                    data-arret="{{ bus.trajet.arret }}">
-                                                <i class="bi bi-signpost-split"></i> Stations
-                                            </button>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="bus-details">
-                                        <div class="detail-item"><i class="bi bi-car-front"></i> <span><strong>Capacité:</strong> {{ bus.vehicule.capacite }}</span></div>
-                                        <div class="detail-item"><i class="bi bi-speedometer2"></i> <span><strong>État:</strong> {{ bus.vehicule.etat }}</span></div>
-                                        {% if bus.conducteur is defined and bus.conducteur %}
-                                            <div class="detail-item"><i class="bi bi-person-badge"></i> <span><strong>Conducteur:</strong> {{ bus.conducteur.nom }} {{ bus.conducteur.prenom }}</span></div>
-                                        {% endif %}
-                                        {% if bus.trajet %}
-                                            <div class="detail-item"><i class="bi bi-signpost-split"></i> <span><strong>Trajet:</strong> {{ bus.trajet.depart }} → {{ bus.trajet.arret }}</span></div>
-                                        {% endif %}
-                                        <hr>
-                                        <div class="detail-item"><i class="bi bi-door-open"></i> <span><strong>Portes:</strong> {{ bus.nombrePortes }}</span></div>
-                                        <div class="detail-item"><i class="bi bi-bus-front"></i> <span><strong>Service:</strong> {{ bus.typeService }}</span></div>
-                                        <div class="detail-item"><i class="bi bi-people"></i> <span><strong>Places:</strong> {{ bus.nombreDePlaces }}</span></div>
-                                        <div class="detail-item"><i class="bi bi-building"></i> <span><strong>Compagnie:</strong> {{ bus.compagnie }}</span></div>
-                                        <div class="detail-item"><i class="bi bi-snow"></i> <span><strong>Climatisation:</strong> {{ bus.climatisation ? 'Oui' : 'Non' }}</span></div>
-                                    </div>
-                                </div>
-                                <div class="card-actions">
-                                    <a href="/bus/edit/{{ bus.vehicule.id }}" class="action-btn edit-btn">
-                                        <i class="bi bi-pencil-square"></i> Modifier
-                                    </a>
-                                    <form method="post" action="{{ path('delete_bus', {'id': bus.vehicule.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce bus?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bus.vehicule.id) }}">
-                                        <button type="submit" class="action-btn delete-btn">
-                                            <i class="bi bi-trash"></i> Supprimer
-                                        </button>
-                                    </form>
+            <!-- Formulaire de Recherche amélioré -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-search me-2"></i>Recherche avancée de bus</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{{ path('admin_bus') }}" class="row g-3 align-items-end">
+                        <!-- Ligne 1 -->
+                        <div class="col-md-3 col-lg-2">
+                            <label for="immatriculation" class="form-label small">Immatriculation</label>
+                            <input type="text" class="form-control" id="immatriculation" name="immatriculation" 
+                                   placeholder="Ex: AB-123-CD" value="{{ app.request.get('immatriculation') }}">
+                        </div>
+                        
+                        <div class="col-md-3 col-lg-2">
+                            <label for="conducteur" class="form-label small">Conducteur</label>
+                            <input type="text" class="form-control" id="conducteur" name="conducteur" 
+                                   placeholder="Nom ou prénom" value="{{ app.request.get('conducteur') }}">
+                        </div>
+                        
+                        <div class="col-md-3 col-lg-2">
+                            <label for="typeService" class="form-label small">Type de service</label>
+                            <select class="form-select" id="typeService" name="typeService">
+                                <option value="">Tous types</option>
+                                <option value="URBAIN" {{ app.request.get('typeService') == 'URBAIN' ? 'selected' : '' }}>Urbain</option>
+                                <option value="INTERURBAIN" {{ app.request.get('typeService') == 'INTERURBAIN' ? 'selected' : '' }}>Interurbain</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 col-lg-2">
+                            <label for="capacite" class="form-label small">Capacité min.</label>
+                            <input type="number" class="form-control" id="capacite" name="capacite" 
+                                   placeholder="Ex: 50" min="0" value="{{ app.request.get('capacite') }}">
+                        </div>
+                        
+                        <!-- Ligne 2 -->
+                        <div class="col-md-3 col-lg-2">
+                            <label for="etat" class="form-label small">État</label>
+                            <select class="form-select" id="etat" name="etat">
+                                <option value="">Tous états</option>
+                                <option value="NEUF" {{ app.request.get('etat') == 'NEUF' ? 'selected' : '' }}>Neuf</option>
+                                <option value="BON" {{ app.request.get('etat') == 'BON' ? 'selected' : '' }}>Bon état</option>
+                                <option value="MAUVAIS" {{ app.request.get('etat') == 'MAUVAIS' ? 'selected' : '' }}>Mauvais état</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 col-lg-2">
+                            <label for="nombrePortes" class="form-label small">Nombre de portes</label>
+                            <select class="form-select" id="nombrePortes" name="nombrePortes">
+                                <option value="">Tous</option>
+                                <option value="2" {{ app.request.get('nombrePortes') == '2' ? 'selected' : '' }}>2 portes</option>
+                                <option value="3" {{ app.request.get('nombrePortes') == '3' ? 'selected' : '' }}>3 portes</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-3 col-lg-2">
+                            <label for="nombreDePlaces" class="form-label small">Nombre de places</label>
+                            <input type="number" class="form-control" id="nombreDePlaces" name="nombreDePlaces" 
+                                   placeholder="Ex: 60" min="0" value="{{ app.request.get('nombreDePlaces') }}">
+                        </div>
+                        
+                        <div class="col-md-3 col-lg-2">
+                            <label for="compagnie" class="form-label small">Compagnie</label>
+                            <input type="text" class="form-control" id="compagnie" name="compagnie" 
+                                   placeholder="Ex: Transdev" value="{{ app.request.get('compagnie') }}">
+                        </div>
+                        
+                        <!-- Ligne 3 - Boutons -->
+                        <div class="col-md-6 col-lg-4">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary flex-grow-1">
+                                    <i class="fas fa-search me-2"></i>Rechercher
+                                </button>
+                                <a href="{{ path('admin_bus') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-undo me-2"></i>Réinitialiser
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3 col-lg-2">
+                            <label for="climatisation" class="form-label small">Climatisation</label>
+                            <select class="form-select" id="climatisation" name="climatisation">
+                                <option value="">Peu importe</option>
+                                <option value="1" {{ app.request.get('climatisation') == '1' ? 'selected' : '' }}>Avec climatisation</option>
+                                <option value="0" {{ app.request.get('climatisation') == '0' ? 'selected' : '' }}>Sans climatisation</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Cartes des bus -->
+            <div class="row">
+                {% for bus in pagination %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card card-success h-100">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h3 class="card-title mb-0">Bus {{ bus.vehicule.immatriculation }}</h3>
+                                <div class="card-tools">
                                     {% if bus.trajet %}
-                                        <button type="button" class="action-btn route-btn" 
+                                        <button type="button" class="action-btn stations-btn" 
                                                 data-depart="{{ bus.trajet.depart }}" 
                                                 data-arret="{{ bus.trajet.arret }}">
-                                            <i class="bi bi-map"></i> Trajet
+                                            <i class="bi bi-signpost-split"></i> Stations
                                         </button>
                                     {% endif %}
                                 </div>
                             </div>
-                        </div>
-                    {% else %}
-                        <div class="col-12">
-                            <div class="alert alert-warning text-center py-4">
-                                <i class="bi bi-exclamation-triangle-fill fs-1"></i>
-                                <h4 class="mt-3">Aucun bus trouvé</h4>
-                                <p class="mb-0">Cliquez sur le bouton "Ajouter" pour commencer</p>
+                            <div class="card-body">
+                                <div class="bus-details">
+                                    <div class="detail-item"><i class="bi bi-car-front"></i> <span><strong>Capacité:</strong> {{ bus.vehicule.capacite }}</span></div>
+                                    <div class="detail-item"><i class="bi bi-speedometer2"></i> <span><strong>État:</strong> {{ bus.vehicule.etat }}</span></div>
+                                    {% if bus.conducteur is defined and bus.conducteur %}
+                                        <div class="detail-item"><i class="bi bi-person-badge"></i> <span><strong>Conducteur:</strong> {{ bus.conducteur.nom }} {{ bus.conducteur.prenom }}</span></div>
+                                    {% endif %}
+                                    {% if bus.trajet %}
+                                        <div class="detail-item"><i class="bi bi-signpost-split"></i> <span><strong>Trajet:</strong> {{ bus.trajet.depart }} → {{ bus.trajet.arret }}</span></div>
+                                    {% endif %}
+                                    <hr>
+                                    <div class="detail-item"><i class="bi bi-door-open"></i> <span><strong>Portes:</strong> {{ bus.nombrePortes }}</span></div>
+                                    <div class="detail-item"><i class="bi bi-bus-front"></i> <span><strong>Service:</strong> {{ bus.typeService }}</span></div>
+                                    <div class="detail-item"><i class="bi bi-people"></i> <span><strong>Places:</strong> {{ bus.nombreDePlaces }}</span></div>
+                                    <div class="detail-item"><i class="bi bi-building"></i> <span><strong>Compagnie:</strong> {{ bus.compagnie }}</span></div>
+                                    <div class="detail-item"><i class="bi bi-snow"></i> <span><strong>Climatisation:</strong> {{ bus.climatisation ? 'Oui' : 'Non' }}</span></div>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <a href="{{ path('edit_bus', {'id': bus.vehicule.id}) }}" class="action-btn edit-btn">
+                                    <i class="bi bi-pencil-square"></i> Modifier
+                                </a>
+                                <form method="post" action="{{ path('delete_bus', {'id': bus.vehicule.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce bus?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bus.vehicule.id) }}">
+                                    <button type="submit" class="action-btn delete-btn">
+                                        <i class="bi bi-trash"></i> Supprimer
+                                    </button>
+                                </form>
+                                {% if bus.trajet %}
+                                    <button type="button" class="action-btn route-btn" 
+                                            data-depart="{{ bus.trajet.depart }}" 
+                                            data-arret="{{ bus.trajet.arret }}">
+                                        <i class="bi bi-map"></i> Trajet
+                                    </button>
+                                {% endif %}
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
-                <div class="text-center my-4">
-                    <a href="{{ path('create_bus') }}" class="btn btn-success d-inline-flex align-items-center px-4 py-2">
-                        <i class="bi bi-plus-circle me-2"></i> Ajouter un Bus
-                    </a>
-                </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center py-4">
+                            <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                            <h4 class="mt-3">Aucun bus trouvé</h4>
+                            <p class="mb-0">Cliquez sur le bouton "Ajouter" pour commencer</p>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-        </div>
-    </div>
 
-    <!-- Modal pour la carte -->
-    <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="mapModalLabel">Visualisation du trajet</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-0">
-                    <div id="map" style="height: 70vh;"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                </div>
+            <!-- Pagination stylisée -->
+            <div class="d-flex justify-content-center mt-5 mb-5">
+             {{ knp_pagination_render(pagination, 'back-office/vehicules/bus/custom_pagination.html.twig') }}
+            </div>
+            <!-- Bouton Ajouter -->
+            <div class="text-center my-4">
+                <a href="{{ path('create_bus') }}" class="btn btn-success d-inline-flex align-items-center px-4 py-2">
+                    <i class="bi bi-plus-circle me-2"></i> Ajouter un Bus
+                </a>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
 
 
@@ -385,109 +465,92 @@ async function fetchBusStationsNearRoute(routeGeometry) {
 
 
 
-    <style>
+   <style>
+
+
+    /* Style pour la carte */
     #map {
-            height: 70vh;
-            width: 100%;
-            border-radius: 8px;
-        }
-        .leaflet-routing-container {
-            display: none; /* Masquer le panneau d'instructions */
-        }
-        .loading-control {
-            margin: 10px;
-            pointer-events: none;
-        }
-        .loading-control .alert {
-            margin-bottom: 0;
-        }
-        /* Style pour les icônes */
-        .depart-icon, .arrivee-icon {
-            background: transparent;
-            border: none;
-        }
-        
-        /* Style pour la carte */
-        #map {
-            width: 100%;
-            border-radius: 8px;
-        }
-        
-        /* Style pour les boutons d'action */
-        .card-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-            padding: 12px;
-            background: rgba(0,0,0,0.03);
-            border-top: 1px solid rgba(0,0,0,0.125);
-        }
-        
-        .action-btn {
-            border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s ease;
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        .edit-btn {
-            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
-            border: none;
-            color: white;
-        }
-        
-        .delete-btn {
-            background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
-            border: none;
-            color: white;
-        }
-        
-        .route-btn {
-            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-            border: none;
-            color: white;
-        }
-        
-        /* Style pour les détails du bus */
-        .detail-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-            gap: 8px;
-        }
-        
-        .detail-item i {
-            width: 20px;
-            text-align: center;
-        }
-        .stations-btn {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
-            border: none;
-            color: #212529;
-        }
-        
-        .station-icon {
-            background: transparent;
-            border: none;
-        }
-        
-        .loading-control .alert {
-            margin-bottom: 0;
-            font-size: 14px;
-            padding: 8px 12px;
-        }
-        
-        /* Style pour les popups des stations */
-        .leaflet-popup-content b {
-            color: #28a745;
-        }
-    </style>
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    /* Style pour les boutons d'action */
+    .card-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        padding: 12px;
+        background: rgba(0,0,0,0.03);
+        border-top: 1px solid rgba(0,0,0,0.125);
+    }
+
+    .action-btn {
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .edit-btn {
+        background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+        border: none;
+        color: white;
+    }
+
+    .delete-btn {
+        background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%);
+        border: none;
+        color: white;
+    }
+
+    .route-btn {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border: none;
+        color: white;
+    }
+
+    /* Style pour les détails du bus */
+    .detail-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        gap: 8px;
+    }
+
+    .detail-item i {
+        width: 20px;
+        text-align: center;
+    }
+
+    .stations-btn {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        border: none;
+        color: #212529;
+    }
+
+    .station-icon {
+        background: transparent;
+        border: none;
+    }
+
+    .loading-control .alert {
+        margin-bottom: 0;
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    /* Style pour les popups des stations */
+    .leaflet-popup-content b {
+        color: #28a745;
+    }
+</style>
+
 {% endblock %}

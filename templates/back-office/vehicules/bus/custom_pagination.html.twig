@@ -1,0 +1,75 @@
+{% if pageCount > 1 %}
+<div class="custom-pagination">
+    <ul class="pagination-list">
+        {% if first is defined and current != first %}
+            <li class="pagination-item">
+                <a class="pagination-link" href="{{ path(route, query|merge({(pageParameterName): first})) }}">
+                    &laquo;&laquo;
+                </a>
+            </li>
+        {% endif %}
+
+        {% if previous is defined %}
+            <li class="pagination-item">
+                <a class="pagination-link" href="{{ path(route, query|merge({(pageParameterName): previous})) }}">
+                    &laquo;
+                </a>
+            </li>
+        {% endif %}
+
+        {% for page in pagesInRange %}
+            <li class="pagination-item{% if page == current %} active{% endif %}">
+                <a class="pagination-link" href="{{ path(route, query|merge({(pageParameterName): page})) }}">{{ page }}</a>
+            </li>
+        {% endfor %}
+
+        {% if next is defined %}
+            <li class="pagination-item">
+                <a class="pagination-link" href="{{ path(route, query|merge({(pageParameterName): next})) }}">
+                    &raquo;
+                </a>
+            </li>
+        {% endif %}
+
+        {% if last is defined and current != last %}
+            <li class="pagination-item">
+                <a class="pagination-link" href="{{ path(route, query|merge({(pageParameterName): last})) }}">
+                    &raquo;&raquo;
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+</div>
+{% endif %}
+
+<style>
+
+.custom-pagination {
+    margin: 2rem 0;
+}
+
+.pagination-list {
+    display: flex;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination-item {
+    display: flex;
+}
+
+.pagination-link {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+}
+
+.pagination-item.active .pagination-link {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+</style>

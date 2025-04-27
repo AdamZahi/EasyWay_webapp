@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\TrainRepository;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use App\Service\SmsService;
 class TrainController extends AbstractController
 {
     #[Route('/train/create', name: 'create_train')]
@@ -203,7 +204,7 @@ public function edit(
             $em->flush();
         }
 
-        $vehicule->setIdTrajet($trajet->getId());
+        $vehicule->setIdLigne($trajet->getId());
 
         // Mise à jour du conducteur
         $conducteur = $conducteurRepo->findOneBy(['nom' => $nomConducteur, 'prenom' => $prenomConducteur]);
@@ -216,7 +217,7 @@ public function edit(
             $em->flush();
         }
 
-        $vehicule->setId_conducteur($conducteur->getIdConducteur());
+        $vehicule->setIdConducteur($conducteur->getIdConducteur());
 
         // Mise à jour du train
         $train->setLongueurReseau($longueurReseau);
@@ -229,7 +230,7 @@ public function edit(
 
         // Envoi du SMS si l'état a changé
         if ($oldEtat !== $etat) {
-            $phoneNumber = $conducteur->getTelephone();
+            $phoneNumber = $conducteur->getTelephonne();
             if (!empty($phoneNumber)) {
                 if (strpos($phoneNumber, '+216') !== 0) {
                     $phoneNumber = '+216' . ltrim($phoneNumber, '0');
