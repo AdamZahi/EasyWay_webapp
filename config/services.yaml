@@ -8,6 +8,9 @@ parameters:
 
 
 services:
+    App\Security\GoogleAuthenticator:
+        arguments:
+            $googleClient: '@knpu.oauth2.client.google'
     # Service for LogoutListener
     App\EventListener\LogoutListener:
         tags:
