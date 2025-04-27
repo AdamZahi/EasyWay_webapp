@@ -3,15 +3,16 @@
 {% block title %}Statistiques des Réclamations{% endblock %}
 
 {% block content %}
+{% block content %}
 <div class="container mt-4">
-    <h1 class="text-center mb-4">📊 Statistiques des Réclamations</h1>
+    <h1 class="text-center mb-4">📊 Statistiques des Événements</h1>
 
     <div class="row">
         <div class="col-md-4">
             <div class="card text-white bg-primary mb-3 shadow-sm">
                 <div class="card-body text-center">
-                    <h4 class="card-title">Total Réclamations</h4>
-                    <p class="display-4 fw-bold">{{ totalReclamations }}</p>
+                    <h4 class="card-title">Total Événements</h4>
+                    <p class="display-4 fw-bold">{{ totalEvents }}</p>
                 </div>
             </div>
         </div>
@@ -19,7 +20,7 @@
             <div class="card text-white bg-warning mb-3 shadow-sm">
                 <div class="card-body text-center">
                     <h4 class="card-title">En attente</h4>
-                    <p class="display-4 fw-bold">{{ statutCount['en_attente']|default(0) }}</p>
+                    <p class="display-4 fw-bold">{{ statusCount['en_attente']|default(0) }}</p>
                 </div>
             </div>
         </div>
@@ -27,7 +28,7 @@
             <div class="card text-white bg-success mb-3 shadow-sm">
                 <div class="card-body text-center">
                     <h4 class="card-title">Terminé</h4>
-                    <p class="display-4 fw-bold">{{ statutCount['Terminer']|default(0) }}</p>
+                    <p class="display-4 fw-bold">{{ statusCount['Terminer']|default(0) }}</p>
                 </div>
             </div>
         </div>
@@ -37,120 +38,36 @@
     <div class="row">
         <div class="col-md-6">
             <div class="card shadow-sm p-3">
-                <h4 class="text-center">Répartition des Réclamations par Statut</h4>
-                <canvas id="statutChart"></canvas>
+                <h4 class="text-center">Répartition des Événements par Statut</h4>
+                <canvas id="statusChart"></canvas>
             </div>
         </div>
 
         <div class="col-md-6">
             <div class="card shadow-sm p-3">
-                <h4 class="text-center">Répartition par Catégorie</h4>
-                <canvas id="categorieChart"></canvas>
+                <h4 class="text-center">Répartition par Type</h4>
+                <canvas id="typeChart"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- Évolution des réclamations -->
+    <!-- Évolution des événements -->
     <div class="row mt-4">
         <div class="col-md-12">
             <div class="card shadow-sm p-3">
-                <h4 class="text-center">Évolution des Réclamations</h4>
+                <h4 class="text-center">Évolution des Événements</h4>
                 <canvas id="evolutionChart"></canvas>
             </div>
         </div>
     </div>
-   
 
     <div class="text-end mt-4 mb-3">
-        <a href="{{ path('admin_reclamations') }}" class="btn btn-secondary">
-            🔙 Retour à la liste des réclamations
+        <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
+            🔙 Retour à la liste des événements
         </a>
     </div>
-
 </div>
 
 <!-- Importation de Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-
-<script>
-// Données passées depuis Symfony
-const statutData = {{ statutCount|json_encode|raw }};
-const categorieData = {{ categoriesCount|json_encode|raw }};
-const evolutionData = {{ evolutionReclamations|json_encode|raw }};
-
-console.log("Évolution des réclamations :", evolutionData);
-
-
-// Graphique Répartition par Statut
-const statutChart = new Chart(document.getElementById('statutChart'), {
-    type: 'pie',
-    data: {
-        labels: Object.keys(statutData),
-        datasets: [{
-            data: Object.values(statutData),
-            backgroundColor: ['#FF5733', '#FFC107', '#28A745'],
-            hoverOffset: 4
-        }]
-    },
-    options: {
-        plugins: {
-            legend: { position: 'bottom' },
-            title: { display: true, text: 'Répartition des Réclamations' }
-        }
-    }
-});
-
-// Graphique Répartition par Catégorie
-const categorieChart = new Chart(document.getElementById('categorieChart'), {
-    type: 'bar',
-    data: {
-        labels: Object.keys(categorieData),
-        datasets: [{
-            label: 'Nombre de Réclamations',
-            data: Object.values(categorieData),
-            backgroundColor: '#007BFF'
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: { beginAtZero: true }
-        }
-    }
-});
-
-
-// Données passées depuis Symfony
-
-console.log("Évolution des réclamations par jour :", evolutionData);
-
-// Préparer les labels (jours) et les valeurs (nombre de réclamations)
-const evolutionLabels = Object.keys(evolutionData);
-const evolutionValues = Object.values(evolutionData);
-
-// Graphique Évolution des Réclamations par Jour
-const evolutionChart = new Chart(document.getElementById('evolutionChart'), {
-    type: 'line',
-    data: {
-        labels: evolutionLabels, // Clés (jours)
-        datasets: [{
-            label: 'Nombre de Réclamations',
-            data: evolutionValues, // Valeurs (nombre de réclamations)
-            borderColor: '#28A745',
-            fill: false
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: { beginAtZero: true },
-            x: {
-                title: { display: true, text: 'Jour' }
-            }
-        }
-    }
-});
-
-</script>
-
+<script src="https://cdnjs.cloudflare.com/ajax
 {% endblock %}

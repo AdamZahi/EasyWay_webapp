@@ -46,30 +46,31 @@
     <!-- Events Start -->
     <main>
     <div class="container mt-4">
-        <h1>Event List</h1>
+        <h1>Liste des Événements</h1>
 
         <div id="eventsTable">
             <table class="table">
                 <thead>
                     <tr>
+                        <th>Ligne</th>
                         <th>Type</th>
-                        <th>Status</th>
                         <th>Description</th>
-                        <th>Starting Date</th>
-                        <th>Ending Date</th>
+                        <th>Date debut</th>
+                        <th>Date fin</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for event in events %}
                     <tr>
+                        <td> {{ event.ligneAffectee.depart }} - {{ event.ligneAffectee.arret }}</td>
                         <td>{{ event.type }}</td>
-                        <td>{{ event.status }}</td>
                         <td>{{ event.description }}</td>
                         <td>{{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</td>
                         <td>{{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</td>
                         <td>
                             <a href="{{ path('app_event_front_show', {'id': event.id}) }}" class="btn btn-info btn-sm">Voir</a>
+                            <a href="{{ path('event_comment', {'id': event.id}) }}" class="btn btn-info btn-sm">Commentaire</a>
                             
                         </td>
                     </tr>
