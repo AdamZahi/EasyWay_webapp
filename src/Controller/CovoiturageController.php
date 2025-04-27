@@ -6,8 +6,9 @@ use App\Entity\Posts;
 use App\Entity\User;
 use App\Repository\PostsRepository;
 use App\Service\EmailService;
+use App\Service\SmsService; 
 use App\Service\StripePaymentService;
-use App\Form\PostsType;
+use App\Form\PostsType; 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use App\Entity\Commentaire;
 use App\Service\BadWordFilter; 
@@ -24,11 +25,32 @@ use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;  
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\PngWriter;
+
+use BaconQrCode\Renderer\Path\PathImageInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\QrCodeService;
+
+
+
+
 
 
 class CovoiturageController extends AbstractController
 {
-    
+    private $smsService;
+    private $entityManager;
+
+    // Inject both services in a single constructor
+    public function __construct(SmsService $smsService, EntityManagerInterface $entityManager)
+    {
+        $this->smsService = $smsService;
+        $this->entityManager = $entityManager;
+    }
+
+
     #[Route('/covoiturage', name: 'app_covoiturage')]
     public function index(): Response
     {
@@ -36,54 +58,71 @@ class CovoiturageController extends AbstractController
     }
 
     #[Route('/covoiturage/poster', name: 'app_covoiturage_poster')]
-    public function poster(Request $request, EntityManagerInterface $entityManager): Response
+    public function poster(Request $request): Response
     {
         $post = new Posts(); 
         $form = $this->createForm(PostsType::class, $post);
         $form->handleRequest($request);
-    
+
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 $errors = [];
-            
+
+                // Validate the post data
                 if ($post->getVilleDepart() === $post->getVilleArrivee()) {
                     $errors[] = 'La ville de départ et la ville d\'arrivée ne peuvent pas être identiques !';
                 }
-            
+
                 if (null === $post->getDate()) {
                     $errors[] = 'La date est obligatoire !';
                 } elseif ($post->getDate() < new \DateTime('today')) {
                     $errors[] = 'La date de départ ne peut pas être dans le passé !';
                 }
-            
+
                 if ($post->getNombreDePlaces() <= 0) {
                     $errors[] = 'Le nombre de places doit être supérieur à zéro !';
                 }
-            
-              
-    if ($post->getPrix() === null || $post->getPrix() <= 0) {
-        $errors[] = 'Le prix doit être supérieur à zéro !';
-    }
-    
-            
-    if (count($errors) > 0) {
-        foreach ($errors as $error) {
-            $this->addFlash('error', $error);
-        }
+
+                if ($post->getPrix() === null || $post->getPrix() <= 0) {
+                    $errors[] = 'Le prix doit être supérieur à zéro !';
+                }
+
+                // If there are validation errors, display them
+                if (count($errors) > 0) {
+                    foreach ($errors as $error) {
+                        $this->addFlash('error', $error);
+                    }
                 } else {
                     try {
-                      
-                        $user = $entityManager->getReference('App\Entity\User', 1); // or 18
+                        // Set user reference (assuming user ID is 1)
+                        $user = $this->entityManager->getReference('App\Entity\User', 1); 
                         $post->setUser($user); 
-                
-                        $entityManager->persist($post);
-                        $entityManager->flush();
-                
-                          
-                $this->addFlash('success', 'Votre trajet a été publié avec succès!');
-                // Instead of redirecting, render the same page
-                return $this->render('covoiturage/poster.html.twig', [
-                    'form' => $form->createView(),   ]);
+
+                        // Persist the post
+                        $this->entityManager->persist($post);
+                        $this->entityManager->flush();
+
+                        // Check if the date is today and send the SMS immediately
+                        if ($post->getDate()->format('Y-m-d') === (new \DateTime())->format('Y-m-d')) {
+                            // Send SMS if the post's date is today
+                            $phoneNumber = '+216' . $user->getTelephonne(); // Adjust based on phone number format
+                            $message = sprintf(
+                                "Bonjour %s, votre covoiturage de %s à %s est prévu aujourd'hui.",
+                                $user->getNom(),
+                                $post->getVilleDepart(),
+                                $post->getVilleArrivee()
+                            );
+                            $this->smsService->sendSms($phoneNumber, $message); // Send the SMS
+
+                            $this->addFlash('success', 'Votre trajet a été publié et la notification SMS a été envoyée !');
+                        } else {
+                            $this->addFlash('success', 'Votre trajet a été publié. Il sera notifié par SMS lorsqu\'il sera prévu pour aujourd\'hui.');
+                        }
+
+                        // Instead of redirecting, render the same page
+                        return $this->render('covoiturage/poster.html.twig', [
+                            'form' => $form->createView(),
+                        ]);
                     } catch (\Exception $e) {
                         $this->addFlash('error', 'Une erreur est survenue: ' . $e->getMessage());
                     }
@@ -94,12 +133,22 @@ class CovoiturageController extends AbstractController
                 }
             }
         }
-    
+
         return $this->render('covoiturage/poster.html.twig', [
             'form' => $form->createView(),
         ]);
     }
-    
+
+
+
+    #[Route('/covoiturage/show/{id}', name: 'app_covoiturage_show')]
+    public function show(Posts $post): Response
+    {
+        // Render the details of the post (departure city, arrival city, etc.)
+        return $this->render('covoiturage/show.html.twig', [
+            'post' => $post,
+        ]);
+    }
 
     #[Route('/covoiturage/rechercher', name: 'app_covoiturage_rechercher')]
     public function rechercher(Request $request, EntityManagerInterface $entityManager): Response
@@ -181,7 +230,9 @@ public function processPayment(
     Request $request,
     StripePaymentService $stripePayment,
     EmailService $emailService,
-    EntityManagerInterface $entityManager
+    EntityManagerInterface $entityManager,
+    SessionInterface $session,
+    QrCodeService $qrCodeService
 ): Response {
     $email = $request->request->get('email');
     $paymentMethodId = $request->request->get('payment_method_id');
@@ -229,6 +280,18 @@ public function processPayment(
         $post->setNombreDePlaces($post->getNombreDePlaces() - $places);
         $entityManager->flush();
 
+        $data = <<<EOT
+Reservation confirmée
+Email : $email
+Départ : {$post->getVilleDepart()}
+Arrivée : {$post->getVilleArrivee()}
+Nombre de places : $places
+Montant payé : $amount TND
+EOT;
+
+        $qrPath = $qrCodeService->generateQrCode($data);
+        $session->set('qr_path', $qrPath);
+
         // Send confirmation email
         $emailSent = $emailService->sendPaymentConfirmation(
             $email,
@@ -245,10 +308,8 @@ public function processPayment(
         }
 
         // Render the page again with a success message
-        return $this->render('covoiturage/reserver.html.twig', [
-            'post' => $post,
-            'stripe_public_key' => $this->getParameter('stripe_public_key'),
-        ]);
+        return $this->redirectToRoute('covoiturage_show_qr', ['id_post' => $post->getIdPost()]);
+        ;
         
     } catch (\Exception $e) {
         $this->addFlash('error', 'Payment error: ' . $e->getMessage());
@@ -258,11 +319,30 @@ public function processPayment(
         ]);
     }
 }
+#[Route('/covoiturage/{id_post}/qr', name: 'covoiturage_show_qr')]
+public function showQr(int $id_post, SessionInterface $session, EntityManagerInterface $entityManager): Response
+{
+    $qrPath = $session->get('qr_path');
+
+    if (!$qrPath) {
+        $this->addFlash('error', 'Aucun QR Code trouvé.');
+        return $this->redirectToRoute('app_homepage');
+    }
+
+    $post = $entityManager->getRepository(Posts::class)->find($id_post);
+
+    return $this->render('covoiturage/qr.html.twig', [
+        'qrPath' => $qrPath,
+        'post' => $post,
+    ]);
+}
+
 
     
     #[Route('/payment/success', name: 'app_payment_success')]
     public function paymentSuccess(): Response
     {
+
         return $this->render('payment/reserver.html.twig');
     }
 

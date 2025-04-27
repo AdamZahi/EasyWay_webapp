@@ -55,40 +55,45 @@
         <!-- Sidebar and Main Content Layout -->
         <div class="d-flex">
             <!-- Sidebar -->
-            <div class="col-md-3" style="width: 250px; background-color: transparent; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); padding: 20px;">
-                <h3 style="text-align: center; padding-top: 20px; font-size: 20px; font-weight: bold; color: #A11010;">Service de covoiturage</h3>
-
-                <div class="p-3">
+          <div class="d-flex" style="min-height: 100vh;">
+            <!-- Sidebar - Enhanced -->
+            <div class="sidebar" style="width: 280px; background-color: #f8f9fa; border-radius: 0 15px 15px 0; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); padding: 25px; position: sticky; top: 0; height: 100vh;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h3 style="font-size: 22px; font-weight: 600; color: #A11010; border-bottom: 2px solid #A11010; padding-bottom: 10px; display: inline-block;">Service de covoiturage</h3>
+                </div>
+    
+                <div class="sidebar-menu" style="display: flex; flex-direction: column; gap: 15px;">
                     <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
-                        <div class="d-flex align-items-center">
-                            <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
-                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
+                        <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
+                            <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
+                            <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Profile</span>
                         </div>
                     </a>
                 
                     <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
-                        <div class="d-flex align-items-center mt-3">
-                            <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
-                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
+                        <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
+                            <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
+                            <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;background-color: rgba(161, 16, 16, 0.1);">Posts</span>
                         </div>
                     </a>
                 
                     <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
-                        <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
-                            <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
-                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
+                        <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
+                            <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
+                            <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Offres</span>
                         </div>
                     </a>
-
+    
                     <a href="{{ path('app_covoiturage_mes_offres') }}" style="text-decoration: none;">
-                        <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
-                            <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
-                            <label style="font-size: 16px; color: #333; margin-left: 10px;">Mes offres</label>
+                        <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
+                            <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
+                            <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500; ">Mes offres</span>
                         </div>
                     </a>
                 </div>
-            </div>  
-    <div class="container" style="max-width: 800px; margin: 0 auto;">
+            </div>
+        </div>
+    <div class="container" style="max-width: 1000px; margin: 0 auto; background-color: rgba(161, 16, 16, 0.1); padding: 20px; border-radius: 8px;">
         <h1 class="text-center mb-4" style="color: #A11010; font-weight: bold;">
             Besoin d'un passager ? Publiez ici !
         </h1>

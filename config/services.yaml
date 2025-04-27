@@ -1,16 +1,14 @@
-# config/services.yaml
 parameters:
-    # Add your parameters here
-  
     stripe_webhook_secret: '%env(STRIPE_WEBHOOK_SECRET)%'
+    infobip.api_url: '%env(INFOBIP_API_URL)%'
+    infobip.api_key: '%env(INFOBIP_API_KEY)%'
+    infobip.sms_sender: '%env(INFOBIP_SMS_SENDER)%'
 
 services:
-    # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true
+        autoconfigure: true
 
-    # makes classes in src/ available to be used as services
     App\:
         resource: '../src/'
         exclude:
@@ -25,6 +23,12 @@ services:
 
     # Email service configuration
     App\Service\EmailService:
-       
         arguments:
             $senderEmail: '%env(MAILER_FROM)%'
+
+    # Sms service configuration (Make sure the indentation is correct)
+    App\Service\SmsService:
+        arguments:
+            $apiUrl: '%env(INFOBIP_API_URL)%'
+            $apiKey: '%env(INFOBIP_API_KEY)%'
+            $sender: '%env(INFOBIP_SMS_SENDER)%'

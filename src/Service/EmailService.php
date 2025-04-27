@@ -1,5 +1,4 @@
 <?php
-// src/Service/EmailService.php
 namespace App\Service;
 
 use Symfony\Component\Mailer\MailerInterface;
@@ -31,7 +30,7 @@ class EmailService
     ): bool {
         try {
             $email = (new Email())
-                ->from($this->senderEmail)
+                ->from($this->senderEmail)  // Use the sender email provided in constructor
                 ->to($recipientEmail)
                 ->subject('Confirmation de paiement')
                 ->html("
@@ -42,7 +41,9 @@ class EmailService
                     <p>Ville d'arrivée : {$arrival}</p>
                 ");
 
-            $this->mailer->send($email);
+    
+            $this->mailer->send($email, envelope: null);
+
             $this->logger->info('Email sent successfully.');
             return true;
 
