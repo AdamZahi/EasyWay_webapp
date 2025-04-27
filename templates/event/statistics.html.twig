@@ -1,22 +1,85 @@
-{% extends 'back-office/pages/back-office.html.twig' %}
+{% extends 'back-office/reclamation/backbase.html.twig' %}
 
-{% block body %}
-    <h1>Statistiques des Événements</h1>
-    <p>Total événements : {{ totalEvents }}</p>
+{% block title %}Statistiques des Réclamations{% endblock %}
 
-    <canvas id="statusChart"></canvas>
-    <canvas id="typeChart"></canvas>
-    <canvas id="evolutionChart"></canvas>
-{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Statistiques des Événements</h1>
 
-{% block javascripts %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 shadow-sm">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Total Événements</h4>
+                    <p class="display-4 fw-bold">{{ totalEvents }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3 shadow-sm">
+                <div class="card-body text-center">
+                    <h4 class="card-title">En cours</h4>
+                    <p class="display-4 fw-bold">{{ statusCount['En cours']|default(0) }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow-sm">
+                <div class="card-body text-center">
+                    <h4 class="card-title">Résolu</h4>
+                    <p class="display-4 fw-bold">{{ statusCount['Résolu']|default(0) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-3">
+            <h4 class="text-center">Répartition des Événements par Statut</h4>
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm p-3">
+            <h4 class="text-center">Temps de la Journée le Plus Fréquent</h4>
+            <canvas id="timeOfDayChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm p-3">
+            <h4 class="text-center">Répartition par Type</h4>
+            <canvas id="typeChart"></canvas>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm p-3">
+            <h4 class="text-center">Les lignes les Plus Affectées</h4>
+            <canvas id="ligneChart"></canvas>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card shadow-sm p-3">
+            <h4 class="text-center">Évolution des Événements</h4>
+            <canvas id="evolutionChart"></canvas>
+        </div>
+    </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script>
     const statusCount = {{ statusCount|json_encode|raw }};
     const typeCount = {{ typeCount|json_encode|raw }};
     const evolutionEvents = {{ evolutionEvents|json_encode|raw }};
 
-    // Chart 1: Statut
     const statusChart = new Chart(document.getElementById('statusChart'), {
         type: 'pie',
         data: {
@@ -26,16 +89,9 @@
                 backgroundColor: ['#FF5733', '#FFC107', '#28A745'],
                 hoverOffset: 4
             }]
-        },
-        options: {
-            plugins: {
-                legend: { position: 'bottom' },
-                title: { display: true, text: 'Répartition des Événements par Statut' }
-            }
         }
     });
 
-    // Chart 2: Type
     const typeChart = new Chart(document.getElementById('typeChart'), {
         type: 'bar',
         data: {
@@ -45,16 +101,9 @@
                 data: Object.values(typeCount),
                 backgroundColor: '#007BFF'
             }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
         }
     });
 
-    // Chart 3: Evolution
     const evolutionChart = new Chart(document.getElementById('evolutionChart'), {
         type: 'line',
         data: {
@@ -65,18 +114,52 @@
                 borderColor: '#28A745',
                 fill: false
             }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true },
-                x: {
-                    title: { display: true, text: 'Jour' }
-                }
-            }
         }
     });
-</script>
 
+    const ligneLabels = {{ ligneAffecteeCount|keys|json_encode|raw }};
+    const ligneData = {{ ligneAffecteeCount|json_encode|raw }};
+
+const ligneChart = new Chart(document.getElementById('ligneChart'), {
+    type: 'bar',
+    data: {
+        labels: ligneLabels,
+        datasets: [{
+            label: 'Nombre d\'événements',
+            data: ligneData,
+            backgroundColor: '#6f42c1'
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+
+const timeLabels = {{ timeOfDayLabels|json_encode|raw }};
+const timeData = {{ timeOfDayData|json_encode|raw }};
+
+const timeOfDayChart = new Chart(document.getElementById('timeOfDayChart'), {
+    type: 'pie',
+    data: {
+        labels: timeLabels,
+        datasets: [{
+            label: 'Événements par moment de la journée',
+            data: timeData,
+            backgroundColor: ['#FFB347', '#87CEFA', '#9370DB', '#708090']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' }
+        }
+    }
+});
+
+
+</script>
 
 {% endblock %}
