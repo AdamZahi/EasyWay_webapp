@@ -16,28 +16,35 @@ class ReservationRepository extends ServiceEntityRepository
         parent::__construct($registry, Reservation::class);
     }
 
-    //    /**
-    //     * @return Reservation[] Returns an array of Reservation objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('r.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Find the ID of a Ligne based on depart and arret.
+     *
+     * @param string $depart
+     * @param string $arret
+     * @return int|null
+     */
+    public function findLigneIdByDepartAndArret(string $depart, string $arret): ?int
+    {
+        $qb = $this->createQueryBuilder('r')
+            ->select('r.id')
+            ->where('r.depart = :depart')
+            ->andWhere('r.arret = :arret')
+            ->setParameter('depart', $depart)
+            ->setParameter('arret', $arret)
+            ->setMaxResults(1);
 
-    //    public function findOneBySomeField($value): ?Reservation
-    //    {
-    //        return $this->createQueryBuilder('r')
-    //            ->andWhere('r.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        return $qb->getQuery()->getOneOrNullResult()['id'] ?? null;
+    }
+
+    public function findReservationsByDepartAndArret(string $depart, string $arret): array
+{
+    return $this->createQueryBuilder('r')
+        ->where('r.depart = :depart')
+        ->andWhere('r.arret = :arret')
+        ->setParameter('depart', $depart)
+        ->setParameter('arret', $arret)
+        ->getQuery()
+        ->getResult();
+}
+
 }

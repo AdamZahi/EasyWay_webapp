@@ -45,7 +45,7 @@
     </div>
     <!-- Spinner End -->
 
-
+{% block navbar %}
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
         <a href="index.html" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
@@ -62,10 +62,11 @@
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
                     <div class="dropdown-menu fade-up m-0">
-                        <a href="price.html" class="dropdown-item">Co-voiturage</a>
-                        <a href="feature.html" class="dropdown-item">Transport public</a>
-                        <a href="quote.html" class="dropdown-item">Véhicules</a>
-                        <a href="team.html" class="dropdown-item">Réclamation</a>
+                        <a href="{{path('app_covoiturage')}}" class="dropdown-item">Co-voiturage</a>
+                        <a href="" class="dropdown-item">Transport public</a>
+                        <a href="" class="dropdown-item">Véhicules</a>
+                        <a href="{{path('app_reclamation')}}" class="dropdown-item">Réclamation</a>
+                        <a href="{{path('app_event_front')}}" class="dropdown-item">Evenements</a>
                     </div>
                 </div>
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
@@ -74,7 +75,7 @@
         </div>
     </nav>
     <!-- Navbar End -->
-
+{% endblock %}
 
     <!-- Carousel Start -->
     <div class="container-fluid p-0 pb-5">
