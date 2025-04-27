@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Reclamation;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use DateTimeImmutable;
 
 
 #[ORM\Entity]
@@ -30,7 +31,10 @@ class Reponse
     #[ORM\JoinColumn(name: "reclamation_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private ?Reclamation $reclamation = null;
     
-
+    public function __construct()
+    {
+        $this->createdAt = new DateTimeImmutable();
+    }
 
     public function getId()
     {

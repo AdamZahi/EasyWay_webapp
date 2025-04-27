@@ -78,6 +78,8 @@ class Reclamation
 
     public function __construct()
     {
+        $this->dateCreation = new \DateTimeImmutable();
+
         $this->reponses = new ArrayCollection();
     }
 
