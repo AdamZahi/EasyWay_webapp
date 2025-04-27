@@ -585,66 +585,73 @@
 
 <main>
     <div class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="form-container">
-                    <h1 class="form-title text-center">Create New Event</h1>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="form-container">
+                <h1 class="form-title text-center">Create New Event</h1>
 
-                    {% for message in app.flashes('success') %}
-                        <div class="alert alert-success">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">
+                        {{ message }}
+                    </div>
+                {% endfor %}
 
-                    {% for message in app.flashes('error') %}
-                        <div class="alert alert-danger">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger">
+                        {{ message }}
+                    </div>
+                {% endfor %}
 
-                    {{ form_start(form, {'attr': {'id': 'eventForm', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
-                        <div class="form-group">
-                            {{ form_label(form.type, 'Event Type', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.type) }}
-                        </div>
+                {{ form_start(form, {'attr': {'id': 'eventForm', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                    <div class="form-group">
+                        {{ form_label(form.type, 'Event Type', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.type) }}
+                    </div>
 
-                        <div class="form-group">
-                            {{ form_label(form.status, 'Event Status', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.status) }}
-                        </div>
+                    <div class="form-group">
+                        {{ form_label(form.status, 'Event Status', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.status, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.status) }}
+                    </div>
 
-                        <div class="form-group">
-                            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': '4'}}) }}
-                            {{ form_errors(form.description) }}
-                        </div>
+                    <div class="form-group">
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': '4'}}) }}
+                        {{ form_errors(form.description) }}
+                    </div>
 
-                        <div class="form-group">
-                            {{ form_label(form.dateDebut, 'Start Date', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.dateDebut) }}
-                        </div>
+                    <div class="form-group">
+                        {{ form_label(form.dateDebut, 'Start Date', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.dateDebut) }}
+                    </div>
 
-                        <div class="form-group">
-                            {{ form_label(form.dateFin, 'End Date', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
-                            {{ form_errors(form.dateFin) }}
-                        </div>
+                    <div class="form-group">
+                        {{ form_label(form.dateFin, 'End Date', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.dateFin) }}
+                    </div>
 
-                        <div class="btn-group d-flex justify-content-between">
-                            <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
-                                <i class="fas fa-arrow-left"></i> Back to list
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Create Event
-                            </button>
-                        </div>
-                    {{ form_end(form) }}
-                </div>
+                    <div class="form-group">
+                        {{ form_label(form.ligneAffectee, 'Affected Line', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.ligneAffectee, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.ligneAffectee) }}
+                    </div>
+
+                    <div class="btn-group d-flex justify-content-between mt-3">
+                        <a href="{{ path('app_event_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to list
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Create Event
+                        </button>
+                    </div>
+                {{ form_end(form) }}
             </div>
         </div>
     </div>
+</div>
+
 </main>
 {% endblock %} 
