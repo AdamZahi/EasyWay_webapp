@@ -6,23 +6,28 @@ use App\Entity\Event;
 use App\Entity\EventComment;
 use App\Entity\User;
 use App\Form\EventType;
-use App\Form\EventFilterType;
 use App\Form\EventCommentType;
 use App\Repository\EventCommentRepository;
-use Twilio\Rest\Client;
-
+use Symfony\Component\Mime\Email;
 use App\Repository\EventRepository;
 use App\Repository\ReservationRepository;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
+use App\Service\MailerService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/event')]
 class EventController extends AbstractController
 {
+    private $mailer;
+
+    public function __construct(MailerInterface $mailer)
+    {
+        $this->mailer = $mailer;
+    }
     #[Route('/', name: 'app_event_index', methods: ['GET'])]
     public function index(Request $request, EventRepository $eventRepository): Response
     {
@@ -58,8 +63,8 @@ class EventController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         ReservationRepository $reservationRepository,
-        UserRepository $userRepository,
-        Client $twilio
+        MailerService $mailerService
+        // ,Client $twilio
     ): Response {
         $currentUser = $this->getUser(); 
         $event = new Event();
@@ -77,23 +82,29 @@ class EventController extends AbstractController
             $arret = $event->getLigneAffectee()->getArret();
     
             $reservations = $reservationRepository->findReservationsByDepartAndArret($depart, $arret);
-            $notifiedPhones = [];
+            $notified_users = [];
     
             foreach ($reservations as $reservation) {
                 $user = $reservation->getUser();
-                $phone =$user->getTelephonne(); 
+                $user_email =$user->getEmail(); 
     
-                if ($phone && !in_array($phone, $notifiedPhones)) {
-                    $notifiedPhones[] = $phone;
-                    
-                    $twilio->messages->create(
-                        $phone,
-                        [
-                            'from' => $_ENV['TWILIO_FROM'],
-                            'body' => "🚨 Un nouvel événement a été ajouté sur votre ligne $depart → $arret.\n
-                            Merci de consulter votre compte pour plus de détails."
-                        ]
-                    );
+                if ($user_email && !in_array($user_email, $notified_users)) {
+                    $notified_users[] = $user_email;
+                    $user_name = $user->getPrenom(). " ".$user->getNom(); 
+
+                    $email = (new Email())
+                    ->from('mejrieya384@gmail.com')
+                    ->to($user_email)
+                    ->subject('Nouvel événement sur votre ligne')
+                    ->html("Cher(e) $user_name,<br><br>
+                    Un nouvel événement a été ajouté sur votre ligne $depart → $arret.<br>
+                    Date de début : " . $event->getDateDebut()->format('d/m/Y H:i') . "<br>
+                    Date de fin prevue: " . $event->getDateFin()->format('d/m/Y H:i') . "<br>
+                    Merci de consulter votre compte pour plus de détails.<br><br>
+                    Cordialement,<br>
+                    L'équipe de Easy Way");
+        
+                    $this->mailer->send($email);
                     
                 }
             }
@@ -190,11 +201,25 @@ class EventController extends AbstractController
     $statusCount = [];
     $typeCount = [];
     $evolutionEvents = [];
+    $ligneAffecteeCount = [];
+    $timeOfDayCount = [ 'le matin' => 0, "L'après-midi" => 0, 'Le soir' => 0, "L'aube" => 0 ];
 
     foreach ($events as $event) {
+        $hour = (int) $event->getDateDebut()->format('H');
+
+        if ($hour >= 6 && $hour < 12) {
+            $timeOfDayCount['le matin']++;
+        } elseif ($hour >= 12 && $hour < 18) {
+            $timeOfDayCount["L'après-midi"]++;
+        } elseif ($hour >= 18 && $hour < 24) {
+            $timeOfDayCount['Le soir']++;
+        } else {
+            $timeOfDayCount["L'aube"]++;
+        }
         $status = $event->getStatus();
         $type = $event->getType();
         $date = $event->getDateDebut()->format('Y-m-d');
+        $ligne = $event->getLigneAffectee() ? $event->getLigneAffectee()->getDepart() . ' - ' . $event->getLigneAffectee()->getArret() : 'Inconnue';
         if (!isset($statusCount[$status])) {
             $statusCount[$status] = 0;
         }
@@ -207,6 +232,11 @@ class EventController extends AbstractController
             $evolutionEvents[$date] = 0;
         }
         $evolutionEvents[$date]++;
+
+        if (!isset($ligneAffecteeCount[$ligne])) {
+            $ligneAffecteeCount[$ligne] = 0;
+        }
+        $ligneAffecteeCount[$ligne]++;
     }
 
     ksort($evolutionEvents);
@@ -215,7 +245,10 @@ class EventController extends AbstractController
         'totalEvents' => $totalEvents,
         'statusCount' => $statusCount,
         'typeCount' => $typeCount,
-        'evolutionEvents' => $evolutionEvents
+        'ligneAffecteeCount' => $ligneAffecteeCount,
+        'evolutionEvents' => $evolutionEvents,
+        'timeOfDayLabels' => array_keys($timeOfDayCount),
+        'timeOfDayData' => array_values($timeOfDayCount),
     ]);
 }
 
