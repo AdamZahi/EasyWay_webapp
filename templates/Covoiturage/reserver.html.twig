@@ -3,12 +3,51 @@
 {% block title %}Confirmer Réservation{% endblock %}
 
 {% block body %}
+<!-- Navbar Start -->
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
+    <a href="{{ path('passager_dashboard') }}" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" style="width: 60px; height: 60px; border-radius: 50%; margin-right: 10px;">
+        <h2 class="mb-2 text-white">EasyWay</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a href="{{ path('passager_dashboard') }}" class="nav-item nav-link">Accueil</a>
+            <a href="#" class="nav-item nav-link">Co-voiturage</a>
+            <a href="#" class="nav-item nav-link">Réclamation</a>
+            <a href="#" class="nav-item nav-link">Véhicules</a>
+            <a href="#" class="nav-item nav-link">Événements</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">
+                    <i class="fa fa-user me-2"></i>Profil
+                </a>
+                <ul class="dropdown-menu fade-up m-0">
+                    <li><a href="{{ path('profile_edit') }}" class="dropdown-item">Modifier mon profil</a></li>
+                    <li><a href="{{ path('app_logout') }}" class="dropdown-item">Se déconnecter</a></li>
+                </ul>
+            </div>
+            <a href="#" class="nav-item nav-link">Contact</a>
+        </div>
+    </div>
+</nav>
+<!-- Navbar End -->
 <div class="container mt-5">
     <div class="card" style="background-color: white; border-radius: 13px; max-width: 937px; margin: 0 auto;">
         <div class="card-header bg-danger text-white">
             <h2>Vérifiez votre identité</h2>
         </div>
         <div class="card-body">
+          {% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label == 'error' ? 'danger' : (label == 'warning' ? 'warning' : 'success') }} mt-3">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endfor %}
+
+            
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center mb-4">
@@ -20,16 +59,12 @@
                         </div>
                     </div>
 
-                    <form method="post">
+                    <form method="post" action="{{ path('app_process_payment', { 'id_post': post.idPost }) }}">
                         <div class="form-group">
                             <label for="email" style="font-weight: bold;">Email</label>
                             <input type="email" class="form-control" id="email" name="email" required>
                         </div>
 
-                        <div class="form-group mt-3">
-                            <label for="card_id" style="font-weight: bold;">Numéro de carte</label>
-                            <input type="text" class="form-control" id="card_id" name="card_id" required>
-                        </div>
 
                         <div class="form-group mt-3">
                             <label for="places" style="font-weight: bold;">Nombre de places</label>
@@ -40,10 +75,13 @@
                         <div class="form-group mt-3">
                             <label for="montant" style="font-weight: bold;">Montant</label>
                             <input type="text" class="form-control" id="montant" name="montant" 
-                                   value="{{ post.prix }} €" readonly>
+                                   value="{{ post.prix }} DT" readonly>
                         </div>
 
                         <input type="hidden" name="_token" value="{{ csrf_token('reserve' ~ post.getIdPost() ) }}">
+                        
+                        <div id="card-element" class="form-control mb-3"></div>
+                        <div id="card-errors" role="alert" class="text-danger mb-3"></div>
                         
                         <button type="submit" class="btn btn-danger mt-3" style="background-color: #AA1010;">
                             Valider
@@ -63,9 +101,46 @@
             <div class="mt-4">
                 <a href="{{ path('app_covoiturage_rechercher') }}" class="text-primary mr-3">Retour</a>
                 <a href="#" class="text-primary mr-3">Consulter reservations</a>
-                <a href="#" class="text-primary">facebook</a>
+                <a href="#" class="text-primary">Facebook</a>
             </div>
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stripe = Stripe('{{ stripe_public_key }}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+    
+    const form = document.querySelector('form');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        const {error, paymentMethod} = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+        });
+        
+        if (error) {
+            document.getElementById('card-errors').textContent = error.message;
+        } else {
+            // Show loading state
+            const submitButton = form.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processing...';
+            
+            // Add payment method ID to form and submit
+            const hiddenInput = document.createElement('input');
+            hiddenInput.setAttribute('type', 'hidden');
+            hiddenInput.setAttribute('name', 'payment_method_id');
+            hiddenInput.setAttribute('value', paymentMethod.id);
+            form.appendChild(hiddenInput);
+            
+            // Submit form
+            form.submit();
+        }
+    });
+});
+</script>
 {% endblock %}

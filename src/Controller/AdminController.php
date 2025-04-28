@@ -18,7 +18,7 @@ class AdminController extends AbstractController
     {
         $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
-        return $this->render('back-office/index.html.twig', [
+        return $this->render('back-office/admin/home.html.twig', [
             'controller_name' => 'AdminController',
         ]);
     }

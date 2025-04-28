@@ -1,8 +1,10 @@
-{% extends 'front-office/front.html.twig' %}
-
+{% extends 'front-office/index.html.twig' %}
 {% block title %}Event Feedback{% endblock %}
 
 {% block body %}
+{% block navbar %}
+    {{ parent() }}
+{% endblock %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -20,14 +22,6 @@
                     <p><strong>Ligne affectée:</strong> {{ event.ligneAffectee ? event.ligneAffectee.depart ~ ' - ' ~ event.ligneAffectee.arret : 'N/A' }}</p>
 
                     <hr>
-
-                    <!-- Flash Messages -->
-                    {% for message in app.flashes('success') %}
-                        <div class="alert alert-success">{{ message }}</div>
-                    {% endfor %}
-                    {% for message in app.flashes('error') %}
-                        <div class="alert alert-danger">{{ message }}</div>
-                    {% endfor %}
 
                     <!-- Comment Form -->
                     {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}

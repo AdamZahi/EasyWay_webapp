@@ -10,13 +10,13 @@ class Payment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\Column(name: "payment_id", type: 'integer')] // Spécifiez le nom de colonne
     private ?int $paymentId = null;
 
-    #[ORM\Column]
-    private ?int $transactionId = null;
+    #[ORM\Column(length: 255)]
+    private ?string $transactionId = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'float')]
     private ?float $amount = null;
 
     #[ORM\Column(length: 255)]
@@ -27,19 +27,24 @@ class Payment
         return $this->paymentId;
     }
 
+    // Gardez setPaymentId() si nécessaire pour votre logique métier
     public function setPaymentId(int $paymentId): self
     {
         $this->paymentId = $paymentId;
-
         return $this;
     }
 
-    public function getTransactionId(): ?int
+
+    // Removed setPaymentId() as ID should be auto-generated
+
+    // Changed return type and parameter type to string
+    public function getTransactionId(): ?string
     {
         return $this->transactionId;
     }
 
-    public function setTransactionId(int $transactionId): static
+    // Changed parameter type to string
+    public function setTransactionId(string $transactionId): static
     {
         $this->transactionId = $transactionId;
 
