@@ -117,6 +117,38 @@
         {{ form_end(form) }}
     </div>
 </div>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Vos récente réclamations</h2>
+    {% for reclamation in reclamations %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <p><strong>Sujet :</strong> {{ reclamation.sujet }}</p>
+                <p><strong>Description :</strong> {{ reclamation.description }}</p>
+                <p><strong>Catégorie :</strong> {{ reclamation.categoryId.type }}</p>
+                <p><strong>Date de création :</strong> {{ reclamation.dateCreation|date('d/m/Y') }}</p>
+                
+                <hr>
+
+                <h6 class="mt-3 text-secondary">Réponses :</h6>
+                {% if reclamation.reponses is not empty %}
+                    <div class="list-group">
+                        {% for reponse in reclamation.reponses %}
+                            <div class="list-group-item">
+                                <p><strong>Contenu de la réponse :</strong> {{ reponse.contenu }}</p>
+                                <p><strong>Date de création :</strong> {{ reponse.createdAt|date('d/m/Y') }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Aucune réponse pour cette réclamation.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+
 {% endblock %}
 
 {% block javascripts %}
