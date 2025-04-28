@@ -35,7 +35,7 @@ class EmailService
                 ->subject('Confirmation de paiement')
                 ->html("
                     <h2>Confirmation de paiement</h2>
-                    <p>Votre paiement de {$amount} € a été reçu avec succès.</p>
+                    <p>Votre paiement de {$amount} DT a été reçu avec succès.</p>
                     <p>Nombre de places réservées : {$places}</p>
                     <p>Ville de départ : {$departure}</p>
                     <p>Ville d'arrivée : {$arrival}</p>

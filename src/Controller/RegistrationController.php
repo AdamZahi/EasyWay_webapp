@@ -54,7 +54,7 @@ class RegistrationController extends AbstractController
             $user->setTelephonne($form->get('telephonne')->getData());
             $user->setPhotoProfil('default_profile.png');
 
-            // encode the plain password
+            // Encode the plain password
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
@@ -66,20 +66,16 @@ class RegistrationController extends AbstractController
             $role = $form->get('role')->getData();
             $user->setRoles([$role->value]);
 
-            // If the user is a passenger, create a Passager entity
+            // Create specific entities for each role
             if ($role === RoleEnum::PASSAGER) {
                 $passager = new Passager();
                 $passager->setUser($user);
                 $entityManager->persist($passager);
-            }
-            // If the user is a driver, create a Conducteur entity
-            elseif ($role === RoleEnum::CONDUCTEUR) {
+            } elseif ($role === RoleEnum::CONDUCTEUR) {
                 $conducteur = new Conducteur();
                 $conducteur->setUser($user);
                 $entityManager->persist($conducteur);
-            }
-            // If the user is an admin, create an Admin entity
-            elseif ($role === RoleEnum::ADMIN) {
+            } elseif ($role === RoleEnum::ADMIN) {
                 $admin = new Admin();
                 $admin->setUser($user);
                 $admin->setNom($user->getNom());
@@ -90,8 +86,18 @@ class RegistrationController extends AbstractController
                 $entityManager->persist($admin);
             }
 
+            // Persist user and flush changes to database
             $entityManager->persist($user);
             $entityManager->flush();
+
+            // Redirect based on the user's role
+            if ($role === RoleEnum::PASSAGER) {
+                return $this->redirectToRoute('passager_dashboard');
+            } elseif ($role === RoleEnum::CONDUCTEUR) {
+                return $this->redirectToRoute('conducteur_dashboard');
+            } elseif ($role === RoleEnum::ADMIN) {
+                return $this->redirectToRoute('app_admin');
+            }
 
             return $userAuthenticator->authenticateUser(
                 $user,
@@ -104,6 +110,7 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form->createView(),
         ]);
     }
+    
 
     #[Route('/verify/email', name: 'app_verify_email')]
     public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
