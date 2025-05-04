@@ -6,18 +6,6 @@
     {{ parent() }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
-        #password-complexity-feedback div {
-            margin-bottom: 3px;
-        }
-        #password-complexity-feedback i {
-            margin-right: 5px;
-        }
-        .text-success i {
-            color: #28a745;
-        }
-        .text-danger i {
-            color: #dc3545;
-        }
         .input-group-text {
             cursor: pointer;
         }
@@ -38,6 +26,9 @@
         </div>
         <div class="row">
             <div class="col-md-6">
+                <img src="{{ asset('img/map.jpg') }}" alt="Carte" class="img-fluid rounded shadow" />
+            </div>
+            <div class="col-md-6">
                 <h2 class="mb-1" style="font-family: 'Arial Rounded MT Bold';">Créer un compte</h2>
                 <p style="font-size: 12px;">Déjà inscrit ? <a href="{{ path('app_login') }}">Connectez-vous</a></p>
 
@@ -45,8 +36,13 @@
                     <div class="alert alert-danger">{{ flashError }}</div>
                 {% endfor %}
 
-                {{ form_start(registrationForm, {'attr': {'enctype': 'multipart/form-data'}}) }}
-                
+                {{ form_start(registrationForm, {
+                    'attr': {
+                        'enctype': 'multipart/form-data',
+                        'novalidate': 'novalidate'
+                    }
+                }) }}
+
                 {% if registrationForm.vars.errors|length > 0 %}
                     <div class="alert alert-danger">{{ form_errors(registrationForm) }}</div>
                 {% endif %}
@@ -73,38 +69,34 @@
                     {{ form_label(registrationForm.plainPassword) }}
                     <div class="input-group">
                         {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}}) }}
-                        <span class="input-group-text" onclick="togglePasswordVisibility('registration_form_plainPassword', 'eye-icon-password')">
-                            <i class="bi bi-eye-slash" id="eye-icon-password"></i>
+                        <span class="input-group-text">
+                            <i class="bi bi-eye-slash"></i>
                         </span>
                     </div>
                     {{ form_errors(registrationForm.plainPassword) }}
-                    <div id="password-complexity-feedback" class="mt-2 small"></div>
                 </div>
 
                 <div class="form-group mt-2">
                     {{ form_label(registrationForm.confirmPassword) }}
                     <div class="input-group">
                         {{ form_widget(registrationForm.confirmPassword, {'attr': {'class': 'form-control', 'placeholder': 'Confirmer le mot de passe'}}) }}
-                        <span class="input-group-text" onclick="togglePasswordVisibility('registration_form_confirmPassword', 'eye-icon-confirmPassword')">
-                            <i class="bi bi-eye-slash" id="eye-icon-confirmPassword"></i>
+                        <span class="input-group-text">
+                            <i class="bi bi-eye-slash"></i>
                         </span>
                     </div>
                     {{ form_errors(registrationForm.confirmPassword) }}
-                    <div id="password-match-feedback"></div>
                 </div>
 
                 <div class="form-group mt-2">
                     {{ form_label(registrationForm.telephonne) }}
                     {{ form_widget(registrationForm.telephonne, {'attr': {'class': 'form-control', 'placeholder': 'XX XXX XXX'}}) }}
                     {{ form_errors(registrationForm.telephonne) }}
-                    <small class="text-muted">Le numéro de téléphone doit contenir au moins 8 chiffres.</small>
                 </div>
 
                 <div class="form-group mt-2">
                     {{ form_label(registrationForm.photo_profil) }}
                     {{ form_widget(registrationForm.photo_profil, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(registrationForm.photo_profil) }}
-                    <small class="text-muted">Formats acceptés: JPEG, PNG, GIF (max 1Mo).</small>
                 </div>
 
                 <div class="form-group mt-2">
@@ -113,89 +105,24 @@
                     {{ form_errors(registrationForm.role) }}
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-block mt-3" id="submit-btn" disabled>Créer un compte</button>
-                
+                <button type="submit" class="btn btn-primary btn-block mt-3">Créer un compte</button>
+
                 {{ form_end(registrationForm) }}
             </div>
         </div>
     </div>
 </div>
+    <script>
+        document.querySelectorAll('.input-group').forEach(group => {
+            const input = group.querySelector('input');
+            const icon = group.querySelector('.bi');
 
- <script>
-        // Correct the function definition and make sure it is defined before it's called
-function togglePasswordVisibility(fieldId) {
-    const field = document.getElementById(fieldId);
-    const eyeIcon = field.parentNode.querySelector('i');
-    if (field.type === "password") {
-        field.type = "text"; // Show the password
-        eyeIcon.classList.replace("bi-eye-slash", "bi-eye");
-    } else {
-        field.type = "password"; // Hide the password
-        eyeIcon.classList.replace("bi-eye", "bi-eye-slash");
-    }
-}
-
-
-        // Attente que le DOM soit chargé pour activer les événements
-        document.addEventListener('DOMContentLoaded', function() {
-            const passwordField = document.getElementById('registration_form_plainPassword');
-            const confirmPasswordField = document.getElementById('registration_form_confirmPassword');
-            const submitButton = document.querySelector('button[type="submit"]');
-            const feedbackElement = document.getElementById('password-match-feedback');
-            const complexityFeedback = document.getElementById('password-complexity-feedback');
-
-            // Fonction pour vérifier la complexité du mot de passe
-            function checkPasswordComplexity() {
-                const password = passwordField.value;
-                const checks = {
-                    minLength: password.length >= 8,
-                    hasUppercase: /[A-Z]/.test(password),
-                    hasLowercase: /[a-z]/.test(password),
-                    hasDigit: /\d/.test(password),
-                    hasSpecial: /[@$!%*?&]/.test(password)
-                };
-
-                let feedbackHtml = '';
-                for (const [key, valid] of Object.entries(checks)) {
-                    const messages = {
-                        minLength: "Au moins 8 caractères",
-                        hasUppercase: "Au moins une lettre majuscule",
-                        hasLowercase: "Au moins une lettre minuscule",
-                        hasDigit: "Au moins un chiffre",
-                        hasSpecial: "Au moins un caractère spécial (@$!%*?&)"};                    
-                    feedbackHtml += `<div class="${valid ? 'text-success' : 'text-danger'}">
-                        <i class="${valid ? 'bi bi-check-circle' : 'bi bi-x-circle'}"></i> 
-                        ${messages[key]}
-                    </div>`;
-                }
-                complexityFeedback.innerHTML = feedbackHtml;
-                return Object.values(checks).every(v => v);
-            }
-
-            // Fonction pour vérifier si les mots de passe correspondent
-            function checkPasswordMatch() {
-                if (confirmPasswordField.value === '') {
-                    feedbackElement.textContent = '';
-                    feedbackElement.className = '';
-                    return false;
-                }
-                const match = passwordField.value === confirmPasswordField.value;
-                feedbackElement.textContent = match 
-                    ? 'Les mots de passe correspondent' 
-                    : 'Les mots de passe ne correspondent pas';
-                feedbackElement.className = match ? 'text-success mt-1' : 'text-danger mt-1';
-                return match;
-            }
-
-            // Fonction pour valider le formulaire
-            function validateForm() {
-                submitButton.disabled = !(checkPasswordComplexity() && checkPasswordMatch());
-            }
-
-            // Écouteurs d'événements sur les champs de mot de passe
-            passwordField.addEventListener('input', validateForm);
-            confirmPasswordField.addEventListener('input', validateForm);
-            validateForm(); // Vérification initiale
+            icon.addEventListener('click', () => {
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                icon.classList.toggle('bi-eye');
+                icon.classList.toggle('bi-eye-slash');
+            });
         });
-</script>
+    </script>
 {% endblock %}
