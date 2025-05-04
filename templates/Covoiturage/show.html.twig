@@ -1,0 +1,11 @@
+{# templates/covoiturage/show.html.twig #}
+
+<h1>Carpooling Post Details</h1>
+<!-- Display carpooling post details here -->
+<p>From: {{ post.villeDepart }}</p>
+<p>To: {{ post.villeArrivee }}</p>
+<p>Date: {{ post.date|date('Y-m-d') }}</p>
+
+<!-- Display the QR code -->
+<h2>Scan this QR code to view the details:</h2>
+<img src="{{ path('app_covoiturage_qrcode', {'id': post.id}) }}" alt="QR Code for this carpooling post">
