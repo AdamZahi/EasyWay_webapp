@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d4b16d6f904dd6213b39bee1f2d5039",
+    "content-hash": "bf87d4bd0e2994e6a19195048e583403",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -3619,6 +3619,70 @@
                 "source": "https://github.com/ralouphie/getallheaders/tree/develop"
             },
             "time": "2019-03-08T08:55:37+00:00"
+        },
+        {
+            "name": "sendinblue/api-v3-sdk",
+            "version": "v8.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sendinblue/APIv3-php-library.git",
+                "reference": "5d08398c7247a2f5d80f285d08a6dbe169f18eab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sendinblue/APIv3-php-library/zipball/5d08398c7247a2f5d80f285d08a6dbe169f18eab",
+                "reference": "5d08398c7247a2f5d80f285d08a6dbe169f18eab",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "guzzlehttp/guzzle": "^7.4.0",
+                "php": ">=5.6"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "~1.12",
+                "phpunit/phpunit": "^4.8",
+                "squizlabs/php_codesniffer": "~2.6"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "8.x.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "SendinBlue\\Client\\": "lib/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "SendinBlue Developers",
+                    "email": "contact@sendinblue.com",
+                    "homepage": "https://www.sendinblue.com/"
+                }
+            ],
+            "description": "Official SendinBlue provided RESTFul API V3 php library",
+            "homepage": "https://github.com/sendinblue/APIv3-php-library",
+            "keywords": [
+                "api",
+                "php",
+                "sdk",
+                "sendinblue",
+                "swagger"
+            ],
+            "support": {
+                "issues": "https://github.com/sendinblue/APIv3-php-library/issues",
+                "source": "https://github.com/sendinblue/APIv3-php-library/tree/v8.4.2"
+            },
+            "abandoned": "getbrevo/brevo-php",
+            "time": "2023-03-10T04:21:43+00:00"
         },
         {
             "name": "stella-maris/clock",
@@ -9636,24 +9700,35 @@
         },
         {
             "name": "victor-prdh/recaptcha-bundle",
-            "version": "1.0.0",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/victor-prdh/recaptcha-bundle.git",
-                "reference": "d4e81f3de03f0559c372b295262737e8bdc4a858"
+                "reference": "c15879f2891152022a3bc5dced1cd630eff059e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/victor-prdh/recaptcha-bundle/zipball/d4e81f3de03f0559c372b295262737e8bdc4a858",
-                "reference": "d4e81f3de03f0559c372b295262737e8bdc4a858",
+                "url": "https://api.github.com/repos/victor-prdh/recaptcha-bundle/zipball/c15879f2891152022a3bc5dced1cd630eff059e8",
+                "reference": "c15879f2891152022a3bc5dced1cd630eff059e8",
                 "shasum": ""
             },
             "require": {
-                "google/recaptcha": "^1.2",
-                "php": ">=8.0",
-                "symfony/framework-bundle": "^6.0"
+                "google/recaptcha": "^1.3",
+                "php": ">=8.1.0",
+                "symfony/form": "^6.4|^7.0",
+                "symfony/framework-bundle": "^6.4|^7.0",
+                "symfony/translation": "^6.4|^7.0",
+                "symfony/twig-bundle": "^6.4|^7.0",
+                "symfony/validator": "^6.4|^7.0",
+                "twig/extra-bundle": "^2.12|^3.0",
+                "twig/twig": "^2.12|^3.0"
             },
             "type": "symfony-bundle",
+            "extra": {
+                "symfony": {
+                    "allow-contrib": "true"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "VictorPrdh\\RecaptchaBundle\\": "src/"
@@ -9669,12 +9744,12 @@
                     "email": "contact@victor-prdh.com"
                 }
             ],
-            "description": "Use Google Recaptcha v2 as form type with Symfony 6",
+            "description": "Use Google Recaptcha v2/v3 as form type with Symfony 6.4+, see v1.X for symfony 5.4",
             "support": {
                 "issues": "https://github.com/victor-prdh/recaptcha-bundle/issues",
-                "source": "https://github.com/victor-prdh/recaptcha-bundle/tree/1.0.0"
+                "source": "https://github.com/victor-prdh/recaptcha-bundle/tree/2.0.1"
             },
-            "time": "2022-03-22T16:08:00+00:00"
+            "time": "2025-03-17T16:04:54+00:00"
         },
         {
             "name": "webmozart/assert",
