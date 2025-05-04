@@ -1,0 +1,50 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %}Répondre à une Réclamation{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Répondre à la Réclamation</h2>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <p class="card-text"><strong>Email du Client :</strong> {{ reclamation.email }}</p>
+            <p class="card-text"><strong>Sujet :</strong> {{ reclamation.sujet }}</p>
+            <p class="card-text"><strong>Description :</strong> {{ reclamation.description }}</p>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        {{ form_start(form) }}
+    <div class="form-group">
+        {{ form_label(form.contenu, 'Votre réponse', {'label_attr': {'class': 'font-weight-bold'}}) }}
+        {{ form_widget(form.contenu, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <!-- 🆕 Select manuel -->
+    <div class="form-group mt-3">
+        <label for="statut" class="font-weight-bold">Statut de la réclamation</label>
+        <select id="statut" name="statut" class="form-control">
+            <option value="en_cours">En cours</option>
+            <option value="Terminer">Terminer</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+    {{ form_label(form.createdAt, 'Date de la réponse') }}
+    {{ form_widget(form.createdAt, {
+        'attr': {
+            'class': 'form-control',
+            'readonly': true,
+            'value': form.createdAt.vars.value
+        }
+    }) }}
+</div>
+
+
+    <button type="submit" class="btn btn-success mt-3">Envoyer la réponse</button>
+{{ form_end(form) }}
+
+    </div>
+</div>
+{% endblock %}
