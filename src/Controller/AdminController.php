@@ -68,14 +68,26 @@ public function listUsers(Request $request, UserRepository $userRepository): Res
 }
 
 
-    #[Route('/admin/user/delete/{id}', name: 'user_delete')]
-    public function deleteUser(User $user, EntityManagerInterface $em): RedirectResponse
-    {
-        $em->remove($user);
+#[Route('/admin/user/{id}/block', name: 'admin_block_user', methods: ['POST'])]
+public function blockUser(Request $request, UserRepository $userRepository, EntityManagerInterface $em, int $id): Response
+{
+    $user = $userRepository->find($id);
+
+    if (!$user) {
+        $this->addFlash('danger', 'Utilisateur non trouvé.');
+        return $this->redirectToRoute('admin_users');
+    }
+
+    if ($this->isCsrfTokenValid('block' . $user->getIdUser(), $request->request->get('_token'))) {
+        $user->setRoles(['ROLE_BLOCKED']);
+        $em->persist($user);
         $em->flush();
 
-        $this->addFlash('success', 'Utilisateur supprimé avec succès.');
-
-        return $this->redirectToRoute('admin_users'); 
+        $this->addFlash('success', 'Utilisateur bloqué avec succès.');
     }
+
+    return $this->redirectToRoute('admin_users');
+}
+
+
 } 

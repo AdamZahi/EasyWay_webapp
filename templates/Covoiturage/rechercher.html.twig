@@ -181,15 +181,20 @@
                                 ({{ commentaire.getDateCreat() ? commentaire.getDateCreat()|date('Y-m-d H:i') : 'Date inconnue' }})
                             </small>
                         </div>
-                     {% if commentaire.user.getIdUser() == 1 %}
+                       {% if commentaire.user == app.user %}
+                                                    <span class="badge badge-info">Votre commentaire</span>
+                                                {% endif %}
     <div>
-        <a href="{{ path('app_commentaire_edit', {'id': commentaire.getIdCom()}) }}" 
-           class="btn btn-sm btn-primary" style="background-color: rgb(8, 94, 94); border-color: transparent;" >✏️</a>
-        <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteCommentModal{{ commentaire.getIdCom() }}">
+    {% if commentaire.user == app.user %}
+        <a href="{{ path('app_commentaire_edit', {'id': commentaire.idCom}) }}" 
+           class="btn btn-sm btn-primary" style="background-color: rgb(8, 94, 94); border-color: transparent;">✏️</a>
+        <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteCommentModal{{ commentaire.idCom }}">
             ❌
         </button>
-    </div>
-{% endif %}
+    {% endif %}
+</div>
+
+
 <!-- Delete Comment Confirmation Modal -->
 <div class="modal fade" id="deleteCommentModal{{ commentaire.getIdCom() }}" tabindex="-1" role="dialog" aria-labelledby="deleteCommentModalLabel{{ commentaire.getIdCom() }}" aria-hidden="true">
     <div class="modal-dialog" role="document">
