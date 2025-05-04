@@ -1,10 +1,13 @@
 <?php
 
 namespace App\Entity;
-use App\Entity\User;
+
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
@@ -13,37 +16,75 @@ class Reservation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(inversedBy: 'reservations')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id_user', nullable: false)]
+    private ?User $user = null;
+
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]
+    #[Assert\NotBlank(message: 'Le champ départ ne peut pas être vide.')]
+    #[Assert\Length(
+        min: 5,
+        minMessage: 'Le départ doit contenir au moins {{ limit }} caractères.'
+    )]
+    #[Assert\Regex(
+        pattern: '/^(?!unnamed road, ).*/i',
+        message: 'Le départ ne peut pas commencer par "Unnamed Road, ".'
+    )]
     private ?string $depart = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]
+    #[Assert\NotBlank(message: 'Le champ arrêt ne peut pas être vide.')]
+    #[Assert\Length(
+        min: 5,
+        minMessage: 'L\'arrêt doit contenir au moins {{ limit }} caractères.'
+    )]
+    #[Assert\Regex(
+        pattern: '/^(?!unnamed road, ).*/i',
+        message: 'L\'arrêt ne peut pas commencer par "Unnamed Road, ".'
+    )]
     private ?string $arret = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]
+    #[Assert\NotBlank(message: 'Veuillez choisir un type de véhicule.')]
     private ?string $vehicule = null;
-
+    
     #[ORM\Column]
-    #[Assert\NotBlank (message: "Ce champ est obligatoire ")]#[Assert\Range(
+    #[Assert\Range(
         min: 1,
-        max: 5,
-        notInRangeMessage: "Le nombre de places doit être entre {{ min }} et {{ max }}."
+        max: 3,
+        notInRangeMessage: 'Le nombre de places doit être entre {{ min }} et {{ max }}.'  // Using notInRangeMessage
     )]
     private ?int $nb = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "id_user", nullable: false)]
-     private ?User $user = null;
+    /**
+     * @var Collection<int, Paiement>
+     */
+    #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'res_id')]
+    private Collection $paiements;
 
+    public function __construct()
+    {
+        $this->paiements = new ArrayCollection();
+    }
 
+    
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getUserId(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUserId(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
     }
 
     public function getDepart(): ?string
@@ -94,16 +135,34 @@ class Reservation
         return $this;
     }
 
-    public function getUser(): ?User
-{
-    return $this->user;
-}
+    /**
+     * @return Collection<int, Paiement>
+     */
+    public function getPaiements(): Collection
+    {
+        return $this->paiements;
+    }
 
-public function setUser(?User $user): self
-{
-    $this->user = $user;
-    return $this;
-}
+    public function addPaiement(Paiement $paiement): static
+    {
+        if (!$this->paiements->contains($paiement)) {
+            $this->paiements->add($paiement);
+            $paiement->setResId($this);
+        }
 
+        return $this;
+    }
+
+    public function removePaiement(Paiement $paiement): static
+    {
+        if ($this->paiements->removeElement($paiement)) {
+            // set the owning side to null (unless already changed)
+            if ($paiement->getResId() === $this) {
+                $paiement->setResId(null);
+            }
+        }
+
+        return $this;
+    }
     
 }

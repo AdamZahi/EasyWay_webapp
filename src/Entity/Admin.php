@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\AdminRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -54,9 +56,33 @@ class Admin
     )]
     private ?string $photo_profil = null;
 
-    public function getIdAdmin(): ?int
+    /**
+     * @var Collection<int, Station>
+     */
+    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: Station::class)]
+    private Collection $stations;
+
+    /**
+     * @var Collection<int, Ligne>
+     */
+    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: Ligne::class)]
+    private Collection $lignes;
+
+    public function __construct()
+    {
+        $this->stations = new ArrayCollection();
+        $this->lignes = new ArrayCollection();
+    }
+
+    public function getId(): ?int
     {
         return $this->id_admin;
+    }
+
+    public function setId(int $id_admin): static
+    {
+        $this->id_admin = $id_admin;
+        return $this;
     }
 
     public function getUser(): ?User
@@ -133,6 +159,77 @@ class Admin
     public function setPhotoProfil(?string $photo_profil): static
     {
         $this->photo_profil = $photo_profil;
+        return $this;
+    }
+    
+    public function getAdmin(): ?Admin
+    {
+        return $this->admin;
+    }
+
+    public function setAdmin(?Admin $admin): static
+    {
+        $this->admin = $admin;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Station>
+     */
+    public function getStations(): Collection
+    {
+        return $this->stations;
+    }
+
+    public function addStation(Station $station): static
+    {
+        if (!$this->stations->contains($station)) {
+            $this->stations->add($station);
+            $station->setAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStation(Station $station): static
+    {
+        if ($this->stations->removeElement($station)) {
+            // set the owning side to null (unless already changed)
+            if ($station->getAdmin() === $this) {
+                $station->setAdmin(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ligne>
+     */
+    public function getLignes(): Collection
+    {
+        return $this->lignes;
+    }
+
+    public function addLigne(Ligne $ligne): static
+    {
+        if (!$this->lignes->contains($ligne)) {
+            $this->lignes->add($ligne);
+            $ligne->setAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLigne(Ligne $ligne): static
+    {
+        if ($this->lignes->removeElement($ligne)) {
+            // set the owning side to null (unless already changed)
+            if ($ligne->getAdmin() === $this) {
+                $ligne->setAdmin(null);
+            }
+        }
+
         return $this;
     }
 }

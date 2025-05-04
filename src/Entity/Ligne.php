@@ -30,9 +30,7 @@ class Ligne
     #[Assert\NotBlank(message: "Ce champ est obligatoire ")]
     private ?string $type = null;
 
-    #[ORM\Column]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire ")]
-    private ?int $admin_id = null;
+
 
     /**
      * @var Collection<int, Station>
@@ -40,10 +38,15 @@ class Ligne
     #[ORM\OneToMany(targetEntity: Station::class, mappedBy: 'id_ligne')]
     private Collection $stations;
 
+    #[ORM\ManyToOne(targetEntity: Admin::class, inversedBy: 'lignes')]
+    #[ORM\JoinColumn(name: 'admin_id', referencedColumnName: 'id_admin', nullable: false)]
+    private ?Admin $admin = null;
+
     public function __construct()
     {
         $this->stations = new ArrayCollection();
     }
+
 
     public function getId(): ?int
     {
@@ -86,27 +89,10 @@ class Ligne
         return $this;
     }
 
-    public function getAdminId(): ?int
+    
+    public function __toString(): string
     {
-        return $this->admin_id;
-    }
-
-    public function setAdminId(int $admin_id): static
-    {
-        $this->admin_id = $admin_id;
-
-        return $this;
-    }
-    public function getAdmin_Id(): ?int
-    {
-        return $this->admin_id;
-    }
-
-    public function setAdmin_Id(int $admin_id): static
-    {
-        $this->admin_id = $admin_id;
-
-        return $this;
+        return $this->nom ?? 'Ligne #'.$this->id;
     }
 
     /**
@@ -138,10 +124,17 @@ class Ligne
 
         return $this;
     }
-    public function __toString(): string
+
+    
+    public function getAdmin(): ?Admin
     {
-        // Return a string representation of the Ligne
-        // Example: Use the name if it exists, otherwise fall back to ID
-        return $this->nom ?? 'Ligne #'.$this->id;
+        return $this->admin;
+    }
+
+    public function setAdmin(?Admin $admin): static
+    {
+        $this->admin = $admin;
+
+        return $this;
     }
 }

@@ -25,13 +25,15 @@ class Station
     private ?string $localisation = null;
 
     #[ORM\ManyToOne(inversedBy: 'stations')]
-    #[ORM\JoinColumn(name: "id_ligne", referencedColumnName: "id")]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire")]
-    private ?Ligne $ligne = null;
+    private ?Ligne $id_ligne = null;
 
-    #[ORM\Column]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire")]
-    private ?int $id_admin = null;
+    #[ORM\ManyToOne(targetEntity: Admin::class, inversedBy: 'lignes')]
+    #[ORM\JoinColumn(name: 'id_admin', referencedColumnName: 'id_admin', nullable: false)]
+    private ?Admin $admin = null;
+
+  
+
+    
 
     public function getId(): ?int
     {
@@ -62,44 +64,27 @@ class Station
 
     public function getIdLigne(): ?Ligne
     {
-        return $this->ligne;
+        return $this->id_ligne;
     }
 
-    public function setIdLigne(?Ligne $ligne): static
+    public function setIdLigne(?Ligne $id_ligne): static
     {
-        $this->ligne = $ligne;
+        $this->id_ligne = $id_ligne;
+
         return $this;
     }
 
-    public function getIdAdmin(): ?int
+    public function getAdmin(): ?Admin
     {
-        return $this->id_admin;
+        return $this->admin;
     }
 
-    public function setIdAdmin(int $id_admin): static
+    public function setAdmin(?Admin $admin): static
     {
-        $this->id_admin = $id_admin;
-        return $this;
-    }
-    public function getid_ligne(): ?Ligne
-    {
-        return $this->ligne;
-    }
+        $this->admin = $admin;
 
-    public function setid_ligne(?Ligne $ligne): static
-    {
-        $this->ligne = $ligne;
         return $this;
     }
 
-    public function getid_admin(): ?int
-    {
-        return $this->id_admin;
-    }
-
-    public function setid_admin(int $id_admin): static
-    {
-        $this->id_admin = $id_admin;
-        return $this;
-    }
+   
 }

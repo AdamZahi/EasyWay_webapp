@@ -5,8 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     profile_picture_directory: '%kernel.project_dir%/public/uploads'
-    stripe.secret_key: 'sk_test_51Qv6RFJfspVdInoDmTxfpmACuQYygsgpsNopsq5iRu6TxbHGj9rXL6CW7lXq9ukez8Xt9i8fHeoIw7DIsKZEWWZ300E9wVE1TG'
-    stripe.public_key: 'pk_test_51Qv6RFJfspVdInoDIMKyR7fNLu2xewEBhNUjv5oow5QmoCQBQIWNQbSxFSIC8dPG1FeXnDe0Fh6GNwvM7AWzZW0v00CWW1HrPi'
+    stripe.secret_key: 'secret'
+    stripe.public_key: 'secret'
 
 services:
     App\Security\GoogleAuthenticator:

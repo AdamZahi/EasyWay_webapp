@@ -1,17 +1,54 @@
 {% extends 'front-office/front.html.twig' %}
 
-{% block title %}Edit Reservation
+{% block title %}Modifier Réservation{% endblock %}
+
+{% block css %}
+{{ parent() }}
+<link href="{{ asset('css/update_reservation.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block main_content %}
 <br><br><br><br><br><br>
-	<div class="container mt-4">
-		<h1>Edit Reservation #{{ reservation.id }}</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="form-card shadow-sm p-4">
+                <h2 class="text-center mb-4">✏️ Modifier Réservation #{{ reservation.id }}</h2>
 
-		{{ form_start(form) }}
-		{{ form_widget(form) }}
-		<button type="submit" class="btn btn-primary">Update</button>
-		<a href="{{ path('reservation_list') }}" class="btn btn-secondary">Cancel</a>
-		{{ form_end(form) }}
-	</div>
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                <div class="mb-3">
+                    {{ form_row(form.depart, {'attr': {'class': 'form-control', 'placeholder': 'Lieu de départ'}}) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_row(form.arret, {'attr': {'class': 'form-control', 'placeholder': 'Arrêt'}}) }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Type de véhicule</label>
+                    <div class="vehicule-options">
+                        {% for choice in form.vehicule %}
+                            <div class="form-check">
+                                {{ form_widget(choice) }}
+                                {{ form_label(choice) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {{ form_row(form.nb, {'attr': {'class': 'form-control', 'placeholder': 'Nombre de places'}}) }}
+                </div>
+
+                <div class="d-flex justify-content-between action-buttons">
+                    <button type="submit" class="btn btn-primary">💾 Mettre à jour</button>
+                    <a href="{{ path('reservation_list') }}" class="btn btn-outline-secondary">↩️ Annuler</a>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

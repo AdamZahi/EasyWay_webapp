@@ -1,47 +1,86 @@
 {% extends 'front-office/front.html.twig' %}
 
-{% block title %}Paiements{% endblock %}
+{% block title %}Mes Paiements{% endblock %}
+
+{% block css %}
+{{ parent() }}
+    <link href="{{ asset('css/list_paiement.css') }}" rel="stylesheet">
+{% endblock %}
 
 {% block main_content %}
-<br><br><br><br><br><br>
-    <div class="container mt-4">
-        <h1>Paiement</h1>
+<br><br><br>
+<div class="container mt-4">
+    <h1 class="mb-4">💳 Historique de Paiements</h1>
+    <br><br>
 
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
-
-        <table class="table table-striped" border="1">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>DEPART</th>
-                    <th>ARRET</th>
-                    <th>TYPE</th>
-                    <th>Administrateur</th>
-                    <th>ACTIONS</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for paiement in paiements %}
-                    <tr>
-                        <td>{{ paiement.id }}</td>
-                        <td>{{ paiement.pay_id }}</td>
-                        <td>{{ paiement.montant }}</td>
-                        <td>{{ paiement.res_id }}</td>
-                        <td>{{ paiement.user_id }}</td>
-                        <td>
-                            <a href="{{ path('paiement_delete', {'id': paiement.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center">No paiements found</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <a href="{{ path('paiement_add') }}" class="btn btn-primary">Passer au paiement</a>
+    <div class="mb-3">
+        <label class="form-label">Trier par :</label>
+        <div class="d-flex justify-content-center">
+            <div class="sorting-carousel">
+                <div class="sorting-item {% if app.request.query.get('sort') == 'vehicule' %}active{% endif %}" onclick="window.location.href='{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'sort': 'vehicule'})) }}'">
+                    <i class="bi bi-bus-front"></i> Mode de Transport
+                </div>
+                <div class="sorting-item {% if app.request.query.get('sort') == 'montant' %}active{% endif %}" onclick="window.location.href='{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'sort': 'montant'})) }}'">
+                    <i class="bi bi-cash-coin"></i> Montant
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="row g-4" id="paiements-list">
+        {% set border_classes = ['border-primary', 'border-success', 'border-warning', 'border-info', 'border-danger'] %}
+        {% for paiement in paiements %}
+            <div class="col-md-6">
+                <div class="card shadow-sm {{ border_classes[loop.index0 % border_classes|length] }} border-3 rounded-4 paiement-card position-relative">
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge badge-id rounded-pill px-3 py-2" onclick="copyToClipboard('{{ paiement.payId }}')">
+                            🆔 {{ paiement.payId }}
+                        </span>
+                    </div>
+
+                    <div class="card-body p-5">
+                        <div class="d-flex align-items-center mb-4">
+                            {% set vehicule = paiement.resId.vehicule|lower %}
+                            <span class="display-5 me-3">
+                                {% if vehicule == 'bus' %} 🚌
+                                {% elseif vehicule == 'metro' %} 🚇
+                                {% elseif vehicule == 'train' %} 🚆
+                                {% else %} 🚘 {% endif %}
+                            </span>
+                            <h3 class="mb-0 text-capitalize">{{ paiement.resId.vehicule }}</h3>
+                        </div>
+
+                        <div class="fs-5 mb-3">
+                            <strong>Montant:</strong>
+                            <span class="text-danger fw-bold">{{ paiement.montant }} TND</span>
+                        </div>
+
+                        <p class="mb-2 fs-5">
+                            <strong>De:</strong> {{ paiement.resId.depart }}
+                        </p>
+                        <p class="fs-5">
+                            <strong>À:</strong> {{ paiement.resId.arret }}
+                        </p>
+                    </div>
+
+                    <div class="card-footer d-flex justify-content-between mt-auto">
+                        <a href="{{ path('paiement_delete', {'id': paiement.id}) }}" class="btn btn-outline-danger btn-sm px-4 py-2 fw-bold" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce paiement ?')">
+                            🗑️ Supprimer
+                        </a>
+
+                        <a href="" class="btn btn-outline-primary btn-sm px-4 py-2 fw-bold" target="_blank">
+                            📱 Générer QR
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    Aucun paiement trouvé.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

@@ -14,7 +14,6 @@
         <table class="table table-striped" border="1">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Ligne</th>
                     <th>Nom</th>
                     <th>Lcalisation</th>
@@ -25,7 +24,6 @@
             <tbody>
                 {% for station in stations %}
                     <tr>
-                        <td>{{ station.id }}</td>
                         <td>{{ station.id_ligne }}</td>
                         <td>{{ station.nom }}</td>
                         <td>{{ station.localisation }}</td>

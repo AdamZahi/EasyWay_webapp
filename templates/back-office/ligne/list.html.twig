@@ -1,0 +1,53 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %}Lignes{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Lignes</h1>
+
+        <!-- Flash Messages -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <!-- Table Section -->
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>DEPART</th>
+                        <th>ARRET</th>
+                        <th>TYPE</th>
+                        <th>Administrateur</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in lignes %}
+                        <tr>
+                            <td>{{ ligne.depart }}</td>
+                            <td>{{ ligne.arret }}</td>
+                            <td>{{ ligne.type }}</td>
+                            <td>{{ ligne.admin.nom }}</td>
+                            <td>
+                                <a href="{{ path('ligne_edit', {'id': ligne.id}) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <a href="{{ path('ligne_delete', {'id': ligne.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No lignes found</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Action Button Section -->
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ path('ligne_add') }}" class="btn btn-primary">Ajouter une nouvelle Ligne</a>
+            <a href="" class="btn btn-outline-success btn-lg px-5">Gérer les Stations</a>
+        </div>
+    </div>
+{% endblock %}

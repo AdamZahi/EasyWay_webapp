@@ -3,37 +3,66 @@
 namespace App\Controller;
 
 use App\Entity\Ligne;
+use App\Entity\Admin;
 use App\Form\LigneType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Security;
+
 use Symfony\Component\Routing\Annotation\Route;
 
 
 final class LigneController extends AbstractController
 {
-    #[Route('/ligne/add', name: 'ligne_add')]
-public function add(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('admin/ligne/dashboard', name: 'ligne_dashboard')]
+public function dashboard(): Response
+{
+    return $this->render('back-office/ligne/choice.html.twig');
+}
+
+#[Route('admin/ligne/add', name: 'ligne_add')]
+public function add(Request $request, EntityManagerInterface $entityManager, Security $security): Response
 {
     $ligne = new Ligne();
     $form = $this->createForm(LigneType::class, $ligne);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
+        $user = $security->getUser(); 
+
+        $admin = $entityManager->getRepository(Admin::class)->findOneBy(['user' => $user]);
+
+        if ($admin === null) {
+            $this->addFlash('error', 'Admin not found for the current user!');
+            return $this->redirectToRoute('ligne_list_admin');
+        }
+
+        $ligne->setAdmin($admin);
         $entityManager->persist($ligne);
         $entityManager->flush();
 
-        return $this->redirectToRoute('ligne_list');
+        return $this->redirectToRoute('ligne_list_admin');
     }
 
-    return $this->render('/ligne/add.html.twig', [
+    return $this->render('back-office/ligne/add.html.twig', [
         'form' => $form->createView(),
     ]);
 }
 
-#[Route('/ligne/list', name: 'ligne_list')]
+#[Route('admin/ligne/list', name: 'ligne_list_admin')]
 public function list(EntityManagerInterface $entityManager): Response
+{
+    $lignes = $entityManager->getRepository(Ligne::class)->findAll();
+
+    return $this->render('back-office/ligne/list.html.twig', [
+        'lignes' => $lignes
+    ]);
+}
+//espace utilisateur
+#[Route('/ligne/list', name: 'ligne_list_utilisateur')]
+public function list2(EntityManagerInterface $entityManager): Response
 {
     $lignes = $entityManager->getRepository(Ligne::class)->findAll();
 
@@ -42,7 +71,7 @@ public function list(EntityManagerInterface $entityManager): Response
     ]);
 }
 
-#[Route('/ligne/edit/{id}', name: 'ligne_edit')]
+#[Route('admin/ligne/edit/{id}', name: 'ligne_edit')]
 public function edit(Request $request, EntityManagerInterface $entityManager, int $id): Response
 {
     $ligne = $entityManager->getRepository(Ligne::class)->find($id);
@@ -60,13 +89,13 @@ public function edit(Request $request, EntityManagerInterface $entityManager, in
         return $this->redirectToRoute('ligne_list');
     }
 
-    return $this->render('/ligne/update.html.twig', [
+    return $this->render('back-office/ligne/update.html.twig', [
         'form' => $form->createView(),
         'ligne' => $ligne
     ]);
 }
 
-#[Route('/ligne/delete/{id}', name: 'ligne_delete')]
+#[Route('admin/ligne/delete/{id}', name: 'ligne_delete')]
 public function delete(EntityManagerInterface $entityManager, int $id): Response
 {
     $ligne = $entityManager->getRepository(Ligne::class)->find($id);
@@ -77,7 +106,7 @@ public function delete(EntityManagerInterface $entityManager, int $id): Response
         $this->addFlash('success', 'Ligne deleted successfully!');
     }
 
-    return $this->redirectToRoute('ligne_list');
+    return $this->redirectToRoute('ligne_list_admin');
 }
 
 }
