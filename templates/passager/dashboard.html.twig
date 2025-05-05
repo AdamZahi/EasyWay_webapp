@@ -4,8 +4,8 @@
 
 {% block body %}
 <!-- Navbar Start -->
-{% block navbar %}
-        {{ parent() }}
+{% block navbar%}
+{{ parent() }}
     {% endblock %}
 <!-- Navbar End -->
 
@@ -30,11 +30,11 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    Rechercher un trajet
+                    Rechercher un covoiturage
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Rechercher un trajet </h5>
-                    <p class="card-text">Recherchez les trajets disponibles</p>
+                    <h5 class="card-title">Rechercher un covoiturage </h5>
+                    <p class="card-text">Recherchez les covoiturages disponibles ou publiez un offre de covoiturage</p>
                     <a href="{{ path('app_covoiturage') }}" class="btn btn-primary">Trouver un trajet </a>
                 </div>
             </div>
@@ -43,12 +43,12 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    Paiement
+                    Les evenements en cours
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Mes paiements</h5>
-                    <p class="card-text">Consultez l'historique de vos paiements et gérez vos méthodes de paiement.</p>
-                    <a href="#" class="btn btn-primary">Accéder aux paiements</a>
+                    <h5 class="card-title">Consulter les evenements</h5>
+                    <p class="card-text">Consultez les evenements courantset meme les commentaires cree par les autres utilisateurs.</p>
+                    <a href="{{path('app_event_front')}}" class="btn btn-primary">Accéder aux evenements</a>
                 </div>
             </div>
         </div>
@@ -58,10 +58,10 @@
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
-                Réclamation
+                Vous souhaitez faire une réclamation ?
             </div>
             <div class="card-body">
-                <h5 class="card-title">Vous souhaitez faire une réclamation ?</h5>
+                <h5 class="card-title">Soumettre une reclamation</h5>
                 <p class="card-text">Nous sommes là pour vous aider. Cliquez ci-dessous pour accéder au formulaire de réclamation .</p>
                 <a href="{{ path('app_reclamation') }}" class="btn btn-primary">Faire une réclamation</a>
             </div>
