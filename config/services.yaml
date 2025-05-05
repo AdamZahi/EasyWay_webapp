@@ -4,10 +4,23 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+<<<<<<< HEAD
     profile_picture_directory: '%kernel.project_dir%/public/uploads'
     stripe.secret_key: 'sk_test_51Qv6RFJfspVdInoDmTxfpmACuQYygsgpsNopsq5iRu6TxbHGj9rXL6CW7lXq9ukez8Xt9i8fHeoIw7DIsKZEWWZ300E9wVE1TG'
     stripe.public_key: 'pk_test_51Qv6RFJfspVdInoDIMKyR7fNLu2xewEBhNUjv5oow5QmoCQBQIWNQbSxFSIC8dPG1FeXnDe0Fh6GNwvM7AWzZW0v00CWW1HrPi'
+=======
+>>>>>>> origin/main
 
+    profile_picture_directory: '%kernel.project_dir%/public/uploads'
+
+
+
+    profile_pictures_directory: '%kernel.project_dir%/public/uploads/profile_pictures'
+    brevo_api_key: '%env(BREVO_API_KEY)%'
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+
+
+    
 services:
     App\Security\GoogleAuthenticator:
         arguments:
@@ -26,8 +39,6 @@ services:
             $username: '%env(TWILIO_SID)%'
             $password: '%env(TWILIO_TOKEN)%'
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
         exclude:
@@ -35,5 +46,23 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # Add your Stripe service configuration
+    App\Service\StripePaymentService:
+        arguments:
+            $stripeSecretKey: '%env(STRIPE_SECRET_KEY)%'
+
+    # Email service configuration
+    App\Service\EmailService:
+        arguments:
+            $senderEmail: '%env(MAILER_FROM)%'
+
+    # Sms service configuration (Make sure the indentation is correct)
+    App\Service\SmsService:
+        arguments:
+            $apiUrl: '%env(INFOBIP_API_URL)%'
+            $apiKey: '%env(INFOBIP_API_KEY)%'
+            $sender: '%env(INFOBIP_SMS_SENDER)%'
+        
+    App\Service\ChatGptService:
+        arguments:
+            $openAiApiKey: '%env(OPENAI_API_KEY)%'

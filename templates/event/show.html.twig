@@ -1,21 +1,23 @@
-{% extends 'back-office/pages/back-office.html.twig' %}
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
 
 {% block title %}Event Details{% endblock %}
 
-{% block body %}
+{% block content %}
     <div class="container mt-4">
-        <h1>Event Details</h1>
+        <h1>Détails de l'événement</h1>
 
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Event #{{ event.id }}</h5>
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Type:</strong> {{ event.type.value }}</p>
-                        <p><strong>Status:</strong> {{ event.status.value }}</p>
+                        <p><strong>Type:</strong> {{ event.type }}</p>
+                        <p><strong>Status:</strong> {{ event.status }}</p>
                         <p><strong>Description:</strong> {{ event.description }}</p>
                     </div>
                     <div class="col-md-6">
+                        <p><strong>Ligne affectee:</strong> {{ event.ligneAffectee.depart }} - {{ event.ligneAffectee.arret }}</p>
                         <p><strong>Date Debut:</strong> {{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</p>
                         <p><strong>Date Fin:</strong> {{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</p>
                     </div>
@@ -27,5 +29,25 @@
             <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-warning">Edit</a>
             <a href="{{ path('app_event_index') }}" class="btn btn-secondary">Back to list</a>
         </div>
+
+        <br>
+        <h2>Commentaires de l'Événement</h2>
+        <div class="card mt-4">
+            <div class="card-body">
+                {% if event.comments|length > 0 %}
+                    <ul class="list-group">
+                        {% for comment in event.comments %}
+                            <li class="list-group-item">
+                                <p><strong>Utilisateur:</strong> {{ comment.user ? comment.user.nom : 'Utilisateur inconnu' }} {{ comment.user ? comment.user.prenom : 'Utilisateur inconnu' }}</p>
+                                <p><strong>Commentaire:</strong> {{ comment.comment }}</p>
+                                <p><small><strong>Ajouté le:</strong> {{ comment.createdAt ? comment.createdAt|date('d/m/Y H:i:s') : 'N/A' }}</small></p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucun commentaire pour cet événement.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
-{% endblock %} 
+{% endblock %}

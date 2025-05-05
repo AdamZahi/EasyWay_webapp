@@ -40,4 +40,45 @@ class EventRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function getStatistics(): array
+{
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = '
+        SELECT 
+            type,
+            status,
+            ligne_affectee,
+            COUNT(*) AS total
+        FROM evenement
+        GROUP BY type, status, ligne_affectee
+    ';
+
+    $stmt = $conn->prepare($sql);
+    $resultSet = $stmt->executeQuery();
+
+    return $resultSet->fetchAllAssociative();
+}
+
+public function findByFilters(array $filters = []): array
+{
+    $qb = $this->createQueryBuilder('e');
+
+    if (!empty($filters['type'])) {
+        $qb->andWhere('e.type = :type')->setParameter('type', $filters['type']);
+    }
+    if (!empty($filters['status'])) {
+        $qb->andWhere('e.status = :status')->setParameter('status', $filters['status']);
+    }
+    if (!empty($filters['dateDebut'])) {
+        $qb->andWhere('e.dateDebut >= :start')->setParameter('start', $filters['dateDebut']);
+    }
+    if (!empty($filters['dateFin'])) {
+        $qb->andWhere('e.dateFin <= :end')->setParameter('end', $filters['dateFin']);
+    }
+
+    return $qb->getQuery()->getResult();
+}
+
 } 

@@ -1,10 +1,12 @@
-{% extends 'back-office/pages/back-office.html.twig' %}
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
 
 {% block title %}Event List{% endblock %}
 
-{% block body %}
+{% block content %}
+<main>
     <div class="container mt-4">
-        <h1>Event List</h1>
+        <h1>Liste des evenements</h1>
 
         <div class="row mb-3">
             <div class="col-md-6">
@@ -13,7 +15,9 @@
                 </div>
             </div>
             <div class="col-md-6 text-right">
-                <a href="{{ path('app_event_new') }}" class="btn btn-primary">Create New Event</a>
+                <a href="{{ path('app_event_new') }}" class="btn btn-primary">Creer un evenement</a>
+                <a href="{{ path('app_admin_statistics') }}" class="btn btn-primary">Les statistiques</a>
+                <a href="{{ path('app_event_front') }}" class="btn btn-primary">Visualiser comme utilisateur</a>
             </div>
         </div>
 
@@ -23,9 +27,9 @@
                     <tr>
                         <th>Type</th>
                         <th>Status</th>
-                        <th>Description</th>
-                        <th>Starting Date</th>
-                        <th>Ending Date</th>
+                        <th>Ligne Affectée</th>
+                        <th>Date Debut</th>
+                        <th>Date Fin</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -34,7 +38,7 @@
                     <tr>
                         <td>{{ event.type }}</td>
                         <td>{{ event.status }}</td>
-                        <td>{{ event.description }}</td>
+                        <td>{{ event.ligneAffectee.depart }} - {{ event.ligneAffectee.arret }}</td>
                         <td>{{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</td>
                         <td>{{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</td>
                         <td>
@@ -73,7 +77,8 @@
                         const newTable = doc.getElementById('eventsTable');
                         eventsTable.innerHTML = newTable.innerHTML;
                     });
-            }, 300); // Wait 300ms after typing stops before searching
+            }, 200);
         });
     </script>
+</main>
 {% endblock %} 

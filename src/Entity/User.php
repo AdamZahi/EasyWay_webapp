@@ -9,15 +9,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: "id_user")]
+    #[ORM\Column(name: "id_user", type: "integer")]
     private ?int $id_user = null;
+    
+    
+
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(message: "L'email ne peut pas être vide")]
@@ -82,23 +87,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?Admin $admin = null;
 
     /**
-     * @var Collection<int, Reservation>
+     * @var Collection<int, Reclamation>
      */
-    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'id_user')]
-    private Collection $reservations;
-
+    #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_user')]
+    private Collection $reclamations;
     /**
      * @var Collection<int, Paiement>
      */
     #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'user_id')]
     private Collection $paiements;
 
-    
-
     public function __construct()
     {
         $this->photo_profil = 'default_profile.png';
-        $this->reservations = new ArrayCollection();
+        $this->reclamations = new ArrayCollection();
+        $this->paiements = new ArrayCollection();
         $this->paiements = new ArrayCollection();
         
     }
@@ -113,6 +116,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->admin = $admin;
         return $this;
     }
+
 
     public function getIdUser(): ?int
     {
@@ -135,6 +139,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
         return $this;
     }
+
+  
+
 
     /**
      * A visual identifier that represents this user.
@@ -224,10 +231,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function setPhotoProfil(?string $photo_profil): static
-    {
-        $this->photo_profil = $photo_profil ?? 'default_profile.png';
-        return $this;
-    }
+{
+    $this->photo_profil = $photo_profil ?? 'default_profile.png';
+    return $this;
+}
+
 
     public function getPassager(): ?Passager
     {
@@ -252,35 +260,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Reservation>
+     * @return Collection<int, Reclamation>
      */
-    public function getReservations(): Collection
+    public function getReclamations(): Collection
     {
-        return $this->reservations;
+        return $this->reclamations;
     }
 
-    public function addReservation(Reservation $reservation): static
+    public function addReclamation(Reclamation $reclamation): static
     {
-        if (!$this->reservations->contains($reservation)) {
-            $this->reservations->add($reservation);
-            $reservation->setUserId($this);
+        if (!$this->reclamations->contains($reclamation)) {
+            $this->reclamations->add($reclamation);
+            $reclamation->setUser($this);
         }
 
         return $this;
     }
-
-    public function removeReservation(Reservation $reservation): static
-    {
-        if ($this->reservations->removeElement($reservation)) {
-            // set the owning side to null (unless already changed)
-            if ($reservation->getUserId() === $this) {
-                $reservation->setUserId(null);
-            }
-        }
-
-        return $this;
-    }
-
+    
     /**
      * @return Collection<int, Paiement>
      */
