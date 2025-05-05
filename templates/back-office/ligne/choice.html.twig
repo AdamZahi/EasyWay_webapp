@@ -3,35 +3,44 @@
 {% block title %}BIENVENUE ADMINISTRATEUR !{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="display-4 fw-bold text-center mb-5">BIENVENUE ADMINISTRATEUR !</h1>
+<div class="container py-5">
+    <!-- Welcome Message -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold">Bienvenue, Administrateur 👋</h1>
+        <p class="lead text-muted">Gérez facilement les lignes et les stations à travers la Tunisie.</p>
+    </div>
 
+    <!-- Image + Message -->
     <div class="row align-items-center mb-5">
-        <div class="col-md-6 text-center">
-            <img
-                src="{{ asset('img/map.jpg') }}"
-                alt="Tunisia Map"
-                class="img-fluid rounded shadow"
-                style="max-width: 100%; height: auto; max-height: 400px;"
-            />
-        </div>
-        <div class="col-md-6 text-center">
-            <h3 class="fw-semibold">
-                Planifiez vos déplacements <span class="text-primary">facilement</span> <br>
+        <!-- Text Left -->
+        <div class="col-md-6 mb-4 mb-md-0">
+            <h3 class="fw-semibold text-center text-md-start">
+                Planifiez vos déplacements <span class="text-primary">facilement</span><br>
                 à travers <span class="text-success">la Tunisie</span> 🇹🇳
             </h3>
         </div>
+
+        <!-- Image Right -->
+        <div class="col-md-6 text-center">
+            <img
+                src="{{ asset('img/map.jpg') }}"
+                alt="Carte de la Tunisie"
+                class="img-fluid rounded shadow"
+                style="max-height: 350px; width: auto;"
+            />
+        </div>
     </div>
 
-    <div class="row text-center">
-        <div class="col-md-6 mb-3">
-            <a href="{{ path('ligne_list_admin') }}" class="btn btn-outline-primary btn-lg w-75">
-                Gérer les Lignes
+    <!-- Action Buttons -->
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-4 mb-3 text-center">
+            <a href="{{ path('ligne_list_admin') }}" class="btn btn-primary btn-lg w-100 shadow-sm">
+                📍 Gérer les Lignes
             </a>
         </div>
-        <div class="col-md-6 mb-3">
-            <a href="" class="btn btn-outline-success btn-lg w-75">
-                Gérer les Stations
+        <div class="col-md-4 mb-3 text-center">
+            <a href="{{ path('station_list_admin') }}" class="btn btn-success btn-lg w-100 shadow-sm">
+                🏁 Gérer les Stations
             </a>
         </div>
     </div>

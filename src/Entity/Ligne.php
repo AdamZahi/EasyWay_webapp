@@ -6,8 +6,6 @@ use App\Repository\LigneRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-
 
 #[ORM\Entity(repositoryClass: LigneRepository::class)]
 class Ligne
@@ -15,42 +13,46 @@ class Ligne
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire ")]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: Admin::class, inversedBy: 'lignes')]
+    #[ORM\JoinColumn(name: "admin_id", referencedColumnName: "id_admin", nullable: false)]
+    private ?Admin $admin = null;
+
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire ")]
     private ?string $depart = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire ")]
     private ?string $arret = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire ")]
     private ?string $type = null;
-
-
 
     /**
      * @var Collection<int, Station>
      */
-    #[ORM\OneToMany(targetEntity: Station::class, mappedBy: 'id_ligne')]
+    #[ORM\OneToMany(targetEntity: Station::class, mappedBy: 'ligne')]
     private Collection $stations;
-
-    #[ORM\ManyToOne(targetEntity: Admin::class, inversedBy: 'lignes')]
-    #[ORM\JoinColumn(name: 'admin_id', referencedColumnName: 'id_admin', nullable: false)]
-    private ?Admin $admin = null;
 
     public function __construct()
     {
         $this->stations = new ArrayCollection();
     }
 
-
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getAdmin(): ?Admin
+    {
+        return $this->admin;
+    }
+
+    public function setAdmin(?Admin $admin): static
+    {
+        $this->admin = $admin;
+        return $this;
     }
 
     public function getDepart(): ?string
@@ -61,7 +63,6 @@ class Ligne
     public function setDepart(string $depart): static
     {
         $this->depart = $depart;
-
         return $this;
     }
 
@@ -73,7 +74,6 @@ class Ligne
     public function setArret(string $arret): static
     {
         $this->arret = $arret;
-
         return $this;
     }
 
@@ -85,14 +85,7 @@ class Ligne
     public function setType(string $type): static
     {
         $this->type = $type;
-
         return $this;
-    }
-
-    
-    public function __toString(): string
-    {
-        return $this->nom ?? 'Ligne #'.$this->id;
     }
 
     /**
@@ -107,7 +100,7 @@ class Ligne
     {
         if (!$this->stations->contains($station)) {
             $this->stations->add($station);
-            $station->setIdLigne($this);
+            $station->setLigneId($this);
         }
 
         return $this;
@@ -117,23 +110,10 @@ class Ligne
     {
         if ($this->stations->removeElement($station)) {
             // set the owning side to null (unless already changed)
-            if ($station->getIdLigne() === $this) {
-                $station->setIdLigne(null);
+            if ($station->getLigneId() === $this) {
+                $station->setLigneId(null);
             }
         }
-
-        return $this;
-    }
-
-    
-    public function getAdmin(): ?Admin
-    {
-        return $this->admin;
-    }
-
-    public function setAdmin(?Admin $admin): static
-    {
-        $this->admin = $admin;
 
         return $this;
     }

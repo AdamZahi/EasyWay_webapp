@@ -4,9 +4,6 @@ namespace App\Entity;
 
 use App\Repository\StationRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-
 
 #[ORM\Entity(repositoryClass: StationRepository::class)]
 class Station
@@ -16,28 +13,47 @@ class Station
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(inversedBy: 'stations')]
+    #[ORM\JoinColumn(name: "ligne_id", referencedColumnName: "id", nullable: false)]  // Ensuring proper column name
+    private ?Ligne $ligne = null;
+
+    #[ORM\ManyToOne(targetEntity: Admin::class, inversedBy: 'lignes')]
+    #[ORM\JoinColumn(name: "admin_id", referencedColumnName: "id_admin", nullable: false)]
+    private ?Admin $admin = null;
+
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire")]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Ce champ est obligatoire")]
     private ?string $localisation = null;
-
-    #[ORM\ManyToOne(inversedBy: 'stations')]
-    private ?Ligne $id_ligne = null;
-
-    #[ORM\ManyToOne(targetEntity: Admin::class, inversedBy: 'lignes')]
-    #[ORM\JoinColumn(name: 'id_admin', referencedColumnName: 'id_admin', nullable: false)]
-    private ?Admin $admin = null;
-
-  
-
-    
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getLigne(): ?Ligne
+    {
+        return $this->ligne;
+    }
+
+    public function setLigne(?Ligne $ligne): static
+    {
+        $this->ligne = $ligne;
+
+        return $this;
+    }
+
+    public function getAdmin(): ?Admin
+    {
+        return $this->admin;
+    }
+
+    public function setAdmin(?Admin $admin_id): static
+    {
+        $this->admin_id = $admin;
+
+        return $this;
     }
 
     public function getNom(): ?string
@@ -48,6 +64,7 @@ class Station
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
         return $this;
     }
 
@@ -59,32 +76,7 @@ class Station
     public function setLocalisation(string $localisation): static
     {
         $this->localisation = $localisation;
-        return $this;
-    }
-
-    public function getIdLigne(): ?Ligne
-    {
-        return $this->id_ligne;
-    }
-
-    public function setIdLigne(?Ligne $id_ligne): static
-    {
-        $this->id_ligne = $id_ligne;
 
         return $this;
     }
-
-    public function getAdmin(): ?Admin
-    {
-        return $this->admin;
-    }
-
-    public function setAdmin(?Admin $admin): static
-    {
-        $this->admin = $admin;
-
-        return $this;
-    }
-
-   
 }

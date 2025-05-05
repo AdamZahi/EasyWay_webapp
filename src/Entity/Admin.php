@@ -57,32 +57,26 @@ class Admin
     private ?string $photo_profil = null;
 
     /**
-     * @var Collection<int, Station>
-     */
-    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: Station::class)]
-    private Collection $stations;
-
-    /**
      * @var Collection<int, Ligne>
      */
-    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: Ligne::class)]
+    #[ORM\OneToMany(targetEntity: Ligne::class, mappedBy: 'admin_id')]
     private Collection $lignes;
+
+    /**
+     * @var Collection<int, Station>
+     */
+    #[ORM\OneToMany(targetEntity: Station::class, mappedBy: 'admin_id')]
+    private Collection $stations;
 
     public function __construct()
     {
-        $this->stations = new ArrayCollection();
         $this->lignes = new ArrayCollection();
+        $this->stations = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getIdAdmin(): ?int
     {
         return $this->id_admin;
-    }
-
-    public function setId(int $id_admin): static
-    {
-        $this->id_admin = $id_admin;
-        return $this;
     }
 
     public function getUser(): ?User
@@ -161,15 +155,34 @@ class Admin
         $this->photo_profil = $photo_profil;
         return $this;
     }
-    
-    public function getAdmin(): ?Admin
+
+    /**
+     * @return Collection<int, Ligne>
+     */
+    public function getLignes(): Collection
     {
-        return $this->admin;
+        return $this->lignes;
     }
 
-    public function setAdmin(?Admin $admin): static
+    public function addLigne(Ligne $ligne): static
     {
-        $this->admin = $admin;
+        if (!$this->lignes->contains($ligne)) {
+            $this->lignes->add($ligne);
+            $ligne->setAdminId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLigne(Ligne $ligne): static
+    {
+        if ($this->lignes->removeElement($ligne)) {
+            // set the owning side to null (unless already changed)
+            if ($ligne->getAdminId() === $this) {
+                $ligne->setAdminId(null);
+            }
+        }
+
         return $this;
     }
 
@@ -185,7 +198,7 @@ class Admin
     {
         if (!$this->stations->contains($station)) {
             $this->stations->add($station);
-            $station->setAdmin($this);
+            $station->setAdminId($this);
         }
 
         return $this;
@@ -195,38 +208,8 @@ class Admin
     {
         if ($this->stations->removeElement($station)) {
             // set the owning side to null (unless already changed)
-            if ($station->getAdmin() === $this) {
-                $station->setAdmin(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Ligne>
-     */
-    public function getLignes(): Collection
-    {
-        return $this->lignes;
-    }
-
-    public function addLigne(Ligne $ligne): static
-    {
-        if (!$this->lignes->contains($ligne)) {
-            $this->lignes->add($ligne);
-            $ligne->setAdmin($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLigne(Ligne $ligne): static
-    {
-        if ($this->lignes->removeElement($ligne)) {
-            // set the owning side to null (unless already changed)
-            if ($ligne->getAdmin() === $this) {
-                $ligne->setAdmin(null);
+            if ($station->getAdminId() === $this) {
+                $station->setAdminId(null);
             }
         }
 

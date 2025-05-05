@@ -1,51 +1,244 @@
-{% extends 'front-office/front.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
 {% block title %}Passager Dashboard{% endblock %}
 
 {% block body %}
-<div class="container">
-    <h1>Passager Dashboard</h1>
-    <p>Welcome to the passenger dashboard.</p>
-    
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    My Bookings
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Manage Bookings</h5>
-                    <p class="card-text">View and manage your upcoming and past bookings.</p>
-                    <a href="{{ path('reservation_add') }}" class="btn btn-primary">Go to Bookings</a>
-                </div>
+
+<!-- Navbar Start -->
+
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
+    <a href="{{ path('passager_dashboard') }}" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" style="width: 60px; height: 60px; border-radius: 50%; margin-right: 10px;">
+        <h2 class="mb-2 text-white">EasyWay</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a href="{{ path('passager_dashboard') }}" class="nav-item nav-link active">Accueil</a>
+            <a href="#" class="nav-item nav-link">Co-voiturage</a>
+            <a href="#" class="nav-item nav-link">Réclamation</a>
+            <a href="#" class="nav-item nav-link">Véhicules</a>
+            <a href="#" class="nav-item nav-link">Événements</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fa fa-user me-2"></i>Profil
+                </a>
+                <ul class="dropdown-menu fade-up m-0">
+                    <li><a href="" class="dropdown-item">Modifier mon profil</a></li>
+                    <li><a href="" class="dropdown-item">Se déconnecter</a></li>
+                </ul>
+            </div>
+            <a href="#" class="nav-item nav-link">Contact</a>
+        </div>
+    </div>
+</nav>
+<!-- Navbar End -->
+
+<!-- Main Content -->
+<div class="container mt-5 mb-5">
+    <h1 class="animated-title text-center mb-4">📊 Tableau de bord des passagers</h1>
+    <p class="text-center mb-5">Bienvenue sur votre espace personnel. Gérez vos réservations, trajets, paiements, et plus encore.</p>
+<br><br>
+    <div class="scroll-container">
+        <div class="dashboard-card">
+            <img src="{{ asset('img/dashboard/reservation.jpeg') }}" class="card-img-top" alt="Réservations">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">📅 Mes Réservations</h5>
+                <p class="card-text">Consultez, modifiez ou ajoutez de nouvelles réservations facilement.</p>
+                <a href="{{ path('reservation_add') }}" class="btn btn-primary">Gérer mes réservations</a>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    Find a Ride
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Search Rides</h5>
-                    <p class="card-text">Search for available rides.</p>
-                    <a href="#" class="btn btn-primary">Find a Ride</a>
-                </div>
+
+        <div class="dashboard-card">
+            <img src="{{ asset('img/dashboard/covoiturage.png') }}" class="card-img-top" alt="Covoiturage">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">🚗 Co-voiturage</h5>
+                <p class="card-text">Recherchez les trajets disponibles pour vos déplacements.</p>
+                <a href="" class="btn btn-primary">Rechercher un trajet</a>
             </div>
         </div>
-        
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    Payments
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">My Payments</h5>
-                    <p class="card-text">View your payment history and manage payment methods.</p>
-                    <a href="#" class="btn btn-primary">Go to Payments</a>
-                </div>
+
+        <div class="dashboard-card">
+            <img src="{{ asset('img/dashboard/paiement.png') }}" class="card-img-top" alt="Paiement">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">💳 Paiement</h5>
+                <p class="card-text">Consultez l'historique de vos paiements et gérez vos options.</p>
+                <a href="#" class="btn btn-primary">Voir mes paiements</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <img src="{{ asset('img/dashboard/reclamation.jpg') }}" class="card-img-top" alt="Réclamation">
+            <div class="card-body">
+                <h5 class="card-title fw-bold">📩 Réclamation</h5>
+                <p class="card-text">Besoin d'aide ? Envoyez une réclamation à notre support.</p>
+                <a href="{{ path('app_reclamation') }}" class="btn btn-primary">Faire une réclamation</a>
             </div>
         </div>
     </div>
 </div>
-{% endblock %} 
+<br><br><br><br>
+<!-- Abonnement & Tarification Section Start -->
+<div class="container mt-5">
+    <h3 class="text-center mb-4">💼 Nos Abonnements</h3>
+    <p class="text-center mb-5">Optez pour un pass adapté à vos besoins et profitez de nos services en toute liberté.</p>
+    <div class="row justify-content-center">
+        <div class="col-md-4 mb-4">
+            <div class="card text-center shadow border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="my-0 fw-normal">🗓️ Pass Mensuel</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">TND 49.00 <small class="text-muted">/ mois</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Accès illimité aux bus</li>
+                        <li>Priorité sur certaines lignes</li>
+                        <li>Validité sur 30 jours</li>
+                        <li>Application mobile dédiée</li>
+                    </ul>
+                    <a href="#" class="btn btn-outline-primary">Commander Maintenant</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card text-center shadow border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="my-0 fw-normal">📅 Pass Semaine</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">TND 29.00 <small class="text-muted">/ semaine</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Accès illimité aux bus</li>
+                        <li>Validité sur 7 jours</li>
+                        <li>Suivi en temps réel via l'appli</li>
+                        <li>Accès aux stations principales</li>
+                    </ul>
+                    <a href="#" class="btn btn-success">Commander Maintenant</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card text-center shadow border-warning">
+                <div class="card-header bg-warning text-white">
+                    <h4 class="my-0 fw-normal">📆 Pass Quotidien</h4>
+                </div>
+                <div class="card-body">
+                    <h1 class="card-title pricing-card-title">TND 9.00 <small class="text-muted">/ jour</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Accès quotidien aux bus</li>
+                        <li>Réduction sur certains trajets</li>
+                        <li>Utilisable toute la journée</li>
+                        <li>Valable sur toutes les lignes</li>
+                    </ul>
+                    <a href="#" class="btn btn-warning text-white">Commander Maintenant</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><br><br><br><br><br><br><br><br><br><br><br><br>
+<!-- Abonnement & Tarification Section End -->
+
+
+<!-- Footer Start -->
+<div class="container-fluid bg-dark text-light footer pt-5 mt-5">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-lg-4 col-md-6">
+                <h4 class="text-light mb-4">Contact</h4>
+                <p><i class="fa fa-map-marker-alt me-3"></i>Tunisie, Ariana</p>
+                <p><i class="fa fa-phone-alt me-3"></i>+216 12 345 678</p>
+                <p><i class="fa fa-envelope me-3"></i>support@easyway.tn</p>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <h4 class="text-light mb-4">Navigation</h4>
+                <a class="btn btn-link text-light" href="#">Accueil</a>
+                <a class="btn btn-link text-light" href="#">Co-voiturage</a>
+                <a class="btn btn-link text-light" href="#">Réclamation</a>
+                <a class="btn btn-link text-light" href="#">Véhicules</a>
+                <a class="btn btn-link text-light" href="#">Événements</a>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <h4 class="text-light mb-4">Newsletter</h4>
+                <p>Abonnez-vous pour recevoir les dernières nouvelles de EasyWay.</p>
+                <div class="position-relative w-100">
+                    <input class="form-control border-0 py-3 ps-4 pe-5" type="text" placeholder="Votre Email">
+                    <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">S'inscrire</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container text-center mt-4">
+        <p class="mb-0">&copy; 2025 EasyWay. Tous droits réservés.</p>
+    </div>
+</div>
+<!-- Footer End -->
+
+<!-- Custom Styles -->
+<style>
+    .animated-title {
+        animation: floatHeader 2s infinite ease-in-out;
+    }
+
+    @keyframes floatHeader {
+        0%   { transform: translateY(0); }
+        50%  { transform: translateY(-5px); }
+        100% { transform: translateY(0); }
+    }
+
+    .scroll-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 20px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+    }
+
+    .dashboard-card {
+        min-width: 300px;
+        flex: 0 0 auto;
+        background-color: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .dashboard-card img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 1.2rem;
+    }
+
+    .scroll-container::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+        background-color: #007bff;
+        border-radius: 4px;
+    }
+
+    .scroll-container::-webkit-scrollbar-track {
+        background-color: #e0e0e0;
+    }
+</style>
+
+{% endblock %}

@@ -1,53 +1,60 @@
-{% extends 'back-office/reclamation/backbase.html.twig' %}
+    {% extends 'back-office/reclamation/backbase.html.twig' %}
 
-{% block title %}Lignes{% endblock %}
+    {% block title %}Lignes{% endblock %}
 
-{% block content %}
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">Lignes</h1>
+    {% block content %}
+        <div class="container mt-4">
+            <h1 class="text-center mb-4">Lignes</h1>
 
-        <!-- Flash Messages -->
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">{{ message }}</div>
-        {% endfor %}
+            <!-- Flash Messages -->
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
 
-        <!-- Table Section -->
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>DEPART</th>
-                        <th>ARRET</th>
-                        <th>TYPE</th>
-                        <th>Administrateur</th>
-                        <th>ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for ligne in lignes %}
+            <!-- Table Section -->
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ ligne.depart }}</td>
-                            <td>{{ ligne.arret }}</td>
-                            <td>{{ ligne.type }}</td>
-                            <td>{{ ligne.admin.nom }}</td>
-                            <td>
-                                <a href="{{ path('ligne_edit', {'id': ligne.id}) }}" class="btn btn-sm btn-primary">Edit</a>
-                                <a href="{{ path('ligne_delete', {'id': ligne.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
+                            <th>DEPART</th>
+                            <th>ARRET</th>
+                            <th>TYPE</th>
+                            <th>ADMINISTRATEUR</th>
+                            <th>ACTIONS</th>
                         </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="5" class="text-center">No lignes found</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for ligne in lignes %}
+                            <tr>
+                                <td>{{ ligne.depart }}</td>
+                                <td>{{ ligne.arret }}</td>
+                                <td>{{ ligne.type }}</td>
+                                <td>{{ ligne.admin.nom }}</td>
+                                <td>
+                                    <a href="{{ path('ligne_edit', {'id': ligne.id}) }}" class="btn btn-sm btn-primary">Mettre à jour</a>
+                                    <a href="{{ path('ligne_delete', {'id': ligne.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Supprimer</a>
+                                    <a href="{{ path('station_add', {
+                                        'ligne_id': ligne.id,
+                                        'admin_id': ligne.admin
+                                    }) }}" class="btn btn-sm btn-success">Ajouter Station</a>
 
-        <!-- Action Button Section -->
-        <div class="d-flex justify-content-between mt-4">
-            <a href="{{ path('ligne_add') }}" class="btn btn-primary">Ajouter une nouvelle Ligne</a>
-            <a href="" class="btn btn-outline-success btn-lg px-5">Gérer les Stations</a>
+
+
+                                </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center">No lignes found</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Button Section -->
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ path('ligne_add') }}" class="btn btn-primary">Ajouter une nouvelle Ligne</a>
+                <a href="" class="btn btn-outline-success btn-lg px-5">Gérer les Stations</a>
+                
+            </div>
         </div>
-    </div>
-{% endblock %}
+    {% endblock %}

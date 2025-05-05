@@ -6,7 +6,7 @@
     {{ parent() }}
     <style>
         .form-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
         }
         .form-control {
@@ -15,83 +15,75 @@
         .submit-btn {
             margin-top: 20px;
         }
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 8px;
+        }
     </style>
 {% endblock %}
-
 {% block content %}
-<br><br><br><br><br><br>
-<div class="container mt-4">
-    <div class="form-container">
-        <h2 class="text-center mb-4">Ajouter Ligne</h2>
-            
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h2 class="text-center mb-4">Ajouter Ligne</h2>
 
-        <div class="col-md-6">
-            <div class="card bg-primary text-white border-0 shadow-sm h-100">
-                <div class="card-header bg-transparent border-0">
-                    <h4 class="card-title text-white">🗺️ Trouvez votre destination</h4>
-                </div>
-                <div class="card-body p-0">
-                    <div class="card-body p-0">
-                        <div id="map" style="height: 500px; width: 100%;"></div>
+            <div class="row">
+                <!-- Left: Form -->
+                <div class="col-lg-5 mb-4">
+                    <div class="bg-light p-4 rounded shadow-sm">
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
+
+                        {{ form_row(form.depart, {
+                            'attr': {'class': 'form-control mb-3', 'placeholder': 'Enter departure'},
+                            'label': 'Départ',
+                            'row_attr': {'class': 'form-group'}
+                        }) }}
+
+                        {{ form_row(form.arret, {
+                            'attr': {'class': 'form-control mb-3', 'placeholder': 'Enter stop'},
+                            'label': 'Arrêt',
+                            'row_attr': {'class': 'form-group'}
+                        }) }}
+
+                        {{ form_row(form.type, {
+                            'attr': {'class': 'form-control mb-4', 'placeholder': 'Enter type'},
+                            'label': 'Type',
+                            'row_attr': {'class': 'form-group'}
+                        }) }}
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" onclick="window.location.href='{{ path('ligne_list_admin') }}'" class="btn btn-secondary">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Ajouter</button>
+                        </div>
+
+                        {{ form_end(form) }}
                     </div>
-                    <div class="p-2 text-end">
-                        <a href="https://www.openstreetmap.org/?#map=7/36.726/8.789" class="text-white">🔍 Voir en grand</a>
+                </div>
+
+                <!-- Right: Map -->
+                <div class="col-lg-7">
+                    <div class="card bg-primary text-white border-0 shadow-sm h-100">
+                        <div class="card-header bg-transparent border-0">
+                            <h4 class="card-title text-white">🗺️ Trouvez votre destination</h4>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="map" style="height: 500px; width: 100%;"></div>
+                            <div class="p-2 text-end">
+                                <a href="https://www.openstreetmap.org/?#map=7/36.726/8.789" class="text-white">🔍 Voir en grand</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </div> <!-- End row -->
         </div>
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
-
-        <div class="row mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.depart, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Enter departure'
-                    },
-                    'label': 'Départ',
-                    'row_attr': {'class': 'form-group'}
-                }) }}
-            </div>
-
-            <div class="col-md-6">
-                {{ form_row(form.arret, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Enter stop'
-                    },
-                    'label': 'Arrêt',
-                    'row_attr': {'class': 'form-group'}
-                }) }}
-            </div>
-        </div>
-
-        <div class="row mb-3">
-            <div class="col-md-6">
-                {{ form_row(form.type, {
-                    'attr': {
-                        'class': 'form-control',
-                        'placeholder': 'Enter type'
-                    },
-                    'label': 'Type',
-                    'row_attr': {'class': 'form-group'}
-                }) }}
-            </div>
-        </div>
-
-        <div class="d-flex justify-content-center gap-3 submit-btn">
-            <button type="button" onclick="window.location.href='{{ path('ligne_list_admin') }}'" class="btn btn-secondary px-4">Annuler</button>
-            <button type="submit" class="btn btn-primary px-4">Ajouter</button>
-        </div>
-
-        {{ form_end(form) }}
     </div>
 </div>
+
 {% block js %}
-{{ parent() }}
-                    <!--  MY MAP -->
-                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-                <script src="{{ asset('js/map.js') }}"></script>
-            {% endblock %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="{{ asset('js/map2.js') }}"></script>
+{% endblock %}
 {% endblock %}

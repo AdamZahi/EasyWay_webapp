@@ -1,0 +1,51 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %}Station{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Stations</h1>
+
+    <!-- Flash Messages -->
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <!-- Table Section -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Ligne</th>
+                    <th>Nom</th>
+                    <th>Localisation</th>
+                    <th>Administrateur</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for station in stations %}
+                    <tr>
+                        <td>{{ station.id_ligne }}</td>
+                        <td>{{ station.nom }}</td>
+                        <td>{{ station.localisation }}</td>
+                        <td>{{ station.id_admin.nom }}</td>
+                        <td>
+                            <a href="{{ path('station_edit', {'id': station.id}) }}" class="btn btn-sm btn-primary">Mettre à jour</a>
+                            <a href="{{ path('station_delete', {'id': station.id}) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Supprimer</a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">Aucune station trouvée</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Action Button Section -->
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ path('ligne_list_admin') }}" class="btn btn-outline-success btn-lg px-5">Gérer les Lignes</a>
+    </div>
+</div>
+{% endblock %}
