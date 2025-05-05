@@ -47,34 +47,36 @@
 
     {% block navbar %}
     <!-- Navbar Start -->
-    <nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
-        <a href="index.html" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
-            <h2 class="mb-2 text-white">EasyWay</h2>
-        </a>
-        <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a href="" class="nav-item nav-link active">Acceuil</a>
-                <a href="" class="nav-item nav-link">A propos</a>
-                <a href="" class="nav-item nav-link">Notre équipe</a>
-                <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
-                    <div class="dropdown-menu fade-up m-0">
-                        <a href="{{ path('app_covoiturage') }}" class="dropdown-item">Co-voiturage</a>
-                        <a href="" class="dropdown-item">Transport public</a>
-                        <a href="" class="dropdown-item">Véhicules</a>
-                        <a href="{{path('app_event_front')}}" class="dropdown-item">Événements</a>
-                        <a href="{{ path('app_reclamation') }} " class="dropdown-item">Réclamation</a>
-                    </div>
-                </div>
-                <a href="" class="nav-item nav-link">Contact</a>
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
+    <a href="{{ path('passager_dashboard') }}" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
+        <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" style="width: 60px; height: 60px; border-radius: 50%; margin-right: 10px;">
+        <h2 class="mb-2 text-white">EasyWay</h2>
+    </a>
+    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-nav ms-auto p-4 p-lg-0">
+            <a href="{{ path('passager_dashboard') }}" class="nav-item nav-link">Accueil</a>
+            <a href="{{ path('app_covoiturage') }}" class="nav-item nav-link">Co-voiturage</a>
+            <a href="{{ path('app_reclamation') }}" class="nav-item nav-link">Réclamation</a>
+            <a href="#" class="nav-item nav-link">Véhicules</a>
+            <a href="{{ path('app_event_front') }}" class="nav-item nav-link">Événements</a>
+            <div class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">
+                    <i class="fa fa-user me-2"></i>Profil
+                </a>
+                <ul class="dropdown-menu fade-up m-0">
+                    <li><a href="{{ path('profile_edit') }}" class="dropdown-item">Modifier mon profil</a></li>
+                    <li><a href="{{ path('app_logout') }}" class="dropdown-item">Se déconnecter</a></li>
+                </ul>
             </div>
-            <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="fa fa-headphones text-primary me-3"></i>+216 77 777 777</h4>
+            <a href="#" class="nav-item nav-link">Contact</a>
         </div>
-    </nav>
-    <!-- Navbar End -->
+    </div>
+</nav>
+<!-- Navbar End -->
+
     {% endblock %}
 
     <!-- Carousel Start -->
