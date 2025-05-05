@@ -2,19 +2,21 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-#[ORM\Table(name: 'event')]
+#[ORM\Table(name: 'evenement')]
 class Event
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column (type: 'integer')]
+    private ?int $id_evenement = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le type d\'événement est obligatoire')]
@@ -55,10 +57,27 @@ class Event
         message: "La date de fin doit être postérieure à la date de début"
     )]
     private ?\DateTimeInterface $dateFin = null;
+    
+    #[ORM\ManyToOne(targetEntity: Ligne::class)]
+    #[Assert\NotBlank(message: 'La ligne affectee est obligatoire!')]
+    #[ORM\JoinColumn(name: 'ligne_affectee', referencedColumnName: 'id')]
+    private Ligne $ligneAffectee;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'id_createur', referencedColumnName: 'id_user')]
+    private User $id_createur;
+    
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: EventComment::class, cascade: ['remove'])]
+    private Collection $comments;
+    
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection(); // Initialize the comments collection
+    }
 
     public function getId(): ?int
     {
-        return $this->id;
+        return $this->id_evenement;
     }
 
     public function getType(): ?string
@@ -115,4 +134,52 @@ class Event
         $this->dateFin = $dateFin;
         return $this;
     }
-} 
+
+    public function getLigneAffectee(): ?Ligne
+    {
+        return $this->ligneAffectee;
+    }
+
+    public function setLigneAffectee(?Ligne $ligneAffectee): static
+    {
+        $this->ligneAffectee = $ligneAffectee;
+        return $this;
+    }
+
+    public function getId_createur(): ?User{
+        return $this->id_createur;
+    }
+
+    public function setId_createur(User $user):static{
+        $this->id_createur = $user;
+        return $this;
+    }
+
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(EventComment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setEvent($this); // Assuming EventComment has a setEvent method
+        }
+
+        return $this;
+    }
+
+    public function removeComment(EventComment $comment): static
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+            // Set the owning side to null (unless already changed)
+            if ($comment->getEvent() === $this) {
+                $comment->setEvent(null); // Assuming EventComment has a setEvent method
+            }
+        }
+
+        return $this;
+    }
+}

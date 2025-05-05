@@ -67,13 +67,10 @@ class Reclamation
     private ?Categorie $Category_Id = null;
 
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'reclamations')]
-#[ORM\JoinColumn(name: 'id_user', referencedColumnName: 'id_user', nullable: false)]
-private ?User $user = null;
 
-
-    
-
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "id_user", nullable: false)]
+    private ?User $user = null;
 
 
     // 🔹 GETTERS & SETTERS
@@ -81,6 +78,8 @@ private ?User $user = null;
 
     public function __construct()
     {
+        $this->dateCreation = new \DateTimeImmutable();
+
         $this->reponses = new ArrayCollection();
     }
 
@@ -93,17 +92,7 @@ private ?User $user = null;
     }
 
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
     
-    public function setUser(?User $user): self
-    {
-        $this->user = $user;
-        return $this;
-    }
-
 
     public function getEmail(): string
     {
@@ -157,7 +146,7 @@ private ?User $user = null;
     }
 
 
-    public function getDateCreation(): \DateTimeInterface
+   public function getDateCreation(): \DateTimeInterface
     {
         return $this->dateCreation;
     }
@@ -168,7 +157,6 @@ private ?User $user = null;
         $this->dateCreation = $dateCreation;
         return $this;
     }
-
 
     public function getCategoryId(): ?Categorie
     {
@@ -206,6 +194,17 @@ public function removeReponse(Reponse $reponse): self
             $reponse->setReclamation(null);
         }
     }
+    return $this;
+}
+
+public function getUser(): ?User
+{
+    return $this->user;
+}
+
+public function setUser(?User $user): self
+{
+    $this->user = $user;
     return $this;
 }
 
