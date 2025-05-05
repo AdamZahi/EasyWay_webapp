@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 final class LigneController extends AbstractController
 {
-    #[Route('/ligne/add', name: 'ligne_add')]
+    #[Route('/dashboard/ligne/add', name: 'ligne_add')]
 public function add(Request $request, EntityManagerInterface $entityManager): Response
 {
     $ligne = new Ligne();
@@ -38,6 +38,15 @@ public function list(EntityManagerInterface $entityManager): Response
     $lignes = $entityManager->getRepository(Ligne::class)->findAll();
 
     return $this->render('/ligne/list.html.twig', [
+        'lignes' => $lignes
+    ]);
+}
+#[Route('dashboard/ligne/list', name: 'ligne_list_admin')]
+public function list_admin(EntityManagerInterface $entityManager): Response
+{
+    $lignes = $entityManager->getRepository(Ligne::class)->findAll();
+
+    return $this->render('/ligne/list_ligne.html.twig', [
         'lignes' => $lignes
     ]);
 }
