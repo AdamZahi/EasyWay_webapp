@@ -15,6 +15,7 @@ class LigneType extends AbstractType
             ->add('depart')
             ->add('arret')
             ->add('type')
+            ->add('admin_id')
         ;
     }
 

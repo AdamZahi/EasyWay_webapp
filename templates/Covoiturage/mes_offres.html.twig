@@ -4,9 +4,8 @@
 
 {% block body %}
 <!-- Navbar Start -->
-<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
-    <a href="{{ path('passager_dashboard') }}" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
-        <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" style="width: 60px; height: 60px; border-radius: 50%; margin-right: 10px;">
+<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">    
+    <a href="#" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
         <h2 class="mb-2 text-white">EasyWay</h2>
     </a>
     <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -14,22 +13,20 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav ms-auto p-4 p-lg-0">
-            <a href="{{ path('passager_dashboard') }}" class="nav-item nav-link">Accueil</a>
-            <a href="#" class="nav-item nav-link">Co-voiturage</a>
-            <a href="#" class="nav-item nav-link">Réclamation</a>
-            <a href="#" class="nav-item nav-link">Véhicules</a>
-            <a href="#" class="nav-item nav-link">Événements</a>
+            <a href="#" class="nav-item nav-link">Acceuil</a>
+            <a href="#" class="nav-item nav-link active">Événements</a>
             <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">
-                    <i class="fa fa-user me-2"></i>Profil
-                </a>
-                <ul class="dropdown-menu fade-up m-0">
-                    <li><a href="{{ path('profile_edit') }}" class="dropdown-item">Modifier mon profil</a></li>
-                    <li><a href="{{ path('app_logout') }}" class="dropdown-item">Se déconnecter</a></li>
-                </ul>
+                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Services</a>
+                <div class="dropdown-menu fade-up m-0">
+                    <a href="#" class="dropdown-item">Co-voiturage</a>
+                    <a href="#" class="dropdown-item">Transport public</a>
+                    <a href="#" class="dropdown-item">Véhicules</a>
+                    <a href="#" class="dropdown-item">Réclamation</a>
+                </div>
             </div>
             <a href="#" class="nav-item nav-link">Contact</a>
         </div>
+        <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="fa fa-headphones text-primary me-3"></i>+216 77 777 777</h4>
     </div>
 </nav>
 <!-- Navbar End -->
@@ -58,88 +55,64 @@
     </div> -->
 
     <!-- Sidebar and Main Content Layout -->
-  <div class="container-fluid" style="width: 100%; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    
-    <!-- Sidebar and Main Content Layout -->
-    <div class="d-flex" style="min-height: 100vh;">
-        <!-- Sidebar - Enhanced -->
-        <div class="sidebar" style="width: 280px; background-color: #f8f9fa; border-radius: 0 15px 15px 0; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); padding: 25px; position: sticky; top: 0; height: 100vh;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h3 style="font-size: 22px; font-weight: 600; color: #A11010; border-bottom: 2px solid #A11010; padding-bottom: 10px; display: inline-block;">Service de covoiturage</h3>
-            </div>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="col-md-3" style="width: 250px; background-color: transparent; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); padding: 20px;">
+            <h3 style="text-align: center; padding-top: 20px; font-size: 20px; font-weight: bold; color: #A11010;">Service de covoiturage</h3>
 
-            <div class="sidebar-menu" style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="p-3">
                 <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
-                    <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                        <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                        <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Profile</span>
+                    <div class="d-flex align-items-center">
+                        <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Profile</label>
                     </div>
                 </a>
             
                 <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
-                    <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                        <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                        <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Posts</span>
+                    <div class="d-flex align-items-center mt-3">
+                        <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Posts</label>
                     </div>
                 </a>
             
                 <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
-                    <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                        <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Offres</span>
+                    <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Offres</label>
                     </div>
                 </a>
 
                 <a href="{{ path('app_covoiturage_mes_offres') }}" style="text-decoration: none;">
-                    <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                        <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500; background-color: rgba(161, 16, 16, 0.1);">Mes offres</span>
+                    <div class="d-flex align-items-center mt-3" style="background-color: transparent;">
+                        <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 20px; height: 20px;">
+                        <label style="font-size: 16px; color: #333; margin-left: 10px;">Mes offres</label>
                     </div>
                 </a>
             </div>
         </div>
 
-        <!-- Main Content (Posts List) - Enhanced -->
-        <div class="main-content" style="flex: 1; padding: 30px; background-color: rgba(161, 16, 16, 0.1);">
-            <div class="scroll-container" style="width: 100%; max-height: calc(100vh - 60px); overflow-y: auto; padding-right: 15px;">
-                <div class="post-list" style="display: flex; flex-direction: column; gap: 20px;">
+        <!-- Main Content (Posts List) -->
+        <div class="col-md-9" style="padding: 20px;">
+            <div class="scroll-container" style="width: 100%; overflow-y: auto;">
+                <div class="post-list" style="padding: 10px; background-color: #f4efe230;">
                     {% for post in posts %}
-                        <div class="post-item" style="background-color: white; padding: 25px; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); transition: transform 0.3s, box-shadow 0.3s;">
-                            <h4 style="text-align: center; font-size: 20px; font-weight: 600; color: #A11010; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px;">Offre Covoiturage</h4>
+                        <div class="post-item" style="background-color: #f4efe202; padding: 15px; border: 1px solid #ccc; border-radius: 10px; margin-bottom: 10px;">
+                            <h4 style="text-align: center; font-size: 18px; font-weight: bold;">Offre Covoiturage</h4>
 
-                            <div class="post-details" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
-                                <div class="detail-item">
-                                    <span style="font-weight: 600; color: #555;">Description:</span>
-                                    <p style="margin-top: 5px; color: #333;">{{ post.message }}</p>
-                                </div>
-                                <div class="detail-item">
-                                    <span style="font-weight: 600; color: #555;">Départ:</span>
-                                    <p style="margin-top: 5px; color: #333;">{{ post.villeDepart }}</p>
-                                </div>
-                                <div class="detail-item">
-                                    <span style="font-weight: 600; color: #555;">Arrivée:</span>
-                                    <p style="margin-top: 5px; color: #333;">{{ post.villeArrivee }}</p>
-                                </div>
-                                <div class="detail-item">
-                                    <span style="font-weight: 600; color: #555;">Date:</span>
-                                    <p style="margin-top: 5px; color: #333;">{{ post.date ? post.date|date('Y-m-d') : 'Non spécifiée' }}</p>
-                                </div>
-                                <div class="detail-item">
-                                    <span style="font-weight: 600; color: #555;">Places:</span>
-                                    <p style="margin-top: 5px; color: #333;">{{ post.nombreDePlaces }}</p>
-                                </div>
-                                <div class="detail-item">
-                                    <span style="font-weight: 600; color: #555;">Prix:</span>
-                                    <p style="margin-top: 5px; color: #333;">{{ post.prix ? post.prix : 'Non spécifié' }} DT</p>
-                                </div>
+                            <div class="post-details">
+                                <p><strong>Description du trajet:</strong> {{ post.message }}</p>
+                                <p><strong>Lieu de départ:</strong> {{ post.villeDepart }}</p>
+                                <p><strong>Lieu d'arrivée:</strong> {{ post.villeArrivee }}</p>
+                                <p><strong>Date:</strong> {{ post.date ? post.date|date('Y-m-d') : 'Non spécifiée' }}</p>
+                                <p><strong>Nombre de places:</strong> {{ post.nombreDePlaces }}</p>
+                                <p><strong>Prix:</strong> {{ post.prix ? post.prix : 'Non spécifié' }} €</p>
                             </div>
 
-                            <div class="d-flex justify-content-end mt-4" style="gap: 10px;">
-                                <a href="{{ path('app_covoiturage_modifier', {'id_post': post.getIdPost()}) }}" class="btn btn-warning" style="font-size: 14px; padding: 8px 16px; border-radius: 6px; font-weight: 500;">
-                                    <i class="fas fa-edit"></i> Modifier
-                                </a>
-                                <button class="btn btn-danger" style="font-size: 14px; padding: 8px 16px; border-radius: 6px; font-weight: 500;" data-toggle="modal" data-target="#deleteModal{{ post.getIdPost() }}">
-                                    <i class="fas fa-trash-alt"></i> Supprimer
+                            <div class="d-flex justify-content-end mt-3">
+                                <a href="{{ path('app_covoiturage_modifier', {'id_post': post.getIdPost()}) }}" class="btn btn-warning mr-2" style="font-size: 14px;">Modifier</a>
+                                <!-- Trigger modal -->
+                                <button class="btn btn-danger" style="font-size: 14px;" data-toggle="modal" data-target="#deleteModal{{ post.getIdPost() }}">
+                                    Supprimer
                                 </button>
                             </div>
                             
@@ -147,23 +120,26 @@
                             <div class="modal fade" id="deleteModal{{ post.getIdPost() }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel{{ post.getIdPost() }}" aria-hidden="true">
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
-                                        <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
-                                            <h5 class="modal-title" id="deleteModalLabel{{ post.getIdPost() }}" style="font-weight: 600; color: #A11010;">Confirmation de suppression</h5>
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel{{ post.getIdPost() }}">Confirmation de suppression</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true" style="font-size: 28px; color: #777;">&times;</span>
+                                                <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
-                                        <div class="modal-body" style="padding-top: 10px; font-size: 15px; line-height: 1.6;">
-                                            Êtes-vous sûr de vouloir supprimer cette offre de covoiturage ?<br>
-                                            <span style="color: #A11010; font-weight: 500;">Cette action est irréversible.</span>
+                                        <div class="modal-body">
+                                            Êtes-vous sûr de vouloir supprimer cette offre de covoiturage ? Cette action est irréversible.
                                         </div>
-                                        <div class="modal-footer" style="border-top: none; padding-top: 0; justify-content: center; gap: 15px;">
-                                            <button type="button" class="btn btn-secondary" style="padding: 8px 20px; border-radius: 6px; font-weight: 500;" data-dismiss="modal">Annuler</button>
-                                            <a href="{{ path('app_covoiturage_supprimer', {'id_post': post.getIdPost()}) }}" class="btn btn-danger" style="padding: 8px 20px; border-radius: 6px; font-weight: 500;">Supprimer</a>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                            <a href="{{ path('app_covoiturage_supprimer', {'id_post': post.getIdPost()}) }}" class="btn btn-danger">Supprimer</a>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
+                            
+
+                            
                         </div>
                     {% endfor %}
                 </div>
@@ -171,5 +147,4 @@
         </div>
     </div>
 </div>
-               
 {% endblock %}

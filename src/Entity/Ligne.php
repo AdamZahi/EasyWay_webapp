@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\LigneRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LigneRepository::class)]
@@ -27,17 +25,6 @@ class Ligne
 
     #[ORM\Column(length: 255)]
     private ?string $type = null;
-
-    /**
-     * @var Collection<int, Station>
-     */
-    #[ORM\OneToMany(targetEntity: Station::class, mappedBy: 'ligne')]
-    private Collection $stations;
-
-    public function __construct()
-    {
-        $this->stations = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -85,36 +72,6 @@ class Ligne
     public function setType(string $type): static
     {
         $this->type = $type;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Station>
-     */
-    public function getStations(): Collection
-    {
-        return $this->stations;
-    }
-
-    public function addStation(Station $station): static
-    {
-        if (!$this->stations->contains($station)) {
-            $this->stations->add($station);
-            $station->setLigneId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStation(Station $station): static
-    {
-        if ($this->stations->removeElement($station)) {
-            // set the owning side to null (unless already changed)
-            if ($station->getLigneId() === $this) {
-                $station->setLigneId(null);
-            }
-        }
-
         return $this;
     }
 }

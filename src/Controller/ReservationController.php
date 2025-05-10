@@ -46,18 +46,21 @@ final class ReservationController extends AbstractController
             'reservations' => $reservations
         ]);
     }
+    
     #[Route('/reservation/list', name: 'reservation_list')]
-    public function list(EntityManagerInterface $entityManager): Response
-    {
-        $user = $this->getUser();
-        $reservations = $entityManager->getRepository(Reservation::class)->findBy([
-            'user' => $user
-        ]);
+public function list(EntityManagerInterface $entityManager): Response
+{
+    $user = $this->getUser();
+    $reservations = $entityManager->getRepository(Reservation::class)->findBy([
+        'user' => $user
+    ]);
 
-        return $this->render('/reservation/list.html.twig', [
-            'reservations' => $reservations
-        ]);
-    }
+    return $this->render('/reservation/list.html.twig', [
+        'reservations' => $reservations
+    ]);
+}
+
+
     #[Route('/reservation/edit/{id}', name: 'reservation_edit')]
     public function edit(Request $request, EntityManagerInterface $entityManager, int $id): Response
     {

@@ -3,14 +3,6 @@
 {% block title %}Créer un compte{% endblock %}
 
 {% block body %}
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  integrity="sha512-DB4U1XZ9pCn+cIsFQ6N+vX3NjU5fUAtGJOVLgJpgY7T0P4CKB0Yi4quv99IOzFIV1bZ5ISb1FK0eTZF+/P2H6w=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-/>
-
 <div class="container" style="background-color: #B7D973; min-height: 100vh; padding: 40px 0;">
     <div class="card mx-auto p-4 shadow" style="max-width: 800px; background-color: #ffffff;">
         <div class="d-flex justify-content-between mb-3">
@@ -36,18 +28,15 @@
                         {{ form_label(registrationForm.email, 'Adresse mail') }}
                         {{ form_widget(registrationForm.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@exemple.com'}}) }}
                     </div>
-                    <div class="form-group position-relative">
-                        {{ form_row(registrationForm.plainPassword) }}
-                        <span onclick="togglePassword('registration_form_plainPassword', 'eye1')" style="position:absolute; top:38px; right:10px; cursor:pointer;">
-                            <i class="fa fa-eye" id="eye1"></i>
-                        </span>
+
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.plainPassword, 'Mot de passe') }}
+                        {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}}) }}
                     </div>
 
-                    <div class="form-group position-relative mt-2">
-                        {{ form_row(registrationForm.confirmPassword) }}
-                        <span onclick="togglePassword('registration_form_confirmPassword', 'eye2')" style="position:absolute; top:38px; right:10px; cursor:pointer;">
-                            <i class="fa fa-eye" id="eye2"></i>
-                        </span>
+                    <div class="form-group mt-2">
+                        {{ form_label(registrationForm.confirmPassword, 'Confirmer le mot de passe') }}
+                        {{ form_widget(registrationForm.confirmPassword, {'attr': {'class': 'form-control', 'placeholder': 'Confirmer le mot de passe'}}) }}
                     </div>
 
                     <small class="text-muted mt-1 d-block">Utilisez 8 caractères ou plus avec un mélange de lettres, de chiffres et de symboles</small>
@@ -80,22 +69,5 @@
         </div>
     </div>
 </div>
-
-<script>
-function togglePassword(fieldId, iconId) {
-    const input = document.getElementById(fieldId);
-    const icon = document.getElementById(iconId);
-
-    if (input.type === "password") {
-        input.type = "text";
-        icon.classList.remove("fa-eye");
-        icon.classList.add("fa-eye-slash");
-    } else {
-        input.type = "password";
-        icon.classList.remove("fa-eye-slash");
-        icon.classList.add("fa-eye");
-    }
-}
-</script>
-
 {% endblock %}
+

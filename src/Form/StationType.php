@@ -12,8 +12,9 @@ class StationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('id_ligne')
             ->add('nom')
-            ->add('localisation')
+            ->add('id_admin')
         ;
     }
 

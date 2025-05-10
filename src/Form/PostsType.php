@@ -51,7 +51,7 @@ class PostsType extends AbstractType
                 'required' => false
             ])
           
-           
+           // src/Form/PostsType.php
 ->add('message', TextareaType::class, [
     'label' => 'Détails du trajet',
     

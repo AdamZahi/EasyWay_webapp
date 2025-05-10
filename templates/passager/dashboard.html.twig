@@ -1,5 +1,4 @@
 {% extends 'front-office/index.html.twig' %}
-{% extends 'front-office/index.html.twig' %}
 
 {% block title %}Passager Dashboard{% endblock %}
 
@@ -27,8 +26,8 @@
                     <i class="fa fa-user me-2"></i>Profil
                 </a>
                 <ul class="dropdown-menu fade-up m-0">
-                    <li><a href="" class="dropdown-item">Modifier mon profil</a></li>
-                    <li><a href="" class="dropdown-item">Se déconnecter</a></li>
+                    <li><a href="{{ path('profile_edit') }}" class="dropdown-item">Modifier mon profil</a></li>
+                    <li><a href="{{ path('app_logout') }}" class="dropdown-item">Se déconnecter</a></li>
                 </ul>
             </div>
             <a href="#" class="nav-item nav-link">Contact</a>
@@ -57,7 +56,7 @@
             <div class="card-body">
                 <h5 class="card-title fw-bold">🚗 Co-voiturage</h5>
                 <p class="card-text">Recherchez les trajets disponibles pour vos déplacements.</p>
-                <a href="" class="btn btn-primary">Rechercher un trajet</a>
+                <a href="{{ path('app_covoiturage') }}" class="btn btn-primary">Rechercher un trajet</a>
             </div>
         </div>
 
@@ -171,9 +170,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="container text-center mt-4">
-        <p class="mb-0">&copy; 2025 EasyWay. Tous droits réservés.</p>
     </div>
     <div class="container text-center mt-4">
         <p class="mb-0">&copy; 2025 EasyWay. Tous droits réservés.</p>

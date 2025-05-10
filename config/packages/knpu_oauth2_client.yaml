@@ -5,8 +5,4 @@ knpu_oauth2_client:
             client_id: '%env(OAUTH_GOOGLE_CLIENT_ID)%'
             client_secret: '%env(OAUTH_GOOGLE_CLIENT_SECRET)%'
             redirect_route: connect_google_check
-<<<<<<< HEAD
             redirect_params: {}
-=======
-            redirect_params: {}
->>>>>>> origin/main

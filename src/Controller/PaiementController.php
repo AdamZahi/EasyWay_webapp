@@ -22,11 +22,57 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PaiementController extends AbstractController
 {
-    private string $stripeSecretKey;
+        private string $stripeSecretKey;
 
-    public function __construct(ParameterBagInterface $params)
+    public function __construct(string $stripeSecretKey)
     {
-        $this->stripeSecretKey = $params->get('stripe.secret_key');
+        $this->stripeSecretKey = $stripeSecretKey;
+    }
+
+    #[Route('/paiement/add', name: 'paiement_add')]
+    public function add(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Security $security,
+        SessionInterface $session
+    ): Response {
+        $reservationId = $session->get('reservation_id');
+        $reservation = $entityManager->getRepository(Reservation::class)->find($reservationId);
+
+        if (!$reservation) {
+            throw $this->createNotFoundException('Reservation not found.');
+        }
+
+        $user = $security->getUser();
+        if (!$user) {
+            throw $this->createAccessDeniedException('User not authenticated.');
+        }
+
+        $vehicle = strtolower($reservation->getVehicule());
+        $nbSeats = $reservation->getNb();
+
+        $pricePerSeat = match ($vehicle) {
+            'bus' => 3.5,
+            'metro' => 3.0,
+            'train' => 2.5,
+            default => 3.0,
+        };
+
+        $montant = $pricePerSeat * $nbSeats;
+
+        Stripe::setApiKey($this->stripeSecretKey);
+
+        $paymentIntent = PaymentIntent::create([
+            'amount' => intval($montant * 100),
+            'currency' => 'usd',
+            'payment_method_types' => ['card'],
+        ]);
+
+        return $this->render('paiement/add.html.twig', [
+            'clientSecret' => $paymentIntent->client_secret,
+            'montant' => $montant,
+            //'stripe_public_key' => $this->getParameter('stripe.public_key'), 
+        ]);
     }
 
     #[Route('/paiement/confirm', name: 'paiement_confirm', methods: ['POST'])]
@@ -78,56 +124,6 @@ class PaiementController extends AbstractController
             return new Response('Error processing payment: ' . $e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
-        
-            
-
-    #[Route('/paiement/add', name: 'paiement_add')]
-    public function add(
-        Request $request,
-        EntityManagerInterface $entityManager,
-        Security $security,
-        SessionInterface $session
-    ): Response {
-        $reservationId = $session->get('reservation_id');
-        $reservation = $entityManager->getRepository(Reservation::class)->find($reservationId);
-
-        if (!$reservation) {
-            throw $this->createNotFoundException('Reservation not found.');
-        }
-
-        $user = $security->getUser();
-        if (!$user) {
-            throw $this->createAccessDeniedException('User not authenticated.');
-        }
-
-        $vehicle = strtolower($reservation->getVehicule());
-        $nbSeats = $reservation->getNb();
-
-        $pricePerSeat = match ($vehicle) {
-            'bus' => 3.5,
-            'metro' => 3.0,
-            'train' => 2.5,
-            default => 3.0,
-        };
-
-        $montant = $pricePerSeat * $nbSeats;
-
-        Stripe::setApiKey($this->stripeSecretKey);
-
-        $paymentIntent = PaymentIntent::create([
-            'amount' => intval($montant * 100),
-            'currency' => 'usd',
-            'payment_method_types' => ['card'],
-        ]);
-
-        return $this->render('paiement/add.html.twig', [
-            'clientSecret' => $paymentIntent->client_secret,
-            'montant' => $montant,
-            'stripe_public_key' => $this->getParameter('stripe.public_key'), // Add this line
-        ]);
-    }
-
 
     #[Route('/paiement/list', name: 'paiement_list')]
     public function list(Request $request, EntityManagerInterface $entityManager): Response

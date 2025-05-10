@@ -6,14 +6,12 @@ use App\Entity\Reclamation;
 use App\Entity\Categorie;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\DateType; 
+use Symfony\Component\Form\Extension\Core\Type\DateType; // ✅ Correction ici
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 
 
@@ -48,12 +46,9 @@ class ReclamationType extends AbstractType
             ->add('dateCreation', DateType::class, [
                 'widget' => 'single_text',
                 'html5' => true,
-                'attr' => [
-                    'class' => 'form-control',
-                    'readonly' => true,
-                ],
-            ])
-;            
+                'attr' => ['class' => 'form-control', 'id' => 'datepicker']  // Ajout de l'id
+            ]);
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void

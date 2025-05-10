@@ -17,30 +17,15 @@
                     <div class="alert alert-success">{{ flashMessage }}</div>
                 {% endfor %}
 
-                {% for flashMessage in app.flashes('error') %}
-                    <div class="alert alert-danger mt-3">{{ flashMessage }}</div>
-                {% endfor %}
-
-                {% if blocked %}
-                    <div class="alert alert-danger mt-3">
-                        Votre compte est bloqué. L'accès est interdit. Vous allez être déconnecté dans quelques secondes.
-                    </div>
-
-                    <script>
-                        window.onload = function() {
-                            // Affichage du message d'alerte
-                            alert("Votre compte est bloqué. L'accès est interdit.");
-                            // Redirection vers la page de déconnexion après la fermeture du pop-up
-                            setTimeout(function() {
-                                window.location.href = "{{ path('app_logout') }}"; // Redirection vers la page de déconnexion
-                            }, 3000); // Déconnexion après 3 secondes
-                        }
-                    </script>
-                {% endif %}
-
                 <form method="post">
                     {% if error %}
                         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                    {% endif %}
+
+                    {% if app.user %}
+                        <div class="mb-3">
+                            Vous êtes connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
+                        </div>
                     {% endif %}
 
                     <div class="form-group mb-3">

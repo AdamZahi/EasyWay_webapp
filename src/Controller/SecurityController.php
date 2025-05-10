@@ -27,25 +27,12 @@ class SecurityController extends AbstractController
         
         // Last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
-    
-        // Vérifier si l'utilisateur est connecté et si son rôle est 'ROLE_BLOCKED'
-        $blocked = false;
-        if ($this->getUser() && in_array('ROLE_BLOCKED', $this->getUser()->getRoles())) {
-            $blocked = true;
-            // Ajoutez un message flash ici si nécessaire
-            $this->addFlash('error', 'Votre compte est bloqué. L\'accès est interdit.');
-        }
-    
+
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
-            'blocked' => $blocked,
         ]);
     }
-    
-
-    
-
 
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void

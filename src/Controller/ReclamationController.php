@@ -22,10 +22,8 @@
     use Symfony\Component\HttpFoundation\JsonResponse;
     use App\Repository\ReponseRepository;
     use Symfony\Bundle\SecurityBundle\Security;
-    use App\Service\BrevoMailer;
-
-    use App\Entity\User;  
-
+    
+   
 
 
 
@@ -41,79 +39,33 @@
         }
 
         #[Route('/reclamation', name: 'app_reclamation')]
-public function index(Request $request, Security $security, BrevoMailer $brevoMailer, ReclamationRepository $reclamationRepository): Response
-{
-    // Create a new Reclamation instance
-    $reclamation = new Reclamation();
-    
-    // Create the form
-    $form = $this->createForm(ReclamationType::class, $reclamation);
+        public function index(Request $request): Response
+        {
+            // Create a new Reclamation instance
+            $reclamation = new Reclamation();
 
-    // Handle the form submission
-    $form->handleRequest($request);
-    if ($form->isSubmitted() && $form->isValid()) {
-        $user = $security->getUser();
-        if (!$user) {
-            throw new \Exception('Aucun utilisateur connecté.');
+            // Create the form
+            $form = $this->createForm(ReclamationType::class, $reclamation);
+
+            // Handle the form submission
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                // Persist the data to the database
+                $this->entityManager->persist($reclamation);
+                $this->entityManager->flush();
+
+                // Redirect after successful submission to avoid resubmitting on refresh
+                return $this->redirectToRoute('app_reclamation');
+            }
+
+            // Render the form in the template
+            return $this->render('front-office/reclamation/index.html.twig', [
+                'form' => $form->createView(),
+            ]);
         }
-    
-        // Associer l'utilisateur à la réclamation
-        $reclamation->setUser($user); 
-        // Persist the data to the database
-        $this->entityManager->persist($reclamation);
-        $this->entityManager->flush();
-        
-        // Prepare the email content
-        $contenuEmail = "
-            <p><strong>Sujet :</strong> {$reclamation->getSujet()}</p>
-            <p><strong>Description :</strong> {$reclamation->getDescription()}</p>
-            <p><strong>Catégorie :</strong> {$reclamation->getCategoryId()->getType()}</p>
-            <p><strong>Date de création :</strong> {$reclamation->getDateCreation()->format('d/m/Y')}</p>
-        ";
-
-        // Send the email
-        $brevoMailer->sendEmail(
-            $reclamation->getEmail(),
-            'Confirmation de votre réclamation',
-            $contenuEmail
-        );
-        
-        // Redirect after successful submission to avoid resubmitting on refresh
-        return $this->redirectToRoute('app_reclamation');
-    }
-
-    // Get the connected user
-    $user = $security->getUser();
-    if (!$user) {
-        throw new \Exception('Aucun utilisateur connecté.');
-    }
-
-    // Fetch the reclamations of the connected user
-    $reclamations = $reclamationRepository->createQueryBuilder('r')
-        ->leftJoin('r.reponses', 'rep')
-        ->where('r.user = :user')
-        ->setParameter('user', $user)
-        ->getQuery()
-        ->getResult();
-
-    // Prepare the responses for display
-    $reponses = [];
-    foreach ($reclamations as $reclamation) {
-        foreach ($reclamation->getReponses() as $reponse) {
-            $reponses[] = $reponse;
-        }
-    }
-
-    // Render the form and responses in the template
-    return $this->render('front-office/reclamation/index.html.twig', [
-        'form' => $form->createView(),
-        'reclamations' => $reclamations,
-        'reponses' => $reponses,
-    ]);
-}
 
 
-      /*  public function sendEmail(MailerInterface $mailer, $toEmail, $subject, $body)
+        public function sendEmail(MailerInterface $mailer, $toEmail, $subject, $body)
         {
             $email = (new Email())
                 ->from('sarrabennejma746@gmail.com')
@@ -122,10 +74,10 @@ public function index(Request $request, Security $security, BrevoMailer $brevoMa
                 ->text($body);
         
             $mailer->send($email);
-        }*/
+        }
         
 
-       
+
         #[Route('/add-reclamation', name: 'app_add_reclamation')]
         public function addReclamation(Request $request, MailerInterface $mailer, Security $security): Response
         {
@@ -153,6 +105,19 @@ public function index(Request $request, Security $security, BrevoMailer $brevoMa
                 $this->entityManager->persist($reclamation);
                 $this->entityManager->flush();
         
+                // Envoi de l'email de confirmation
+                try {
+                    $this->sendEmail(
+                        $mailer,
+                        $reclamation->getEmail(),
+                        'Confirmation de votre réclamation',
+                        'Votre réclamation a été reçue avec succès. Nous vous répondrons bientôt.'
+                    );
+                    $this->addFlash('success', 'Réclamation ajoutée et email envoyé.');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Réclamation ajoutée, mais erreur lors de l\'envoi de l\'email : ' . $e->getMessage());
+                }
+        
                 // Rediriger vers la page des réclamations
                 return $this->redirectToRoute('app_reclamation');
             }
@@ -160,10 +125,43 @@ public function index(Request $request, Security $security, BrevoMailer $brevoMa
             // Rendu du formulaire
             return $this->render('front-office/reclamation/index.html.twig', [
                 'form' => $form->createView(),
-                
             ]);
         }
         
+        
+
+////
+        
+        #[Route('/api/reclamation', name: 'api_add_reclamation', methods: ['POST'])]
+        public function addReclamationJson(Request $request, EntityManagerInterface $entityManager): JsonResponse
+        {
+            $data = json_decode($request->getContent(), true);
+        
+            if (!$data || !isset($data['email'], $data['sujet'], $data['description'])) {
+                return new JsonResponse(['error' => 'Données invalides'], 400);
+            }
+        
+            $reclamation = new Reclamation();
+            $reclamation->setEmail($data['email']);
+            $reclamation->setSujet($data['sujet']);
+            $reclamation->setDescription($data['description']);
+            $reclamation->setDateCreation(new \DateTime());
+            
+            // Assigner une valeur par défaut à 'statut'
+            $reclamation->setStatut('en_attente'); // Valeur par défaut
+        
+            $entityManager->persist($reclamation);
+            $entityManager->flush();
+        
+            return new JsonResponse(['message' => 'Réclamation ajoutée avec succès'], 201);
+        }
+
+        /*{
+  "email": "test@example.com",
+  "sujet": "Problème",
+  "description": "Description du problème"
+}
+*/
 
 
 #[Route('/list', name: 'admin_reclamations', methods: ['GET'])]
@@ -186,9 +184,8 @@ public function listReclamations(
         $qb->andWhere('r.statut = :statut')
            ->setParameter('statut', $selectedStatut);
     }
-    $qb->orderBy('r.dateCreation', 'DESC');
-    $reclamations = $qb->getQuery()->getResult();
 
+    $reclamations = $qb->getQuery()->getResult();
 
     $reclamationsWithReponses = $reponseRepository->findBy([], ['reclamation' => 'ASC']);
     $reclamationsWithReponsesIds = array_map(fn($r) => $r->getReclamation()->getId(), $reclamationsWithReponses);
@@ -221,6 +218,105 @@ public function listReclamationsApi(): JsonResponse
 
     return new JsonResponse($data, Response::HTTP_OK);
 }
+
+/*
+        #[Route('/edit/{id}', name: 'reclamation_edit')]
+        public function edit(Reclamation $reclamation, Request $request, EntityManagerInterface $entityManager): Response
+        {
+            // Sauvegarder les champs à ne pas modifier
+            $emailOriginal = $reclamation->getEmail();
+            $sujetOriginal = $reclamation->getSujet();
+            $descriptionOriginal = $reclamation->getDescription();
+
+            $form = $this->createFormBuilder($reclamation)
+                ->add('sujet', TextType::class, [
+                    'label' => 'Sujet',
+                    'disabled' => true,
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->add('email', TextType::class, [
+                    'label' => 'Email',
+                    'disabled' => true,
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->add('description', TextareaType::class, [
+                    'label' => 'Description',
+                    'disabled' => true,
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->add('statut', ChoiceType::class, [
+                    'label' => 'Statut',
+                    'choices' => [
+                        'En attend' => 'en_attente',
+                        'En cours' => 'en_cours',
+                        'Terminer' => 'Terminer',
+                    ],
+                    'attr' => ['class' => 'form-control']
+                ])
+                ->getForm();
+
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                // Restaurer les valeurs originales
+                $reclamation->setEmail($emailOriginal);
+                $reclamation->setSujet($sujetOriginal);
+                $reclamation->setDescription($descriptionOriginal);
+
+                $entityManager->flush();
+                $this->addFlash('success', 'Réclamation modifiée avec succès !');
+                return $this->redirectToRoute('admin_reclamations');
+            }
+
+            return $this->render('back-office/reclamation/edit.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
+       */ 
+
+
+        #[Route('/delete/{id}', name:'reclamation_delete', methods:["POST"])]
+        
+        public function delete(Request $request, Reclamation $reclamation, EntityManagerInterface $entityManager, CsrfTokenManagerInterface $csrfTokenManager): Response
+        {
+            $submittedToken = $request->request->get('_token');
+
+            if ($csrfTokenManager->isTokenValid(new CsrfToken('delete' . $reclamation->getId(), $submittedToken))) {
+                $entityManager->remove($reclamation);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Réclamation supprimée avec succès !');
+            } else {
+                $this->addFlash('danger', 'Token CSRF invalide.');
+            }
+
+            return $this->redirectToRoute('admin_reclamations');
+        }
+
+
+        #[Route('/api/reclamation/{id}', name: 'api_delete_reclamation', methods: ['DELETE'])]
+public function deleteReclamationJson($id, EntityManagerInterface $entityManager): JsonResponse
+{
+    // Recherche de la réclamation par son ID
+    $reclamation = $entityManager->getRepository(Reclamation::class)->find($id);
+
+    if (!$reclamation) {
+        // Si la réclamation n'existe pas, renvoyer une erreur 404
+        return new JsonResponse(['error' => 'Réclamation non trouvée'], 404);
+    }
+
+    // Supprimer la réclamation
+    $entityManager->remove($reclamation);
+    $entityManager->flush();
+
+    // Réponse JSON de succès
+    return new JsonResponse(['message' => 'Réclamation supprimée avec succès'], 200);
+}
+
+/*delete + http://127.0.0.1:8000/api/reclamation/16 */
+
+
 
         
 #[Route('/admin/reclamation/{id}/repondre', name:'admin_repondre_reclamation')]

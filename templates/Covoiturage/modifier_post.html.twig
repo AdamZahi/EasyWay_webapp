@@ -3,90 +3,23 @@
 {% block title %}Modifier l'offre | EasyWay{% endblock %}
 
 {% block body %}
-<!-- Navbar Start -->
-<nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
-    <a href="{{ path('passager_dashboard') }}" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
-        <img src="{{ asset('img/LOGOEASY.png') }}" alt="Logo EasyWay" style="width: 60px; height: 60px; border-radius: 50%; margin-right: 10px;">
-        <h2 class="mb-2 text-white">EasyWay</h2>
-    </a>
-    <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarCollapse">
-        <div class="navbar-nav ms-auto p-4 p-lg-0">
-            <a href="{{ path('passager_dashboard') }}" class="nav-item nav-link">Accueil</a>
-            <a href="#" class="nav-item nav-link">Co-voiturage</a>
-            <a href="#" class="nav-item nav-link">Réclamation</a>
-            <a href="#" class="nav-item nav-link">Véhicules</a>
-            <a href="#" class="nav-item nav-link">Événements</a>
-            <div class="nav-item dropdown">
-                <a href="#" class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">
-                    <i class="fa fa-user me-2"></i>Profil
-                </a>
-                <ul class="dropdown-menu fade-up m-0">
-                    <li><a href="{{ path('profile_edit') }}" class="dropdown-item">Modifier mon profil</a></li>
-                    <li><a href="{{ path('app_logout') }}" class="dropdown-item">Se déconnecter</a></li>
-                </ul>
-            </div>
-            <a href="#" class="nav-item nav-link">Contact</a>
-        </div>
+<div class="container mt-5">
+
+    {# LOGO #}
+    <div class="text-center mb-4">
+        <img src="{{ asset('img/carpool.png') }}" alt="Logo EasyWay" class="img-fluid" style="max-height: 120px;">
     </div>
-</nav>
-<!-- Navbar End -->
 
-<div class="d-flex" style="min-height: 100vh;">
-    <!-- Sidebar Start -->
-    <div class="sidebar" style="width: 280px; background-color: #f8f9fa; border-radius: 0 15px 15px 0; box-shadow: 4px 0 15px rgba(0, 0, 0, 0.05); padding: 25px; position: sticky; top: 0; height: 100vh;">
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h3 style="font-size: 22px; font-weight: 600; color: #A11010; border-bottom: 2px solid #A11010; padding-bottom: 10px; display: inline-block;">Service de covoiturage</h3>
-        </div>
+    <h2 class="mb-4 text-center fw-bold text-primary">Modifier l'offre de covoiturage</h2>
 
-        <div class="sidebar-menu" style="display: flex; flex-direction: column; gap: 15px;">
-            <a href="{{ path('app_covoiturage') }}" style="text-decoration: none;">
-                <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                    <img src="{{ asset('img/profil.png') }}" alt="Profile Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                    <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Profile</span>
-                </div>
-            </a>
+    {# Affichage des erreurs globales #}
+    {% for error in form.vars.errors %}
+        <div class="alert alert-danger text-center">{{ error.message }}</div>
+    {% endfor %}
 
-            <a href="{{ path('app_covoiturage_poster') }}" style="text-decoration: none;">
-                <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                    <img src="{{ asset('img/car.png') }}" alt="Car Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                    <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Posts</span>
-                </div>
-            </a>
-
-            <a href="{{ path('app_covoiturage_rechercher') }}" style="text-decoration: none;">
-                <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                    <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                    <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500; background-color: rgba(161, 16, 16, 0.1);">Offres</span>
-                </div>
-            </a>
-
-            <a href="{{ path('app_covoiturage_mes_offres') }}" style="text-decoration: none;">
-                <div class="menu-item" style="display: flex; align-items: center; padding: 12px 15px; border-radius: 8px; transition: all 0.3s;">
-                    <img src="{{ asset('img/chatt.png') }}" alt="Chat Icon" style="width: 22px; height: 22px; filter: brightness(0.7);">
-                    <span style="font-size: 16px; color: #333; margin-left: 12px; font-weight: 500;">Mes offres</span>
-                </div>
-            </a>
-        </div>
-    </div>
-    <!-- Sidebar End -->
-
-    <!-- Main Content Start -->
-    <div class="container mt-5">
-        <!-- LOGO -->
-      
-        <h2 class="mb-4 text-center fw-bold text-primary">Modifier l'offre de covoiturage</h2>
-
-        <!-- Display global errors -->
-        {% for error in form.vars.errors %}
-            <div class="alert alert-danger text-center">{{ error.message }}</div>
-        {% endfor %}
-
-        <div class="card shadow-lg mx-auto" style="max-width: 600px;">
-            <div class="card-body bg-light rounded">
-                {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+    <div class="card shadow-lg mx-auto" style="max-width: 600px;">
+        <div class="card-body bg-light rounded">
+            {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
 
                 <div class="form-group mb-3">
                     {{ form_label(form.message, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
@@ -132,11 +65,8 @@
                         <i class="fas fa-check me-2"></i>Enregistrer
                     </button>
                 </div>
-
-                {{ form_end(form) }}
-            </div>
+            {{ form_end(form) }}
         </div>
     </div>
-    <!-- Main Content End -->
 </div>
 {% endblock %}

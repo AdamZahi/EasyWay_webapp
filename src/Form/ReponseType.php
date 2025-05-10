@@ -25,13 +25,9 @@ class ReponseType extends AbstractType
         ->add('createdAt', DateTimeType::class, [
             'label' => 'Date de la réponse',
             'widget' => 'single_text',
-            'attr' => [
-                'class' => 'form-control',
-                'readonly' => true,
-            ],
+            'attr' => ['class' => 'form-control'],
             'required' => false,
-        ])
-        ;
+        ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

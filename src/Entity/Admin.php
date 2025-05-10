@@ -62,16 +62,9 @@ class Admin
     #[ORM\OneToMany(targetEntity: Ligne::class, mappedBy: 'admin_id')]
     private Collection $lignes;
 
-    /**
-     * @var Collection<int, Station>
-     */
-    #[ORM\OneToMany(targetEntity: Station::class, mappedBy: 'admin_id')]
-    private Collection $stations;
-
     public function __construct()
     {
         $this->lignes = new ArrayCollection();
-        $this->stations = new ArrayCollection();
     }
 
     public function getIdAdmin(): ?int
@@ -180,36 +173,6 @@ class Admin
             // set the owning side to null (unless already changed)
             if ($ligne->getAdminId() === $this) {
                 $ligne->setAdminId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Station>
-     */
-    public function getStations(): Collection
-    {
-        return $this->stations;
-    }
-
-    public function addStation(Station $station): static
-    {
-        if (!$this->stations->contains($station)) {
-            $this->stations->add($station);
-            $station->setAdminId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeStation(Station $station): static
-    {
-        if ($this->stations->removeElement($station)) {
-            // set the owning side to null (unless already changed)
-            if ($station->getAdminId() === $this) {
-                $station->setAdminId(null);
             }
         }
 
