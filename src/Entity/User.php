@@ -88,6 +88,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 
 
+
+
     /**
      * @var Collection<int, Reclamation>
      */
@@ -112,6 +114,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->photo_profil = 'default_profile.png';
         $this->reclamations = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
+        $this->paiements = new ArrayCollection();       
         $this->reservations = new ArrayCollection();
         $this->paiements = new ArrayCollection();       
     }
@@ -174,6 +178,8 @@ public function setAdmin(?Admin $admin): static
         $this->roles = $roles;
         return $this;
     }
+
+    
 
     
     /**
