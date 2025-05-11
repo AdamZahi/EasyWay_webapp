@@ -1,0 +1,14 @@
+
+
+{% block body %}
+    <h2>Réponses liées à l'email : {{ email }}</h2>
+    {% if reponses is not empty %}
+        <ul>
+            {% for reponse in reponses %}
+                <li>{{ reponse.contenu }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucune réponse trouvée.</p>
+    {% endif %}
+{% endblock %}

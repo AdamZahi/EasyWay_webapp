@@ -32,7 +32,7 @@
                     <th>Status</th>
                     <th><a href="#" onclick="sortTable(5)">Date ⬍</a></th>
                     <th>Réponse</th>
-                    <th>Actions</th>
+                  {#  <th>Actions</th> #}
                 </tr>
 </thead>
 
@@ -57,21 +57,21 @@
                                 Voir Réponses >>
                             </a>
                         </td>
-                        <td>
+                      {#    <td>
                             <!-- Bouton Modifier -->
-                          {#   <a href="{{ path('reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning btn-sm">
+                           <a href="{{ path('reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning btn-sm">
                                 ✏ Modifier
-                            </a>  #}
+                            </a>  
 
                             <!-- Bouton Supprimer -->
-                            <form action="{{ path('reclamation_delete', {'id': reclamation.id}) }}" method="post" style="display:inline;">
+                           <form action="{{ path('reclamation_delete', {'id': reclamation.id}) }}" method="post" style="display:inline;">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?');">
                                     🗑 Supprimer
                                 </button>
                             </form>
-                        </td>
+                        </td> #}
                     </tr>
                 {% else %}
                     <tr>

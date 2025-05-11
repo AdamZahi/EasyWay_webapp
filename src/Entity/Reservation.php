@@ -57,7 +57,6 @@ class Reservation
         notInRangeMessage: 'Le nombre de places doit être entre {{ min }} et {{ max }}.'  // Using notInRangeMessage
     )]
     private ?int $nb = null;
-
     /**
      * @var Collection<int, Paiement>
      */

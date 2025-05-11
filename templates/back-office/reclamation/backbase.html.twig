@@ -113,7 +113,7 @@
     <!--begin::Sidebar Brand-->
     <div class="sidebar-brand">
         <!--begin::Brand Link-->
-        <a href="{{path('back_office')}}" class="brand-link">
+        <a href="{{path('admin__home')}}" class="brand-link">
             <!--begin::Brand Image-->
             <img
                 src="{{ asset('img/LOGOEASY.png') }}"
@@ -157,19 +157,18 @@
 </li>
 
      <li class="nav-item">
-    <a href="#" class="nav-link">
+    <a href="{{path('back_office4')}}" class="nav-link">
         <i class="nav-icon bi bi-graph-up"></i>
         <p>Statistique posts</p>
     </a>
 </li>
 
 <li class="nav-item">
-    <a href="#" class="nav-link">
+    <a href="{{ path('ligne_dashboard') }}" class="nav-link">
         <i class="nav-icon bi bi-map"></i>
         <p>Trajet</p>
     </a>
 </li>
-
 
 <li class="nav-item">
     <a href="#" class="nav-link">

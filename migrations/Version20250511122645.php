@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250428085000 extends AbstractMigration
+final class Version20250511122645 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -39,19 +39,19 @@ final class Version20250428085000 extends AbstractMigration
             CREATE TABLE event_comment (id INT AUTO_INCREMENT NOT NULL, event_id INT NOT NULL, user_id INT DEFAULT NULL, comment VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_1123FBC371F7E88B (event_id), INDEX IDX_1123FBC3A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE ligne (id INT AUTO_INCREMENT NOT NULL, admin_id INT NOT NULL, depart VARCHAR(255) NOT NULL, arret VARCHAR(255) NOT NULL, type VARCHAR(255) NOT NULL, INDEX IDX_57F0DB83642B8210 (admin_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE ligne (id INT AUTO_INCREMENT NOT NULL, depart VARCHAR(255) NOT NULL, arret VARCHAR(255) NOT NULL, type VARCHAR(255) NOT NULL, admin_id INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE messenger_messages (id BIGINT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at VARCHAR(255) NOT NULL, available_at VARCHAR(255) NOT NULL, delivered_at VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE paiement (id INT AUTO_INCREMENT NOT NULL, res_id_id INT DEFAULT NULL, user_id INT NOT NULL, pay_id VARCHAR(255) NOT NULL, montant DOUBLE PRECISION NOT NULL, INDEX IDX_B1DC7A1E396948FC (res_id_id), INDEX IDX_B1DC7A1EA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE paiement (id INT AUTO_INCREMENT NOT NULL, res_id INT NOT NULL, user_id INT NOT NULL, pay_id VARCHAR(255) NOT NULL, montant DOUBLE PRECISION NOT NULL, INDEX IDX_B1DC7A1E4670E604 (res_id), INDEX IDX_B1DC7A1EA76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE passager (id_passager INT AUTO_INCREMENT NOT NULL, id_user INT NOT NULL, nom VARCHAR(255) NOT NULL, prenom VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, mot_de_passe VARCHAR(255) NOT NULL, telephonne INT NOT NULL, photo_profil VARCHAR(255) DEFAULT 'default_profile.png' NOT NULL, nb_trajet_effectues INT NOT NULL, UNIQUE INDEX UNIQ_BFF42EE96B3CA4B (id_user), PRIMARY KEY(id_passager)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE payment (payment_id INT AUTO_INCREMENT NOT NULL, transaction_id INT NOT NULL, amount DOUBLE PRECISION NOT NULL, email VARCHAR(255) NOT NULL, PRIMARY KEY(payment_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE payment (payment_id INT AUTO_INCREMENT NOT NULL, transaction_id VARCHAR(255) NOT NULL, amount DOUBLE PRECISION NOT NULL, email VARCHAR(255) NOT NULL, PRIMARY KEY(payment_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE posts (id_post INT AUTO_INCREMENT NOT NULL, id_user INT NOT NULL, ville_depart VARCHAR(255) NOT NULL, ville_arrivee VARCHAR(255) NOT NULL, date DATE NOT NULL, message VARCHAR(255) NOT NULL, nombre_de_places INT NOT NULL, prix DOUBLE PRECISION NOT NULL, INDEX IDX_885DBAFA6B3CA4B (id_user), PRIMARY KEY(id_post)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -66,7 +66,7 @@ final class Version20250428085000 extends AbstractMigration
             CREATE TABLE reservation (id INT AUTO_INCREMENT NOT NULL, user_id INT NOT NULL, depart VARCHAR(255) NOT NULL, arret VARCHAR(255) NOT NULL, vehicule VARCHAR(255) NOT NULL, nb INT NOT NULL, INDEX IDX_42C84955A76ED395 (user_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE station (id INT AUTO_INCREMENT NOT NULL, id_ligne_id INT DEFAULT NULL, id_admin INT NOT NULL, nom VARCHAR(255) NOT NULL, localisation VARCHAR(255) NOT NULL, INDEX IDX_9F39F8B1A9862E3 (id_ligne_id), INDEX IDX_9F39F8B1668B4C46 (id_admin), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            CREATE TABLE station (id INT AUTO_INCREMENT NOT NULL, id_ligne INT DEFAULT NULL, nom VARCHAR(255) NOT NULL, localisation VARCHAR(255) NOT NULL, id_admin INT NOT NULL, INDEX IDX_9F39F8B1B9759AB3 (id_ligne), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
         SQL);
         $this->addSql(<<<'SQL'
             CREATE TABLE user (id_user INT AUTO_INCREMENT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL COMMENT '(DC2Type:json)', password VARCHAR(255) NOT NULL, nom VARCHAR(255) NOT NULL, prenom VARCHAR(255) NOT NULL, telephonne VARCHAR(255) NOT NULL, photo_profil VARCHAR(255) DEFAULT 'default_profile.png' NOT NULL, UNIQUE INDEX UNIQ_8D93D649E7927C74 (email), PRIMARY KEY(id_user)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
@@ -96,10 +96,7 @@ final class Version20250428085000 extends AbstractMigration
             ALTER TABLE event_comment ADD CONSTRAINT FK_1123FBC3A76ED395 FOREIGN KEY (user_id) REFERENCES user (id_user)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE ligne ADD CONSTRAINT FK_57F0DB83642B8210 FOREIGN KEY (admin_id) REFERENCES admin (id_admin)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE paiement ADD CONSTRAINT FK_B1DC7A1E396948FC FOREIGN KEY (res_id_id) REFERENCES reservation (id)
+            ALTER TABLE paiement ADD CONSTRAINT FK_B1DC7A1E4670E604 FOREIGN KEY (res_id) REFERENCES reservation (id)
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE paiement ADD CONSTRAINT FK_B1DC7A1EA76ED395 FOREIGN KEY (user_id) REFERENCES user (id_user)
@@ -123,10 +120,7 @@ final class Version20250428085000 extends AbstractMigration
             ALTER TABLE reservation ADD CONSTRAINT FK_42C84955A76ED395 FOREIGN KEY (user_id) REFERENCES user (id_user)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE station ADD CONSTRAINT FK_9F39F8B1A9862E3 FOREIGN KEY (id_ligne_id) REFERENCES ligne (id)
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE station ADD CONSTRAINT FK_9F39F8B1668B4C46 FOREIGN KEY (id_admin) REFERENCES admin (id_admin)
+            ALTER TABLE station ADD CONSTRAINT FK_9F39F8B1B9759AB3 FOREIGN KEY (id_ligne) REFERENCES ligne (id)
         SQL);
     }
 
@@ -158,10 +152,7 @@ final class Version20250428085000 extends AbstractMigration
             ALTER TABLE event_comment DROP FOREIGN KEY FK_1123FBC3A76ED395
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE ligne DROP FOREIGN KEY FK_57F0DB83642B8210
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE paiement DROP FOREIGN KEY FK_B1DC7A1E396948FC
+            ALTER TABLE paiement DROP FOREIGN KEY FK_B1DC7A1E4670E604
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE paiement DROP FOREIGN KEY FK_B1DC7A1EA76ED395
@@ -185,10 +176,7 @@ final class Version20250428085000 extends AbstractMigration
             ALTER TABLE reservation DROP FOREIGN KEY FK_42C84955A76ED395
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE station DROP FOREIGN KEY FK_9F39F8B1A9862E3
-        SQL);
-        $this->addSql(<<<'SQL'
-            ALTER TABLE station DROP FOREIGN KEY FK_9F39F8B1668B4C46
+            ALTER TABLE station DROP FOREIGN KEY FK_9F39F8B1B9759AB3
         SQL);
         $this->addSql(<<<'SQL'
             DROP TABLE admin

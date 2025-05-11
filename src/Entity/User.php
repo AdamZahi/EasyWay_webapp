@@ -9,15 +9,20 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: "id_user")]
+    #[ORM\Column(name: "id_user", type: "integer")]
     private ?int $id_user = null;
+    
+    
+
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank(message: "L'email ne peut pas être vide")]
@@ -78,26 +83,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Conducteur $conducteur = null;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Admin::class, cascade: ['persist', 'remove'])]
+    private ?Admin $admin = null;
+
+
+
+    /**
+     * @var Collection<int, Reclamation>
+     */
+    #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_user')]
+    private Collection $reclamations;
+
+    
     /**
      * @var Collection<int, Reservation>
      */
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'id_user')]
     private Collection $reservations;
-
     /**
      * @var Collection<int, Paiement>
      */
     #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'user_id')]
     private Collection $paiements;
 
-    
 
     public function __construct()
     {
         $this->photo_profil = 'default_profile.png';
+        $this->reclamations = new ArrayCollection();
         $this->reservations = new ArrayCollection();
-        $this->paiements = new ArrayCollection();
-        
+        $this->paiements = new ArrayCollection();       
     }
 
     public function getIdUser(): ?int
@@ -121,6 +136,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
         return $this;
     }
+
+    public function getAdmin(): ?Admin
+{
+    return $this->admin;
+}
+
+public function setAdmin(?Admin $admin): static
+{
+    $this->admin = $admin;
+    return $this;
+}
 
     /**
      * A visual identifier that represents this user.
@@ -148,6 +174,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -210,10 +237,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     public function setPhotoProfil(?string $photo_profil): static
-    {
-        $this->photo_profil = $photo_profil ?? 'default_profile.png';
-        return $this;
-    }
+{
+    $this->photo_profil = $photo_profil ?? 'default_profile.png';
+    return $this;
+}
+
 
     public function getPassager(): ?Passager
     {
@@ -238,6 +266,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return Collection<int, Reclamation>
+     */
+    public function getReclamations(): Collection
+    {
+        return $this->reclamations;
+    }
+
+    public function addReclamation(Reclamation $reclamation): static
+    {
+        if (!$this->reclamations->contains($reclamation)) {
+            $this->reclamations->add($reclamation);
+            $reclamation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Reservation>
      */
     public function getReservations(): Collection
@@ -249,7 +295,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->reservations->contains($reservation)) {
             $this->reservations->add($reservation);
-            $reservation->setUserId($this);
+            $reservation->setUser($this);
         }
 
         return $this;
@@ -259,15 +305,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->reservations->removeElement($reservation)) {
             // set the owning side to null (unless already changed)
-            if ($reservation->getUserId() === $this) {
-                $reservation->setUserId(null);
+            if ($reservation->getUser() === $this) {
+                $reservation->setUser(null);
             }
         }
 
         return $this;
+        
     }
-
-    /**
+     /**
      * @return Collection<int, Paiement>
      */
     public function getPaiements(): Collection
@@ -295,6 +341,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
-    }
+    } 
 
 }

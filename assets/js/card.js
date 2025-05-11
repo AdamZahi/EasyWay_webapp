@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Try to find the nb input (by name or id)
     const hiddenInput = document.querySelector('input[name$="[nb]"]');
 
     if (!hiddenInput) {

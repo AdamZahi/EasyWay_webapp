@@ -5,44 +5,53 @@
         {{ parent() }}
     {% endblock %}
     <main>
-    <div class="container mt-4">
-        <h1>Liste des Événements</h1>
+    <main class="py-5 bg-light">
+        <div class="container">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-light text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">📅 Liste des Événements</h3>
+                    <span class="badge bg-light text-primary">{{ events|length }} événement(s)</span>
+                </div>
 
-        <div id="eventsTable">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Ligne</th>
-                        <th>Type</th>
-                        <th>Description</th>
-                        <th>Date debut</th>
-                        <th>Date fin</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for event in events %}
-                    <tr>
-                        <td> {{ event.ligneAffectee.depart }} - {{ event.ligneAffectee.arret }}</td>
-                        <td>{{ event.type }}</td>
-                        <td>{{ event.description }}</td>
-                        <td>{{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i:s') : '' }}</td>
-                        <td>{{ event.dateFin ? event.dateFin|date('d/m/Y H:i:s') : '' }}</td>
-                        <td>
-                            <a href="{{ path('app_event_front_show', {'id': event.id}) }}" class="btn btn-info btn-sm">Voir</a>
-                            <a href="{{ path('event_comment', {'id': event.id}) }}" class="btn btn-info btn-sm">Commentaire</a>
-                            
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7">No events found</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                <div class="card-body p-0">
+                
+                    <div class="table-responsive">
+                        <table class="table table-striped mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Ligne</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Date début</th>
+                                    <th>Date fin</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for event in events %}
+                                    <tr>
+                                        <td>{{ event.ligneAffectee.depart }} → {{ event.ligneAffectee.arret }}</td>
+                                        <td><span class="badge bg-info text-dark">{{ event.type }}</span></td>
+                                        <td>{{ event.description }}</td>
+                                        <td>{{ event.dateDebut ? event.dateDebut|date('d/m/Y H:i') : '' }}</td>
+                                        <td>{{ event.dateFin ? event.dateFin|date('d/m/Y H:i') : '' }}</td>
+                                        <td>
+                                            <a href="{{ path('app_event_front_show', {'id': event.id}) }}" class="btn btn-outline-primary btn-sm mb-1">🔍 Voir</a>
+                                            <a href="{{ path('event_comment', {'id': event.id}) }}" class="btn btn-outline-secondary btn-sm">💬 Commentaire</a>
+                                        </td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4">Aucun événement trouvé.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 
     <script>
         let searchTimeout;

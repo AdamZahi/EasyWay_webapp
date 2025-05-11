@@ -31,14 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     montant: window.paiementData.montant
                 }),
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = window.paiementData.redirectUrl;
-                } else {
-                    alert("Erreur d'enregistrement du paiement. 😓");
-                }
-            });
+            .then(res => res.json());
         }
     });
 

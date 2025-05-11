@@ -1,0 +1,49 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %}Stations{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Liste des Stations</h1>
+
+        <!-- Flash Messages -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <!-- Table of Stations -->
+        <div class="table-responsive">
+            <table class="table table-striped align-middle text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Localisation</th>
+                        <th>Départ de la Ligne</th>
+                        <th>Administrateur</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for station in stations %}
+                        <tr>
+                            <td>{{ station.nom }}</td>
+                            <td>{{ station.localisation }}</td>
+                            <td>{{ station.ligne.depart }}</td>
+                            <td>{{ station.admin.nom }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ path('station_edit', {'id': station.id}) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                                    <a href="{{ path('station_delete', {'id': station.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette station ?')">Supprimer</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune station trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
