@@ -53,7 +53,8 @@
                                     <ul class="list-group">
                                         {% for comment in event.comments %}
                                             <li class="list-group-item">
-                                                <p><strong>Commentaire:</strong> {{ comment.comment }}</p>
+                                                <strong>{{ comment.user.nom }} {{ comment.user.prenom }}</strong>
+                                                <p> {{ comment.comment }}</p>
                                                 <p><small><strong>Ajouté le:</strong> {{ comment.createdAt ? comment.createdAt|date('d/m/Y H:i') : 'N/A' }}</small></p>
                                             </li>
                                         {% endfor %}
