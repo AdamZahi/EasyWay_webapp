@@ -86,17 +86,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Admin::class, cascade: ['persist', 'remove'])]
     private ?Admin $admin = null;
 
+
+
     /**
      * @var Collection<int, Reclamation>
      */
     #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_user')]
     private Collection $reclamations;
 
+    
+    /**
+     * @var Collection<int, Reservation>
+     */
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'id_user')]
+    private Collection $reservations;
+    /**
+     * @var Collection<int, Paiement>
+     */
+    #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'user_id')]
+    private Collection $paiements;
+
+
     public function __construct()
     {
         $this->photo_profil = 'default_profile.png';
         $this->reclamations = new ArrayCollection();
-       
+        $this->reservations = new ArrayCollection();
+        $this->paiements = new ArrayCollection();       
     }
 
     public function getIdUser(): ?int
@@ -158,6 +174,7 @@ public function setAdmin(?Admin $admin): static
         return $this;
     }
 
+    
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -265,4 +282,65 @@ public function setAdmin(?Admin $admin): static
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
+    }
+
+    public function addReservation(Reservation $reservation): static
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): static
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getUser() === $this) {
+                $reservation->setUser(null);
+            }
+        }
+
+        return $this;
+        
+    }
+     /**
+     * @return Collection<int, Paiement>
+     */
+    public function getPaiements(): Collection
+    {
+        return $this->paiements;
+    }
+
+    public function addPaiement(Paiement $paiement): static
+    {
+        if (!$this->paiements->contains($paiement)) {
+            $this->paiements->add($paiement);
+            $paiement->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaiement(Paiement $paiement): static
+    {
+        if ($this->paiements->removeElement($paiement)) {
+            // set the owning side to null (unless already changed)
+            if ($paiement->getUserId() === $this) {
+                $paiement->setUserId(null);
+            }
+        }
+
+        return $this;
+    } 
+
 }

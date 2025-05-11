@@ -1,0 +1,10 @@
+.seat-images {
+    display: inline-flex;
+    gap: 4px;
+    vertical-align: middle;
+}
+
+.seat-icon {
+    width: 28px;
+    height: 28px;
+}

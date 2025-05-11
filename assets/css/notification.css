@@ -1,0 +1,26 @@
+form .invalid-feedback {
+    color: red;
+}
+.custom-notification {
+position: fixed;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+background-color:rgb(83, 195, 238); /* Red background (can be changed based on message type) */
+color: white;
+padding: 10px 20px;
+border-radius: 5px;
+font-size: 16px;
+box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+z-index: 9999;
+opacity: 1;
+transition: opacity 0.5s ease;
+}
+
+.custom-notification.rose {
+background-color: #ff9f9f; /* Light red for different notification */
+}
+
+.custom-notification.fade-out {
+opacity: 0;
+}

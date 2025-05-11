@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 /**
 * Template Name: Kelly - v2.1.1
 * Template URL: https://bootstrapmade.com/kelly-free-bootstrap-cv-resume-html-template/
@@ -1281,9 +1279,6 @@ section {
 #footer .credits a {
   color: #34b7a7;
 }
-=======
-=======
->>>>>>> tayssir
 /********** Template CSS **********/
 :root {
     --primary: #ba1b1b;
@@ -1536,6 +1531,12 @@ section {
     .about-text  {
         padding-right: calc(((100% - 1320px) / 2) + .75rem);
     }
+    .feature-text  {
+        padding-left: calc(((100% - 1320px) / 2) + .75rem);
+    }
+    .contact-page .contact-form  {
+        padding-left: calc(((100% - 1320px) / 2) + .75rem);
+    }
 }
 
 
@@ -1553,12 +1554,6 @@ section {
 @media (min-width: 1200px) {
     .feature-text  {
         padding-left: calc(((100% - 1140px) / 2) + .75rem);
-    }
-}
-
-@media (min-width: 1400px) {
-    .feature-text  {
-        padding-left: calc(((100% - 1320px) / 2) + .75rem);
     }
 }
 
@@ -1696,13 +1691,6 @@ section {
     }
 }
 
-@media (min-width: 1400px) {
-    .contact-page .contact-form  {
-        padding-left: calc(((100% - 1320px) / 2) + .75rem);
-    }
-}
-
-
 /*** Footer ***/
 .footer {
     background: linear-gradient(rgba(6, 3, 21, .5), rgba(6, 3, 21, .5)), url(../img/map.png) center center no-repeat;
@@ -1756,12 +1744,3 @@ section {
     font-size: 15px;
     border-top: 1px solid rgba(256, 256, 256, .1);
 }
-
-.footer .copyright a {
-    color: var(--light);
-<<<<<<< HEAD
-}
->>>>>>> 78df1d0b375aabdd442fded7d2b224fcae7e86a5
-=======
-}
->>>>>>> tayssir
