@@ -91,7 +91,7 @@ public function edit(Request $request, EntityManagerInterface $entityManager, in
     if ($form->isSubmitted() && $form->isValid()) {
         $entityManager->flush();
         $this->addFlash('success', 'Ligne updated successfully!');
-        return $this->redirectToRoute('ligne_list');
+        return $this->redirectToRoute('ligne_list_admin');
     }
 
     return $this->render('back-office/ligne/update.html.twig', [

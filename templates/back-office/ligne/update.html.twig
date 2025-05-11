@@ -1,6 +1,6 @@
 {% extends 'back-office/reclamation/backbase.html.twig' %}
 
-{% block title %}Modifier Ligne{% endblock %}
+{% block title %}Modifier la Ligne{% endblock %}
 
 {% block css %}
     {{ parent() }}
@@ -73,9 +73,11 @@
 {% block content %}
     <div class="container mt-4">
         <div class="form-container">
-            <h1>Modifier Ligne #{{ ligne.id }}</h1>
+            <h1>Modifier la Ligne #{{ ligne.id }}</h1>
 
             {{ form_start(form) }}
+
+                <!-- Champ Départ -->
                 <div class="mb-4">
                     {{ form_row(form.depart, {
                         'attr': {'class': 'form-control'},
@@ -83,6 +85,7 @@
                     }) }}
                 </div>
 
+                <!-- Champ Arrêt -->
                 <div class="mb-4">
                     {{ form_row(form.arret, {
                         'attr': {'class': 'form-control'},
@@ -90,17 +93,20 @@
                     }) }}
                 </div>
 
+                <!-- Champ Type -->
                 <div class="mb-4">
                     {{ form_row(form.type, {
                         'attr': {'class': 'form-control'},
-                        'label': 'Type'
+                        'label': 'Type de ligne'
                     }) }}
                 </div>
 
+                <!-- Boutons -->
                 <div class="submit-btn">
-                    <button type="submit" class="btn btn-primary">Update</button>
-                    <a href="{{ path('ligne_list_admin') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                    <a href="{{ path('ligne_list_admin') }}" class="btn btn-secondary">Annuler</a>
                 </div>
+
             {{ form_end(form) }}
         </div>
     </div>

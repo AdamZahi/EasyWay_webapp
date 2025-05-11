@@ -94,7 +94,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_user')]
     private Collection $reclamations;
 
-    
+    // by chiraz *************************************
     /**
      * @var Collection<int, Reservation>
      */
@@ -105,6 +105,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'user_id')]
     private Collection $paiements;
+    //*********************************************** */
 
 
     public function __construct()
@@ -282,6 +283,7 @@ public function setAdmin(?Admin $admin): static
 
         return $this;
     }
+    //  by chiraz ***********************
 
     /**
      * @return Collection<int, Reservation>
@@ -342,5 +344,6 @@ public function setAdmin(?Admin $admin): static
 
         return $this;
     } 
+    //************************************************** */
 
 }
