@@ -1,17 +1,133 @@
-{% extends 'front-office/test.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
-{% block content %}
-     
-            <h1>Reclamation Form</h1>
+{% block body %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-            {{ form_start(form) }}
-                {{ form_widget(form) }}
-                <button type="submit" class="btn-submit">Submit</button>
-            {{ form_end(form) }}
+    .form-container h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #444;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    .form-error {
+        color: red;
+        font-size: 0.85em;
+        margin-top: 5px;
+    }
+
+    .btn-submit {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .btn-submit:hover {
+        background-color: #0056b3;
+    }
+</style>
+<!-- Navbar Start -->
+    <!-- Navbar Start -->
+{% block navbar %}
+        {{ parent() }}
+    {% endblock %}
+<!-- Navbar End -->
+<div class="container mt-5">
+    <div class="card shadow p-4">
+        <h2 class="mb-4 text-center">Formulaire de réclamation</h2>
+
+        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
         
+        <div class="row">
+            {% for field in form %}
+                <div class="mb-3 col-md-6">
+                    {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(field) }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-3">
+            <button type="submit" class="btn btn-primary px-4">Ajouter</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='{{ path('chatbot') }}'">💬 Vous pouvez questionner l'AI</button>
+        </div>
+        
+        {{ form_end(form) }}
+    </div>
+</div>
+
+<!-- Affichage des réclamations -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Vos récente réclamations</h2>
+    {% for reclamation in reclamations %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <p><strong>Sujet :</strong> {{ reclamation.sujet }}</p>
+                <p><strong>Description :</strong> {{ reclamation.description }}</p>
+                <p><strong>Catégorie :</strong> {{ reclamation.categoryId.type }}</p>
+                <p><strong>Date de création :</strong> {{ reclamation.dateCreation|date('d/m/Y') }}</p>
+                
+                <hr>
+
+                <h6 class="mt-3 text-secondary">Réponses :</h6>
+                {% if reclamation.reponses is not empty %}
+                    <div class="list-group">
+                        {% for reponse in reclamation.reponses %}
+                            <div class="list-group-item">
+                                <p><strong>Contenu de la réponse :</strong> {{ reponse.contenu }}</p>
+                                <p><strong>Date de création :</strong> {{ reponse.createdAt|date('d/m/Y') }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Aucune réponse pour cette réclamation.</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
 {% endblock %}
-
-
 {% block javascripts %}
     {{ parent() }}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -25,4 +141,16 @@
             });
         });
     </script>
+
+
+    {% if showAlert %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (confirm("Réclamation ajoutée.\nVoulez-vous voir les réponses liées à cette réclamation ?")) {
+                window.location.href = "{{ path('admin_voir_reponses', {'id': reclamationId}) }}";
+            }
+        });
+    </script>
+{% endif %}
+
 {% endblock %}

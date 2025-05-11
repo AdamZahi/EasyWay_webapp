@@ -1,64 +1,136 @@
-{% extends 'front-office/front.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
-{% block title %}Ajouter Paiement{% endblock %}
+{% block title %}Confirmer Paiement | 🚍 Transport Local{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .form-control {
-            max-width: 100%;
-        }
-        .submit-btn {
-            margin-top: 20px;
-        }
-    </style>
+{% block css %}
+{{ parent() }}
+    <link href="{{ asset('css/add_paiement.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block main_content %}
-    <br><br><br><br><br><br>
-    <div class="container mt-4">
-        <div class="form-container">
-            <h2 class="text-center mb-4">Ajouter Paiement</h2>
+{% block body %}
+{% block navbar %}
+        {{ parent() }}
+    {% endblock %}
+<br>
+<div class="container mt-5">
+    <!-- Floating and Animated Title -->
+    <h1 class="text-center mb-4 text-primary floating-title" style="font-family: 'Roboto', sans-serif;">
+        🎉 Confirmer votre Paiement - Prêt(e) à embarquer ?
+    </h1>
+    <br>
+    <div class="card shadow-sm p-4">
+        <h2 class="text-center mb-4">
+            Montant à payer : <span class="text-danger">{{ montant }} TND</span> <br>
+            <span class="text-muted" style="font-size: 1.2rem;">Votre voyage commence ici !</span>
+        </h2>
 
-            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
+        <!-- Stripe Payment Form -->
+        <form id="payment-form" class="mt-4">
+            <div id="card-element"></div>
+            <div class="text-center mt-3">
+                <button id="submit" class="btn btn-primary px-5 py-3" style="font-size: 18px; border-radius: 25px;">
+                    💳 Payer et Embarquer !
+                </button>
+            </div>
+            <div id="card-errors" class="text-danger text-center mt-3"></div>
+            <!-- 🔽 New Button to View Payment List -->
+    <div class="text-center mt-4">
+        <a href="{{ path('paiement_list') }}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 20px;">
+            📄 Voir Mes Paiements
+        </a>
+    </div>
+        </form>
+    </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    {{ form_row(form.montant, {
-                        'attr': {
-                            'class': 'form-control',
-                            'placeholder': 'Montant'
-                        },
-                        'label': 'Montant',
-                        'row_attr': {'class': 'form-group'}
-                    }) }}
+    <div id="payment-status" class="text-center mt-4">
+        <!-- Status dynamique ici -->
+    </div>
+
+    <!-- Pricing Section Start -->
+    <div class="container-xxl py-5">
+        <div class="container py-5">
+            <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+                <h6 class="text-secondary text-uppercase">Nos Plans de Transport</h6>
+                <h1 class="mb-5">Choisissez votre Plan de Transport</h1>
+            </div>
+            <div class="row g-4">
+                <!-- New Pricing Plans -->
+                <div class="col-md-6 col-lg-4 wow fadeInUp pricing-card" data-wow-delay="0.3s">
+                    <div class="price-item">
+                        <div class="border-bottom p-4 mb-4">
+                            <h5 class="text-primary mb-1">Pass Mensuel</h5>
+                            <h1 class="display-5 mb-0">
+                                <small class="align-top" style="font-size: 22px; line-height: 45px;">TND</small>49.00<small
+                                    class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Mois</small>
+                            </h1>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <p><i class="fa fa-check text-success me-3"></i>Accès illimité aux bus</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Priorité sur certaines lignes</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Validité sur 30 jours</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Application mobile dédiée</p>
+                            <a class="btn-slide mt-2" href=""><i class="fa fa-arrow-right"></i><span >Commander Maintenant</span></a>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-md-6">
-                    {{ form_row(form.res_id, {
-                        'attr': {
-                            'class': 'form-control',
-                            'placeholder': 'Réservation'
-                        },
-                        'label': 'Réservation',
-                        'row_attr': {'class': 'form-group'}
-                    }) }}
+                <div class="col-md-6 col-lg-4 wow fadeInUp pricing-card" data-wow-delay="0.5s">
+                    <div class="price-item">
+                        <div class="border-bottom p-4 mb-4">
+                            <h5 class="text-primary mb-1">Pass Semaine</h5>
+                            <h1 class="display-5 mb-0">
+                                <small class="align-top" style="font-size: 22px; line-height: 45px;">TND</small>29.00<small
+                                    class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Semaine</small>
+                            </h1>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <p><i class="fa fa-check text-success me-3"></i>Accès illimité aux bus</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Validité sur 7 jours</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Suivi en temps réel via l'appli</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Accès aux stations principales</p>
+                            <a class="btn-slide mt-2" href=""><i class="fa fa-arrow-right"></i><span >Commander Maintenant</span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 wow fadeInUp pricing-card" data-wow-delay="0.7s">
+                    <div class="price-item">
+                        <div class="border-bottom p-4 mb-4">
+                            <h5 class="text-primary mb-1">Pass Quotidien</h5>
+                            <h1 class="display-5 mb-0">
+                                <small class="align-top" style="font-size: 22px; line-height: 45px;">TND</small>9.00<small
+                                    class="align-bottom" style="font-size: 16px; line-height: 40px;">/ Jour</small>
+                            </h1>
+                        </div>
+                        <div class="p-4 pt-0">
+                            <p><i class="fa fa-check text-success me-3"></i>Accès quotidien aux bus</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Réduction sur certains trajets</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Utilisable toute la journée</p>
+                            <p><i class="fa fa-check text-success me-3"></i>Valable sur toutes les lignes</p>
+                            <a class="btn-slide mt-2" href=""><i class="fa fa-arrow-right"></i><span >Commander Maintenant</span></a>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            {# Optional: If pay_id and user_id are hidden or auto-set in controller, skip rendering them. #}
-            {{ form_row(form.pay_id) }}
-            {{ form_row(form.user_id) }}
-
-            <div class="text-center submit-btn">
-                <button type="submit" class="btn btn-primary px-4">Payer</button>
-            </div>
-
-            {{ form_end(form) }}
         </div>
     </div>
+    <!-- Pricing Section End -->
+</div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+    window.paiementData = {
+        stripePublicKey: "{{ stripe_public_key }}",
+        clientSecret: "{{ clientSecret }}",
+        confirmUrl: "{{ path('paiement_confirm') }}",  // URL to the confirm route
+        redirectUrl: "{{ path('paiement_list') }}",   // Redirect after success
+        montant: {{ montant }}  // Amount to be paid
+    };
+</script>
+
+    <script src="{{ asset('js/add_paiement.js') }}"></script>
+{% endblock %}
+
 {% endblock %}

@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Entity\Reclamation;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
 
@@ -21,8 +21,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(name: "id_user", type: "integer")]
     private ?int $id_user = null;
     
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Reclamation::class)]
-    private Collection $reclamations;
     
 
 
@@ -88,10 +86,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'user', targetEntity: Admin::class, cascade: ['persist', 'remove'])]
     private ?Admin $admin = null;
 
+
+
+
+
+    /**
+     * @var Collection<int, Reclamation>
+     */
+    #[ORM\OneToMany(targetEntity: Reclamation::class, mappedBy: 'id_user')]
+    private Collection $reclamations;
+
+    // by chiraz *************************************
+    /**
+     * @var Collection<int, Reservation>
+     */
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'id_user')]
+    private Collection $reservations;
+    /**
+     * @var Collection<int, Paiement>
+     */
+    #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'user_id')]
+    private Collection $paiements;
+    //*********************************************** */
+
+
     public function __construct()
     {
         $this->photo_profil = 'default_profile.png';
         $this->reclamations = new ArrayCollection();
+        $this->reservations = new ArrayCollection();
+        $this->paiements = new ArrayCollection();       
+        $this->reservations = new ArrayCollection();
+        $this->paiements = new ArrayCollection();       
     }
 
     public function getIdUser(): ?int
@@ -153,6 +179,9 @@ public function setAdmin(?Admin $admin): static
         return $this;
     }
 
+    
+
+    
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -215,10 +244,11 @@ public function setAdmin(?Admin $admin): static
     }
 
     public function setPhotoProfil(?string $photo_profil): static
-    {
-        $this->photo_profil = $photo_profil ?? 'default_profile.png';
-        return $this;
-    }
+{
+    $this->photo_profil = $photo_profil ?? 'default_profile.png';
+    return $this;
+}
+
 
     public function getPassager(): ?Passager
     {
@@ -242,29 +272,84 @@ public function setAdmin(?Admin $admin): static
         return $this;
     }
 
+    /**
+     * @return Collection<int, Reclamation>
+     */
     public function getReclamations(): Collection
-{
-    return $this->reclamations;
-}
-
-public function addReclamation(Reclamation $reclamation): static
-{
-    if (!$this->reclamations->contains($reclamation)) {
-        $this->reclamations[] = $reclamation;
-        $reclamation->setUser($this);
+    {
+        return $this->reclamations;
     }
 
-    return $this;
-}
-
-public function removeReclamation(Reclamation $reclamation): static
-{
-    if ($this->reclamations->removeElement($reclamation)) {
-        if ($reclamation->getUser() === $this) {
-            $reclamation->setUser(null);
+    public function addReclamation(Reclamation $reclamation): static
+    {
+        if (!$this->reclamations->contains($reclamation)) {
+            $this->reclamations->add($reclamation);
+            $reclamation->setUser($this);
         }
+
+        return $this;
+    }
+    //  by chiraz ***********************
+
+    /**
+     * @return Collection<int, Reservation>
+     */
+    public function getReservations(): Collection
+    {
+        return $this->reservations;
     }
 
-    return $this;
-}
+    public function addReservation(Reservation $reservation): static
+    {
+        if (!$this->reservations->contains($reservation)) {
+            $this->reservations->add($reservation);
+            $reservation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReservation(Reservation $reservation): static
+    {
+        if ($this->reservations->removeElement($reservation)) {
+            // set the owning side to null (unless already changed)
+            if ($reservation->getUser() === $this) {
+                $reservation->setUser(null);
+            }
+        }
+
+        return $this;
+        
+    }
+     /**
+     * @return Collection<int, Paiement>
+     */
+    public function getPaiements(): Collection
+    {
+        return $this->paiements;
+    }
+
+    public function addPaiement(Paiement $paiement): static
+    {
+        if (!$this->paiements->contains($paiement)) {
+            $this->paiements->add($paiement);
+            $paiement->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removePaiement(Paiement $paiement): static
+    {
+        if ($this->paiements->removeElement($paiement)) {
+            // set the owning side to null (unless already changed)
+            if ($paiement->getUserId() === $this) {
+                $paiement->setUserId(null);
+            }
+        }
+
+        return $this;
+    } 
+    //************************************************** */
+
 }

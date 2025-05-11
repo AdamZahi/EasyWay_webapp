@@ -3,6 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Paiement;
+use App\Entity\Reservation;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -12,10 +15,7 @@ class PaiementType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('pay_id')
             ->add('montant')
-            ->add('res_id')
-            ->add('user_id')
         ;
     }
 

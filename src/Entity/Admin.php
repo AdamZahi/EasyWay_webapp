@@ -5,6 +5,9 @@ namespace App\Entity;
 use App\Repository\AdminRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 #[ORM\Entity(repositoryClass: AdminRepository::class)]
 class Admin
@@ -53,6 +56,27 @@ class Admin
         mimeTypesMessage: "Veuillez télécharger une image valide (JPEG, PNG, GIF)"
     )]
     private ?string $photo_profil = null;
+
+    /**
+     * @var Collection<int, Ligne>
+     */
+    #[ORM\OneToMany(targetEntity: Ligne::class, mappedBy: 'admin')]
+    private Collection $lignes;
+
+    
+    /**
+     * @var Collection<int, Station>
+     */
+    #[ORM\OneToMany(targetEntity: Station::class, mappedBy: 'admin')]
+    private Collection $stations;
+
+    public function __construct()
+    {
+        $this->lignes = new ArrayCollection();
+        $this->stations = new ArrayCollection();
+    }
+
+
 
     public function getIdAdmin(): ?int
     {
@@ -135,4 +159,63 @@ class Admin
         $this->photo_profil = $photo_profil;
         return $this;
     }
+    /**
+     * @return Collection<int, Ligne>
+     */
+    public function getLignes(): Collection
+    {
+        return $this->lignes;
+    }
+
+    public function addLigne(Ligne $ligne): static
+    {
+        if (!$this->lignes->contains($ligne)) {
+            $this->lignes->add($ligne);
+            $ligne->setAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLigne(Ligne $ligne): static
+    {
+        if ($this->lignes->removeElement($ligne)) {
+            // set the owning side to null (unless already changed)
+            if ($ligne->getAdmin() === $this) {
+                $ligne->setAdmin(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Station>
+     */
+    public function getStations(): Collection
+    {
+        return $this->stations;
+    }
+
+    public function addStation(Station $station): static
+    {
+        if (!$this->stations->contains($station)) {
+            $this->stations->add($station);
+            $station->setAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStation(Station $station): static
+    {
+        if ($this->stations->removeElement($station)) {
+            if ($station->getAdmin() === $this) {
+                $station->setAdmin(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

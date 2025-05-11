@@ -2,83 +2,161 @@
 
 {% block title %}Ajouter Réservation{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .form-control {
-            max-width: 100%;
-        }
-        .submit-btn {
-            margin-top: 20px;
-        }
-    </style>
+{% block css %}
+{{ parent() }}
+    <link href="{{ asset('css/add_reservation.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/seat_icon.css') }}" rel="stylesheet">
 {% endblock %}
-
 {% block main_content %}
-    <br><br><br><br><br><br>
-    <div class="container mt-4">
-        <div class="form-container">
-            <h2 class="text-center mb-4">Ajouter Réservation</h2>
+<div class="container mt-5">
+    <h1 class="mb-4 text-center">📋 Ajouter une Réservation</h1>
 
-            {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        {{ form_row(form.depart, {
-                            'attr': {
-                                'class': 'form-control',
-                                'placeholder': 'Départ'
-                            },
-                            'label': 'Départ',
-                            'row_attr': {'class': 'form-group'}
-                        }) }}
+    <div class="row g-4">
+        <!-- Form -->
+        <div class="col-md-6">
+            <div class="card shadow-sm p-4">
+                {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                <div class="mb-3">
+                    {{ form_label(form.depart) }}
+                    {{ form_widget(form.depart, {'attr': {'class': 'form-control', 'placeholder': 'Lieu de départ'}}) }}
+                    {{ form_errors(form.depart) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.arret) }}
+                    {{ form_widget(form.arret, {'attr': {'class': 'form-control', 'placeholder': 'Arrêt'}}) }}
+                    {{ form_errors(form.arret) }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Type de véhicule</label>
+                    <div class="vehicule-options">
+                        {% for choice in form.vehicule %}
+                            <div class="form-check">
+                                {{ form_widget(choice) }}
+                                {{ form_label(choice) }}
+                            </div>
+                        {% endfor %}
                     </div>
+                    {{ form_errors(form.vehicule) }} {# 🔴 Affichage global des erreurs ici #}
+                </div>
+                <div class="mb-3" style="display: none;">
+                    {{ form_widget(form.nb, {'attr': {'id': 'nb'}}) }}
+                    {{ form_errors(form.nb) }}
+                </div>
 
-                    <div class="col-md-6">
-                        {{ form_row(form.arret, {
-                            'attr': {
-                                'class': 'form-control',
-                                'placeholder': 'Arrêt'
-                            },
-                            'label': 'Arrêt',
-                            'row_attr': {'class': 'form-group'}
-                        }) }}
+                <div class="mb-3">
+                    <label class="form-label">Nombre de places</label>
+                    <div class="row">
+                        <div class="col">
+                            <div class="seat-card" data-value="1">
+                                <div class="seat-icons">
+                                    <img src="https://cdn3.emoji.gg/default/samsung/seat.png" alt="Seat">
+                                </div>
+                                <p>1 Place</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="seat-card" data-value="2">
+                                <div class="seat-icons">
+                                    <img src="https://cdn3.emoji.gg/default/samsung/seat.png" alt="Seat">
+                                    <img src="https://cdn3.emoji.gg/default/samsung/seat.png" alt="Seat">
+                                </div>
+                                <p>2 Places</p>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="seat-card" data-value="3">
+                                <div class="seat-icons">
+                                    <img src="https://cdn3.emoji.gg/default/samsung/seat.png" alt="Seat">
+                                    <img src="https://cdn3.emoji.gg/default/samsung/seat.png" alt="Seat">
+                                    <img src="https://cdn3.emoji.gg/default/samsung/seat.png" alt="Seat">
+                                </div>
+                                <p>3 Places</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        {{ form_row(form.vehicule, {
-                            'attr': {
-                                'class': 'form-control',
-                                'placeholder': 'Véhicule'
-                            },
-                            'label': 'Véhicule',
-                            'row_attr': {'class': 'form-group'}
-                        }) }}
-                    </div>
 
-                    <div class="col-md-6">
-                        {{ form_row(form.nb, {
-                            'attr': {
-                                'class': 'form-control',
-                                'placeholder': 'Nombre de places'
-                            },
-                            'label': 'Nombre de places',
-                            'row_attr': {'class': 'form-group'}
-                        }) }}
-                    </div>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary px-5 py-2">🚀 Réserver</button>
                 </div>
 
-                <div class="text-center submit-btn">
-                    <button type="submit" class="btn btn-primary px-4">Réserver</button>
-                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
 
-            {{ form_end(form) }}
+
+        <!-- Map Column -->
+        <div class="col-md-6">
+            <div class="card bg-primary text-white border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-0">
+                    <h4 class="card-title text-white">🗺️ Trouvez votre destination</h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="card-body p-0">
+                        <div id="map" style="height: 500px; width: 100%;"></div>
+                    </div>
+                    <div class="p-2 text-end">
+                        <a href="https://www.openstreetmap.org/?#map=7/36.726/8.789" class="text-white">🔍 Voir en grand</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+</div>
+<br><br><br><br><br><br>
+<!-- Reservation List -->
+    <h2 class="text-center mt-4">🗂️ Historique des Réservations</h2>
+    <div class="accordion" id="reservationAccordion">
+        {% for reservation in reservations %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ reservation.id }}">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ reservation.id }}" aria-expanded="true" aria-controls="collapse{{ reservation.id }}">
+                        <div class="d-flex align-items-center">
+                            {% set vehicule = reservation.vehicule|lower %}
+                            {% if vehicule == 'bus' %}
+                                <img src="{{ asset('img/vehicules/bus.png') }}" alt="Bus" width="32" class="me-3">
+                            {% elseif vehicule == 'metro' %}
+                                <img src="{{ asset('img/vehicules/metro.png') }}" alt="Metro" width="32" class="me-3">
+                            {% elseif vehicule == 'train' %}
+                                <img src="{{ asset('img/vehicules/train.png') }}" alt="Train" width="32" class="me-3">
+                            {% else %}
+                                <span class="me-3 fs-3">🚘</span>
+                            {% endif %}
+                            <h5 class="mb-0">{{ reservation.vehicule|capitalize }} - {{ reservation.depart }} → {{ reservation.arret }}</h5>
+                        </div>
+                    </button>
+                </h2>
+                <div id="collapse{{ reservation.id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ reservation.id }}" data-bs-parent="#reservationAccordion">
+                    <div class="accordion-body">
+                        <p><strong>Départ:</strong> {{ reservation.depart }}</p>
+                        <p><strong>Arrêt:</strong> {{ reservation.arret }}</p>
+                        <p><strong>Places:</strong> {{ reservation.nb }}</p>
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ path('reservation_edit', {'id': reservation.id}) }}" class="btn btn-outline-primary btn-sm px-3">✏️ Modifier</a>
+                            <a href="{{ path('reservation_delete', {'id': reservation.id}) }}" class="btn btn-outline-danger btn-sm px-3" onclick="return confirm('Êtes-vous sûr ?')">🗑️ Supprimer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-secondary text-center">
+                Aucune réservation trouvée.
+            </div>
+        {% endfor %}
+        <div class="text-center mt-5">
+            <a href="{{ path('reservation_list') }}" class="btn btn-primary px-5 py-2">>👁️ Voir toutes les réservations</a>
+        </div>
+    </div>
+
 {% endblock %}

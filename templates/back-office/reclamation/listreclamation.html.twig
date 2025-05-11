@@ -6,20 +6,18 @@
     <div class="container mt-4">
         <h1 class="text-center">Liste des Réclamations</h1>
 
-        <form method="get" action="{{ path('admin_search_reclamation') }}" class="mb-3">
-    <input type="text" name="q" class="form-control" id="searchInput" placeholder="Rechercher une réclamation..." onkeyup="fetchResults()">
-</form>
-
-
-<form method="get" action="{{ path('admin_reclamations') }}" class="form-inline mb-3">
-    <label for="statut" class="mr-2">Filtrer par statut :</label>
-    <select name="statut" id="statut" class="form-control" onchange="this.form.submit()">
+      <form method="get" action="{{ path('admin_reclamations') }}" class="form-inline mb-3">
+    <input type="text" name="q" class="form-control mb-2" id="searchInput" placeholder="Rechercher une réclamation..." onkeyup="fetchResults()" />
+    
+    <label for="statut" class="mr-2 ml-3">Filtrer par statut :</label>
+    <select name="statut" id="statut" class="form-control" onchange="fetchResults()">
         <option value="">-- Tous les statuts --</option>
-        <option value="en_attente" {{ selected_statut == 'en_attente' ? 'selected' : '' }}>en attente</option>
+        <option value="en_attente" {{ selected_statut == 'en_attente' ? 'selected' : '' }}>En attente</option>
         <option value="en_cours" {{ selected_statut == 'en_cours' ? 'selected' : '' }}>En cours</option>
         <option value="Terminer" {{ selected_statut == 'Terminer' ? 'selected' : '' }}>Terminer</option>
     </select>
 </form>
+
 
 
 
@@ -34,7 +32,7 @@
                     <th>Status</th>
                     <th><a href="#" onclick="sortTable(5)">Date ⬍</a></th>
                     <th>Réponse</th>
-                    <th>Actions</th>
+                  {#  <th>Actions</th> #}
                 </tr>
 </thead>
 
@@ -59,21 +57,21 @@
                                 Voir Réponses >>
                             </a>
                         </td>
-                        <td>
+                      {#    <td>
                             <!-- Bouton Modifier -->
-                          {#   <a href="{{ path('reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning btn-sm">
+                           <a href="{{ path('reclamation_edit', {'id': reclamation.id}) }}" class="btn btn-warning btn-sm">
                                 ✏ Modifier
-                            </a>  #}
+                            </a>  
 
                             <!-- Bouton Supprimer -->
-                            <form action="{{ path('reclamation_delete', {'id': reclamation.id}) }}" method="post" style="display:inline;">
+                           <form action="{{ path('reclamation_delete', {'id': reclamation.id}) }}" method="post" style="display:inline;">
                                 <input type="hidden" name="_method" value="DELETE">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reclamation.id) }}">
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réclamation ?');">
                                     🗑 Supprimer
                                 </button>
                             </form>
-                        </td>
+                        </td> #}
                     </tr>
                 {% else %}
                     <tr>
@@ -100,17 +98,23 @@
       <!-- Script pour la recherche dynamique -->
    <script>
     function fetchResults() {
-        let query = document.getElementById('searchInput').value;
+    let query = document.getElementById('searchInput').value;
+    let statut = document.getElementById('statut').value;
 
-        fetch(`{{ path('admin_search_reclamation') }}?q=${encodeURIComponent(query)}`)
-            .then(response => response.text())
-            .then(html => {
-                let parser = new DOMParser();
-                let doc = parser.parseFromString(html, 'text/html');
-                let newTable = doc.querySelector("tbody"); // Récupère les nouvelles données
-                document.querySelector("tbody").innerHTML = newTable.innerHTML; // Met à jour la table
-            });
-    }
+    fetch(`/list?q=${encodeURIComponent(query)}&statut=${encodeURIComponent(statut)}`)
+        .then(response => response.text())
+        .then(html => {
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(html, 'text/html');
+            let newTable = doc.querySelector("tbody");
+
+            if (newTable) {
+                document.querySelector("tbody").innerHTML = newTable.innerHTML;
+            }
+        });
+}
+
+
 
     function sortTable(columnIndex) {
     let table = document.querySelector("table tbody");

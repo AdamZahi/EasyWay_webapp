@@ -1,0 +1,89 @@
+   /* Floating title style */
+   .floating-title {
+    position: relative;
+    animation: floatAnimation 3s ease-in-out infinite;
+}
+
+@keyframes floatAnimation {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);  /* Move upwards */
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+/* Card Styling */
+.price-item {
+    background-color: #fff; /* White background for the card */
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    padding: 30px 25px;
+    overflow: hidden;
+    border: 1px solid #ddd; /* Light border to define card */
+}
+
+.price-item h5 {
+    color: #e50914; /* Red color for headings to match the overall style */
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+}
+
+.price-item h1 {
+    color: #333; /* Darker color for the price */
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.price-item h1 small {
+    font-size: 1.2rem;
+}
+
+.price-item .p-4 {
+    padding: 30px 25px;
+    color: #333; /* Dark color for the text */
+}
+
+.price-item .p-4 p {
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    font-weight: 500;
+}
+
+/* Button Styling */
+.btn-slide {
+    display: inline-flex;
+    align-items: center;
+    background-color: #0056b3; /* Blue button */
+    color: #fff;
+    padding: 10px 20px; /* Reduced padding to make button slimmer */
+    border-radius: 30px; /* Rounded corners */
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    text-decoration: none;
+    font-weight: 600; /* Bold text for clarity */
+}
+
+.btn-slide:hover {
+    background-color: #007bff; /* Darker blue when hovered */
+    transform: translateY(-3px); /* Slight lift effect on hover */
+}
+
+/* Hover Effects for Cards */
+.price-item:hover {
+    transform: scale(1.05); /* Slightly larger when hovered */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* More prominent shadow on hover */
+}
+
+.price-item:hover .btn-slide {
+    background-color: #007bff; /* Darker blue when hovered */
+    color: #fff;
+    transform: translateY(-3px); /* Slight lift effect */
+}
+

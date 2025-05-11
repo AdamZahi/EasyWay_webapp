@@ -1,8 +1,11 @@
-{% extends 'front-office/front.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
 {% block title %}Lignes{% endblock %}
 
-{% block main_content %}
+{% block body %}
+{% block navbar %}
+        {{ parent() }}
+    {% endblock %}
 <br><br><br><br><br><br>
     <div class="container mt-4">
         <h1>Lignes</h1>
@@ -14,7 +17,6 @@
         <table class="table table-striped" border="1">
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>DEPART</th>
                     <th>ARRET</th>
                     <th>TYPE</th>
@@ -25,7 +27,6 @@
             <tbody>
                 {% for ligne in lignes %}
                     <tr>
-                        <td>{{ ligne.id }}</td>
                         <td>{{ ligne.depart }}</td>
                         <td>{{ ligne.arret }}</td>
                         <td>{{ ligne.type }}</td>

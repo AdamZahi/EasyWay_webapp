@@ -1,0 +1,55 @@
+{% extends 'back-office/reclamation/backbase.html.twig' %}
+
+{% block title %}Lignes{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Liste des Lignes</h1>
+
+        <!-- Messages Flash -->
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        <!-- Tableau des lignes -->
+        <div class="table-responsive">
+            <table class="table table-striped align-middle text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Départ</th>
+                        <th>Arrêt</th>
+                        <th>Type</th>
+                        <th>Administrateur</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ligne in lignes %}
+                        <tr>
+                            <td>{{ ligne.depart }}</td>
+                            <td>{{ ligne.arret }}</td>
+                            <td>{{ ligne.type }}</td>
+                            <td>{{ ligne.admin.nom }}</td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ path('ligne_edit', {'id': ligne.id}) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+                                    <a href="{{ path('ligne_delete', {'id': ligne.id}) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette ligne ?')">Supprimer</a>
+                                    <a href="{{ path('station_add', {'id_admin': ligne.admin.idAdmin,'id_ligne': ligne.id}) }}" class="btn btn-sm btn-outline-success">Ajouter une station</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune ligne trouvée.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Boutons d'action globaux -->
+        <div class="d-flex justify-content-end mt-4 gap-3">
+            <a href="{{ path('ligne_add') }}" class="btn btn-primary">Ajouter une nouvelle ligne</a>
+        </div>
+    </div>
+{% endblock %}
