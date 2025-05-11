@@ -1,4 +1,4 @@
-{% extends 'front-office/front.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
 {% block title %}Modifier Réservation{% endblock %}
 
@@ -7,7 +7,10 @@
 <link href="{{ asset('css/update_reservation.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block main_content %}
+{% block body %}
+{% block navbar %}
+        {{ parent() }}
+    {% endblock %}
 <br><br><br><br><br><br>
 <div class="container mt-5">
     <div class="row justify-content-center">

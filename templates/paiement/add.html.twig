@@ -1,4 +1,4 @@
-{% extends 'front-office/front.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
 {% block title %}Confirmer Paiement | 🚍 Transport Local{% endblock %}
 
@@ -7,7 +7,10 @@
     <link href="{{ asset('css/add_paiement.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block main_content %}
+{% block body %}
+{% block navbar %}
+        {{ parent() }}
+    {% endblock %}
 <br>
 <div class="container mt-5">
     <!-- Floating and Animated Title -->

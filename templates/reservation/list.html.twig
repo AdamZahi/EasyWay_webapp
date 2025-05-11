@@ -1,11 +1,14 @@
-{% extends 'front-office/front.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
 {% block title %}Reservations{% endblock %}
 {% block css %}
 {{ parent() }}
         <link href="{{ asset('css/seat_icon2.css') }}" rel="stylesheet">
 {% endblock %}
-{% block main_content %}
+{% block body %}
+{% block navbar %}
+        {{ parent() }}
+    {% endblock %}
 <br><br><br><br><br><br>
 <div class="container mt-4">
     <h1 class="mb-4">📋 Mes Réservations</h1>

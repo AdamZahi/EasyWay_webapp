@@ -1,4 +1,4 @@
-{% extends 'front-office/front.html.twig' %}
+{% extends 'front-office/index.html.twig' %}
 
 {% block title %}Mes Paiements{% endblock %}
 
@@ -7,7 +7,10 @@
     <link href="{{ asset('css/list_paiement.css') }}" rel="stylesheet">
 {% endblock %}
 
-{% block main_content %}
+{% block body %}
+{% block navbar %}
+        {{ parent() }}
+    {% endblock %}
 <br><br><br>
 <div class="container mt-4">
     <h1 class="mb-4">💳 Historique de Paiements</h1>

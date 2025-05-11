@@ -29,7 +29,7 @@
                             <td>{{ station.nom }}</td>
                             <td>{{ station.localisation }}</td>
                             <td>{{ station.ligne.depart }}</td>
-                            <td>{{ station.admin.nom }}</td>
+                            <td>{{ station.admin.nom }} {{ station.admin.prenom }}</td>
                             <td>
                                 <div class="d-flex justify-content-center gap-2">
                                     <a href="{{ path('station_edit', {'id': station.id}) }}" class="btn btn-sm btn-outline-primary">Modifier</a>
